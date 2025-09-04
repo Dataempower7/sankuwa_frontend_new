@@ -1,0 +1,1 @@
+import{s as r}from"./index-BLXOA87U.js";const a=e=>r({url:"salesman/overview/coreSummary",method:"get",params:e}),t=e=>r({url:"salesman/overview/coreTrend",method:"get",params:e}),n=e=>r({url:"salesman/salesman/ranking",method:"get",params:e}),o=e=>r({url:"salesman/product/analysis",method:"get",params:e});export{n as a,o as b,t as c,a as g};

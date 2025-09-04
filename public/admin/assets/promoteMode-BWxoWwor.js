@@ -1,0 +1,1 @@
+import{s}from"./index-BLXOA87U.js";const n=()=>s({url:"salesman/config/detail?code=salesmanConfig",method:"get"}),o=e=>s({url:"salesman/config/save?code=salesmanConfig",method:"post",data:e});export{n as g,o as s};

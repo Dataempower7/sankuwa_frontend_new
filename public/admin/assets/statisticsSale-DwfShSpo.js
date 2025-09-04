@@ -1,0 +1,1 @@
+import{s as t}from"./index-BLXOA87U.js";const a=e=>t({url:"panel/salesStatistics/salesDetail",method:"get",params:e}),l=e=>t({url:"panel/salesStatistics/salesProductDetail",method:"get",params:e}),r=e=>t({url:"panel/salesStatistics/salesProductDetail",method:"get",responseType:"arraybuffer",data:e});export{l as a,r as e,a as g};
