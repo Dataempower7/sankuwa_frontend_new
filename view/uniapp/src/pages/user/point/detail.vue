@@ -1,9 +1,12 @@
 <template>
     <tig-layout title="积分明细">
         <view class="top-card">
-            <view class="balance-row"> {{ $t("我的积分") }} </view>
-            <view class="amount-row">
-                {{ userStore.userInfo.points }}
+            <image class="card-bg" src="/static/images/common/integral.png" mode="aspectFill"></image>
+            <view class="card-content">
+                <view class="balance-row"> {{ $t("我的积分") }} </view>
+                <view class="amount-row">
+                    {{ userStore.userInfo.points }}
+                </view>
             </view>
         </view>
         <view v-if="filterState.length > 0" class="log-main">
@@ -27,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed } from "vue";
+import { reactive } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import type { AccountFilterParams } from "@/types/user/account";
 import { getPointList } from "@/api/user/point";
@@ -35,6 +38,7 @@ import type { PointFilterState } from "@/types/user/point";
 import { staticResource } from "@/utils";
 import { useUserStore } from "@/store/user";
 import { useList } from "@/hooks";
+
 
 const userStore = useUserStore();
 
@@ -61,37 +65,50 @@ onLoad(async () => {
     await getList();
 });
 
-const topCardBg = computed(() => {
-    return `url(${staticResource("user/background2.png")})`;
-});
+
 </script>
 <style lang="scss" scoped>
 .top-card {
-    background: v-bind(topCardBg);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
+    position: relative;
     border-radius: 5px;
     margin: 10px;
-    color: #fff;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    padding: 40rpx;
+    overflow: hidden;
 
-    .balance-row,
-    .amount-row,
-    .button-row {
-        margin: 25rpx 30px 0;
+    .card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        border-radius: 35rpx;
     }
 
-    .balance-row {
-        font-size: 36rpx;
-    }
+    .card-content {
+        position: relative;
+        top: -20px;
+        right: 55rpx;
+        z-index: 2;
+        color: #fff;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        padding: 40rpx;
 
-    .amount-row {
-        font-size: 52rpx;
-        font-weight: 400;
+        .balance-row,
+        .amount-row,
+        .button-row {
+            margin: 25rpx 30px 0;
+        }
+
+        .balance-row {
+            font-size: 40rpx;
+        }
+
+        .amount-row {
+            font-size: 52rpx;
+            font-weight: 400;
+        }
     }
 }
 .log-main {

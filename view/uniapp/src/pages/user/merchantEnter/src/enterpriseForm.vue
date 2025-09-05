@@ -32,7 +32,7 @@
                                 <up-textarea
                                     v-model="firstForm.businessScope"
                                     input-align="right"
-                                    height="48"
+                                    height="28"
                                     :placeholder="$t('请输入经营范围')"
                                     border="none"
                                 />
@@ -44,7 +44,7 @@
                                 <view>
                                     <view class="certificate-validity-item">
                                         <up-radio-group v-model="firstForm.operatingTermType" placement="column" @change="getValidity">
-                                            <up-radio active-color="var(--general)" shape="circle" :name="1" :label="$t('区间有效')" />
+                                            <up-radio active-color=" #3744b2" shape="circle" :name="1" :label="$t('区间有效')" />
                                         </up-radio-group>
                                         <view class="validity-item-text">
                                             <uni-datetime-picker
@@ -58,7 +58,7 @@
 
                                     <view class="certificate-validity-item">
                                         <up-radio-group v-model="firstForm.operatingTermType" placement="column" @change="getValidity">
-                                            <up-radio active-color="var(--general)" shape="circle" :name="2" :label="$t('长期有效')" />
+                                            <up-radio active-color=" #3744b2" shape="circle" :name="2" :label="$t('长期有效')" />
                                         </up-radio-group>
                                         <view class="period_end-box">
                                             <view style="width: 70%">
@@ -86,8 +86,8 @@
                             <up-form-item :required="true" :label="$t('性别') + '：'" prop="sex">
                                 <view class="sex-box">
                                     <up-radio-group v-model="firstForm.sex" style="width: 485rpx; justify-content: end" placement="row">
-                                        <up-radio style="padding-right: 15rpx" active-color="var(--general)" shape="circle" :name="1" :label="$t('男')" />
-                                        <up-radio active-color="var(--general)" shape="circle" :name="2" :label="$t('女')" />
+                                        <up-radio style="padding-right: 15rpx" active-color=" #3744b2" shape="circle" :name="1" :label="$t('男')" />
+                                        <up-radio active-color=" #3744b2" shape="circle" :name="2" :label="$t('女')" />
                                     </up-radio-group>
                                 </view>
                             </up-form-item>
@@ -121,7 +121,7 @@
                                 <view>
                                     <view class="certificate-validity-item">
                                         <up-radio-group v-model="firstForm.certificateValidityPeriod" placement="column" @change="getValidity">
-                                            <up-radio active-color="var(--general)" shape="circle" :name="1" :label="$t('区间有效')" />
+                                            <up-radio active-color=" #3744b2" shape="circle" :name="1" :label="$t('区间有效')" />
                                         </up-radio-group>
                                         <view class="validity-item-text">
                                             <uni-datetime-picker
@@ -135,7 +135,7 @@
 
                                     <view class="certificate-validity-item">
                                         <up-radio-group v-model="firstForm.certificateValidityPeriod" placement="column" @change="getValidity">
-                                            <up-radio active-color="var(--general)" shape="circle" :name="2" :label="$t('长期有效')" />
+                                            <up-radio active-color=" #3744b2" shape="circle" :name="2" :label="$t('长期有效')" />
                                         </up-radio-group>
                                         <view class="period_end-box">
                                             <view style="width: 70%">
@@ -280,7 +280,7 @@
                 <view class="status-box">
                     <view class="status-text">
                         <template v-if="formData.status == 1">
-                            <view> {{ $t("申请已受理") }}（{{ formData.addTime }}），{{ $t("将在1-3个工作日内完成审核。以下为本次申请内容") }}：</view>
+                            <view style="color: #EAA034"> {{ $t("申请已受理") }}（{{ formData.addTime }}）,{{ $t("将在1-3个工作日内完成审核。以下为本次申请内容") }}：</view>
                         </template>
                         <!-- <template v-if="formData.status == 10">
                             <view
@@ -290,11 +290,11 @@
                             <view v-if="formData.auditRemark"> {{ $t("备注") }}：{{ formData.auditRemark }} </view>
                         </template> -->
                         <template v-if="formData.status == 20">
-                            <view>
+                            <view >
                                 {{ $t("很遗憾") }}，{{ $t("您的申请审核") }}<text class="specaial-text">{{ $t("未通过") }}</text
                                 >。</view
                             >
-                            <div v-if="formData.auditRemark">{{ $t("备注") }}：{{ formData.auditRemark }}</div>
+                            <div v-if="formData.auditRemark" >{{ $t("备注") }}：{{ formData.auditRemark }}</div>
                             <view>{{ $t("重新审核") }} </view>
                         </template>
                     </view>
@@ -470,20 +470,20 @@
             <template v-if="currentStep < stepList?.length - 1">
                 <tig-fixed-placeholder background-color="#fff">
                     <template v-if="currentStep == 1">
-                        <view class="btn-box">
-                            <tig-button @click="handlBtn('next')">{{ $t("下一步") }} </tig-button>
+                        <view class="btn-box" >
+                            <tig-button style="background-color: #3544BA;border-color: #3544BA;" @click="handlBtn('next')">{{ $t("下一步") }} </tig-button>
                         </view>
                     </template>
                     <template v-else>
                         <view class="btn-box-tow">
                             <template v-if="currentStep > 1">
-                                <tig-button plain style="width: 45%; font-size: 28rpx" @click="handlBtn('pre')">{{ $t("上一步") }} </tig-button>
+                                <tig-button plain style=" width: 45%; font-size: 28rpx" @click="handlBtn('pre')">{{ $t("上一步") }} </tig-button>
                             </template>
                             <template v-if="currentStep > 1 && currentStep < stepList?.length - 2">
-                                <tig-button style="width: 45%; font-size: 28rpx" @click="handlBtn('next')">{{ $t("下一步") }} </tig-button>
+                                <tig-button style="background-color: #3544BA;border-color: #3544BA; width: 45%; font-size: 28rpx" @click="handlBtn('next')">{{ $t("下一步") }} </tig-button>
                             </template>
                             <template v-else>
-                                <tig-button style="width: 45%; font-size: 28rpx" @click="handlBtn('submit')">{{ $t("提交") }} </tig-button>
+                                <tig-button style="background-color: #3544BA;border-color: #3544BA; width: 45%; font-size: 28rpx" @click="handlBtn('submit')">{{ $t("提交") }} </tig-button>
                             </template>
                         </view>
                     </template>
@@ -493,7 +493,7 @@
             <template v-if="formData.status == 20 && !isReapply">
                 <tig-fixed-placeholder background-color="#fff">
                     <view class="btn-box">
-                        <tig-button @click="handlReapply">{{ $t("重新申请") }} </tig-button>
+                        <tig-button style="background-color: #3544BA;border-color: #3544BA;" @click="handlReapply">{{ $t("重新申请") }} </tig-button>
                     </view>
                 </tig-fixed-placeholder>
             </template>
@@ -984,19 +984,55 @@ const handlReapply = () => {
 
 <style>
 .form-box :deep(.uni-datetime-picker--btn) {
-    background-color: var(--general);
+    background-color: #3744b2;
 }
 .form-box :deep(.uni-calendar-item__weeks-box .uni-calendar-item--checked) {
-    background-color: var(--general);
+    background-color: #3443B7;
 }
 .form-box :deep(.uni-calendar-item--multiple .uni-calendar-item--after-checked) {
-    background-color: var(--general);
+    background-color: #3443B7
 }
 .form-box .special-item :deep(.u-form-item__body) {
     padding-bottom: 5px;
 }
 .form-box .noflex :deep(.u-form-item__body__right__content__slot) {
     display: block;
+}
+</style>
+
+<style>
+/* 全局样式确保输入框右对齐 */
+.form-box .u-input__content__field-wrapper__field,
+.form-box .u-input input,
+.form-box .uni-input-input,
+.form-box input {
+    text-align: right !important;
+}
+
+.form-box .u-textarea__content__field,
+.form-box .u-textarea textarea,
+.form-box .uni-textarea-textarea,
+.form-box textarea {
+    text-align: right !important;
+}
+
+/* 全局按钮样式 */
+.btn-box .u-button,
+.btn-box-tow .u-button,
+.btn-box .tig-button .u-button,
+.btn-box-tow .tig-button .u-button {
+    background-color: #3544BA !important;
+    border-color: #3544BA !important;
+    color: #ffffff !important;
+}
+
+.btn-box .u-button--plain,
+.btn-box-tow .u-button--plain,
+.btn-box .tig-button .u-button--plain,
+.btn-box-tow .tig-button .u-button--plain {
+    background-color: transparent !important;
+    border-color: #3544BA !important;
+    color: #3544BA !important;
 }
 </style>
 
@@ -1041,6 +1077,45 @@ const handlReapply = () => {
 .btn-box {
     padding: 25rpx;
     font-size: 28rpx;
+
+    /* 修改按钮颜色 - 使用多种选择器确保兼容性 */
+    :deep(.u-button),
+    :deep(.u-button__content),
+    :deep(.tig-button),
+    :deep(.tig-button .u-button) {
+        background-color: #3544BA !important;
+        border-color: #3544BA !important;
+        color: #ffffff !important;
+
+        &:hover {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+        }
+
+        &:active {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+            transform: scale(0.98);
+        }
+    }
+
+    /* 朴素按钮样式 */
+    :deep(.u-button--plain),
+    :deep(.u-button.u-button--plain),
+    :deep(.tig-button .u-button--plain) {
+        background-color: transparent !important;
+        border-color: #3544BA !important;
+        color: #3544BA !important;
+
+        &:hover {
+            background-color: rgba(53, 68, 186, 0.1) !important;
+        }
+
+        &:active {
+            background-color: rgba(53, 68, 186, 0.2) !important;
+            transform: scale(0.98);
+        }
+    }
 }
 
 .btn-box-tow {
@@ -1050,14 +1125,55 @@ const handlReapply = () => {
     justify-content: space-between;
     height: 100%;
     font-size: 28rpx;
+
+    /* 修改按钮颜色 - 使用多种选择器确保兼容性 */
+    :deep(.u-button),
+    :deep(.u-button__content),
+    :deep(.tig-button),
+    :deep(.tig-button .u-button) {
+        background-color: #3544BA !important;
+        border-color: #3544BA !important;
+        color: #ffffff !important;
+
+        &:hover {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+        }
+
+        &:active {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+            transform: scale(0.98);
+        }
+    }
+
+    /* 朴素按钮样式 */
+    :deep(.u-button--plain),
+    :deep(.u-button.u-button--plain),
+    :deep(.tig-button .u-button--plain) {
+        background-color: transparent !important;
+        border-color: #3544BA !important;
+        color: #3544BA !important;
+
+        &:hover {
+            background-color: rgba(53, 68, 186, 0.1) !important;
+        }
+
+        &:active {
+            background-color: rgba(53, 68, 186, 0.2) !important;
+            transform: scale(0.98);
+        }
+    }
 }
 
 .status-box {
-    background: none repeat scroll 0 0 #fffdee;
-    border: 1px solid #edd28b;
+    background: none repeat scroll 0 0 #FFF6E9;
+    border: 1px solid #EAA034;
     padding: 20rpx;
     font-size: 28rpx;
     margin: 20rpx 20rpx;
+    border-radius: 35rpx;
+
     .status-text {
         padding-bottom: 15rpx;
         &:last-child {
@@ -1067,14 +1183,44 @@ const handlReapply = () => {
 }
 
 .specaial-text {
-    color: var(--general);
+    color: black;
 }
 
 .form-box {
     background-color: #fff;
-    border-radius: 20rpx;
+    border-radius: 35rpx;
     padding: 20rpx 30rpx;
     margin: 20rpx;
+
+    /* 为输入框添加下划线样式 */
+    :deep(.u-form-item__body__right__content__slot) {
+        border-bottom: 1rpx solid #e9ecef;
+        padding-bottom: 10rpx;
+    }
+
+    /* 输入框右对齐样式 - 多种选择器确保兼容性 */
+    :deep(.u-input__content__field-wrapper__field),
+    :deep(.u-input__content__field-wrapper input),
+    :deep(.u-input input),
+    :deep(.uni-input-input),
+    :deep(input) {
+        text-align: right !important;
+    }
+
+    /* textarea右对齐样式 */
+    :deep(.u-textarea__content__field),
+    :deep(.u-textarea textarea),
+    :deep(.uni-textarea-textarea),
+    :deep(textarea) {
+        text-align: right !important;
+    }
+
+    /* 显示文本右对齐 */
+    :deep(.type-text),
+    :deep(.u-form-item__body__right__content__slot) {
+        text-align: right !important;
+        justify-content: flex-end !important;
+    }
     .type-text {
         width: 100%;
         display: flex;
@@ -1128,7 +1274,7 @@ const handlReapply = () => {
             display: inline-block;
             width: 6rpx;
             height: 30rpx;
-            background: var(--general);
+            background: #3744b2;
             border-radius: 3rpx;
             margin-right: 10rpx;
         }

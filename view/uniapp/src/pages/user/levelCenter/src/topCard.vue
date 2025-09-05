@@ -7,38 +7,41 @@
                     <swiper-item v-if="item?.rankCardType === 1" class="card_swiper_item">
                         <view class="card_item" :class="item?.rankIco">
                             <view class="level_name_wrap">
-                                <view class="level_name">{{ item?.rankName }}</view>
-                                <view class="level_expiry">{{ $t("当前等级有效期至") + " " + rankExpireTime }}</view>
+                                <view class="level_title_row">
+                                    <image class="level_icon" :src="item?.rankLogo" mode="aspectFit"></image>
+                                    <view class="level_name" :class="{ 'current-level': item?.rankLevel === userInfo.rankLevel }" :style="getRankNameStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ item?.rankName }}</view>
+                                </view>
+                                <view class="level_expiry" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("当前等级有效期至") + " " + rankExpireTime }}</view>
                             </view>
                             <view v-if="item?.rankLevel === userInfo.rankLevel" class="card_badge">{{ $t("当前等级") }}</view>
                             <!-- <view class="card_code_icon" v-if="item?.rank_level === userInfo.rank_level"></view> -->
-                            <view class="card_bottom">
+                            <view class="card_bottom" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">
                                 <!-- 成长值模式 -->
                                 <template v-if="userInfo.rankType === 1">
                                     <view v-if="item?.rankLevel === userInfo.rankLevel" class="level_value_wapper">
-                                        <text class="level_value">{{ userInfo?.growthPoints }}</text>
-                                        <text class="desc">{{ $t("成长值") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ userInfo?.growthPoints }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("成长值") }}</text>
                                     </view>
                                     <view v-else class="upgrades_wapper">
-                                        <text class="desc">{{ $t("再获得") }}</text>
-                                        <text class="level_value">{{
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("再获得") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{
                                             item?.minGrowthPoints - userInfo.growth < 0 ? 0 : item?.minGrowthPoints - userInfo.growth
                                         }}</text>
-                                        <text class="desc"> {{ $t("成长值升级为该等级") }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)"> {{ $t("成长值升级为该等级") }}</text>
                                     </view>
                                 </template>
                                 <!-- 消费模式 -->
                                 <template v-if="userInfo.rankType === 2">
                                     <view v-if="item?.rankLevel === userInfo.rankLevel" class="level_value_wapper">
-                                        <text class="level_value">{{ userInfo?.growthPoints }}</text>
-                                        <text class="desc">{{ $t("成长值") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ userInfo?.growthPoints }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("成长值") }}</text>
                                     </view>
                                     <view v-else class="upgrades_wapper">
-                                        <text class="desc">{{ $t("再消费") }}</text>
-                                        <text class="level_value">{{
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("再消费") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{
                                             item?.minGrowthPoints - userInfo.growth < 0 ? 0 : item?.minGrowthPoints - userInfo.growth
                                         }}</text>
-                                        <text class="desc"> {{ $t("元升级为该等级") }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)"> {{ $t("元升级为该等级") }}</text>
                                     </view>
                                 </template>
                             </view>
@@ -48,38 +51,41 @@
                     <swiper-item v-if="item?.rankCardType === 2" class="card_swiper_item">
                         <view class="card_item" :style="`background-image: url(${item?.rankBg});`">
                             <view class="level_name_wrap">
-                                <view class="level_name">{{ item?.rankName }}</view>
-                                <view class="level_expiry">{{ $t("当前等级有效期至") + " " + rankExpireTime }}</view>
+                                <view class="level_title_row">
+                                    <image class="level_icon" :src="item?.rankLogo" mode="aspectFit"></image>
+                                    <view class="level_name" :style="getRankNameStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ item?.rankName }}</view>
+                                </view>
+                                <view class="level_expiry" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("当前等级有效期至") + " " + rankExpireTime }}</view>
                             </view>
                             <view v-if="item?.rankLevel === userInfo.rankLevel" class="card_badge">{{ $t("当前等级") }}</view>
                             <view v-if="item?.rankLevel === userInfo.rankLevel" class="card_code_icon" />
-                            <view class="card_bottom">
+                            <view class="card_bottom" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">
                                 <!-- 成长值模式 -->
                                 <template v-if="userInfo.rankType === 1">
                                     <view v-if="item?.rankLevel === userInfo.rankLevel" class="level_value_wapper">
-                                        <text class="level_value">{{ userInfo?.growthPoints }}</text>
-                                        <text class="desc">{{ $t("成长值") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ userInfo?.growthPoints }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("成长值") }}</text>
                                     </view>
                                     <view v-else class="upgrades_wapper">
-                                        <text class="desc">{{ $t("再获得") }}</text>
-                                        <text class="level_value">{{
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("再获得") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{
                                             item?.minGrowthPoints - userInfo.growth < 0 ? 0 : item?.minGrowthPoints - userInfo.growth
                                         }}</text>
-                                        <text class="desc"> {{ $t("成长值升级为该等级") }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)"> {{ $t("成长值升级为该等级") }}</text>
                                     </view>
                                 </template>
                                 <!-- 消费模式 -->
                                 <template v-if="userInfo.rankType === 2">
                                     <view v-if="item?.rankLevel === userInfo.rankLevel" class="level_value_wapper">
-                                        <text class="level_value">{{ userInfo?.growthPoints }}</text>
-                                        <text class="desc">{{ $t("成长值") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ userInfo?.growthPoints }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("成长值") }}</text>
                                     </view>
                                     <view v-else class="upgrades_wapper">
-                                        <text class="desc">{{ $t("再消费") }}</text>
-                                        <text class="level_value">{{
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{ $t("再消费") }}</text>
+                                        <text class="level_value" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)">{{
                                             item?.minGrowthPoints - userInfo.growth < 0 ? 0 : item?.minGrowthPoints - userInfo.growth
                                         }}</text>
-                                        <text class="desc"> {{ $t("元升级为该等级") }}</text>
+                                        <text class="desc" :style="getRankTextStyle(item?.rankName, item?.rankLevel === userInfo.rankLevel)"> {{ $t("元升级为该等级") }}</text>
                                     </view>
                                 </template>
                             </view>
@@ -215,6 +221,33 @@ const toRightDetail = () => {
     });
 };
 
+
+// 根据会员等级名称获取对应的文字样式
+const getRankTextStyle = (rankName: string, isCurrentLevel: boolean) => {
+    // 根据等级名称返回对应的颜色样式，不管是否为当前等级都显示对应颜色
+    const rankStyleMap: { [key: string]: any } = {
+        '黄金会员': { color: '#91583E' },
+        '铂金会员': { color: '#2A426C' },
+        '黑金会员': { color: '#ffffff' },
+        '钻石会员': { color: '#2E236C' },
+        '至尊会员': { color: '#9D87F4' } // 使用渐变的主色调作为备用颜色
+    };
+    return rankStyleMap[rankName] || { color: '#fff' };
+};
+
+// 专门为等级名称获取样式（支持渐变）
+const getRankNameStyle = (rankName: string, isCurrentLevel: boolean) => {
+    if (rankName === '至尊会员') {
+        return {
+            background: 'linear-gradient(135deg, #CED2FC 0%, #9D87F4 100%)',
+            '-webkit-background-clip': 'text',
+            '-webkit-text-fill-color': 'transparent',
+            'background-clip': 'text'
+        };
+    }
+    return getRankTextStyle(rankName, isCurrentLevel);
+};
+
 const discountBg = computed(() => {
     return `url(${staticResource("user/discount.png")})`;
 });
@@ -229,15 +262,20 @@ const pointBg = computed(() => {
 </script>
 <style scoped lang="scss">
 .top_card_container {
-    padding-top: 32rpx;
+   // padding-top: 22rpx;
     .margin {
-        margin-left: 32rpx;
+        margin-left: 18rpx;
         .card_swiper {
             width: 100%;
-            height: 350rpx;
+            height: 275rpx;
+            position: relative;
+            top: 105rpx;
+            left: 18rpx;
+            z-index: 0;
+
             .card_swiper_item {
                 &:last-child .card_item {
-                    margin-right: 16rpx;
+                   // margin-right: 16rpx;
                 }
                 .card_item {
                     display: flex;
@@ -245,18 +283,31 @@ const pointBg = computed(() => {
                     justify-content: space-between;
                     position: relative;
                     height: 100%;
-                    margin-right: 32rpx;
-                    padding: 38rpx 32rpx 32rpx;
+                    margin-right: 36rpx;
+                    padding: 20rpx 33rpx 75rpx;
                     border-radius: 32rpx;
                     background-repeat: no-repeat;
                     background-size: 100% 100%;
 
                     .level_name_wrap {
-                        .level_name {
-                            font-size: 40rpx;
-                            color: #fff;
-                            font-weight: 700;
+                        .level_title_row {
+                            display: flex;
+                            align-items: center;
+                            gap: 12rpx;
+
+                            .level_icon {
+                                width: 48rpx;
+                                height: 48rpx;
+                                flex-shrink: 0;
+                            }
+
+                            .level_name {
+                                font-size: 40rpx;
+                                color: #fff;
+                                font-weight: 700;
+                            }
                         }
+
                         .level_expiry {
                             margin-top: 8rpx;
                             font-size: 22rpx;
@@ -440,4 +491,7 @@ const pointBg = computed(() => {
         }
     }
 }
+
+
+
 </style>

@@ -37,7 +37,7 @@ const props = defineProps({
 });
 const themeStore = useThemeStore();
 const checkedColor = computed(() => {
-    return themeStore.themeStyle["#3744b2"] || "#3744b2";
+    return "#3443B7";
 });
 
 const emit = defineEmits(["update:checked", "change"]);

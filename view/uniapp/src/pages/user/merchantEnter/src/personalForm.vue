@@ -748,6 +748,42 @@ const handlReapply = () => {
 }
 </style>
 
+<style>
+/* 全局样式确保输入框右对齐 */
+.form-box .u-input__content__field-wrapper__field,
+.form-box .u-input input,
+.form-box .uni-input-input,
+.form-box input {
+    text-align: right !important;
+}
+
+.form-box .u-textarea__content__field,
+.form-box .u-textarea textarea,
+.form-box .uni-textarea-textarea,
+.form-box textarea {
+    text-align: right !important;
+}
+
+/* 全局按钮样式 */
+.btn-box .u-button,
+.btn-box-tow .u-button,
+.btn-box .tig-button .u-button,
+.btn-box-tow .tig-button .u-button {
+    background-color: #3544BA !important;
+    border-color: #3544BA !important;
+    color: #ffffff !important;
+}
+
+.btn-box .u-button--plain,
+.btn-box-tow .u-button--plain,
+.btn-box .tig-button .u-button--plain,
+.btn-box-tow .tig-button .u-button--plain {
+    background-color: transparent !important;
+    border-color: #3544BA !important;
+    color: #3544BA !important;
+}
+</style>
+
 <style lang="scss" scoped>
 .textarea {
     :deep(.u-form-item__body) {
@@ -777,6 +813,45 @@ const handlReapply = () => {
 .btn-box {
     padding: 25rpx;
     font-size: 28rpx;
+
+    /* 修改按钮颜色 - 使用多种选择器确保兼容性 */
+    :deep(.u-button),
+    :deep(.u-button__content),
+    :deep(.tig-button),
+    :deep(.tig-button .u-button) {
+        background-color: #3544BA !important;
+        border-color: #3544BA !important;
+        color: #ffffff !important;
+
+        &:hover {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+        }
+
+        &:active {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+            transform: scale(0.98);
+        }
+    }
+
+    /* 朴素按钮样式 */
+    :deep(.u-button--plain),
+    :deep(.u-button.u-button--plain),
+    :deep(.tig-button .u-button--plain) {
+        background-color: transparent !important;
+        border-color: #3544BA !important;
+        color: #3544BA !important;
+
+        &:hover {
+            background-color: rgba(53, 68, 186, 0.1) !important;
+        }
+
+        &:active {
+            background-color: rgba(53, 68, 186, 0.2) !important;
+            transform: scale(0.98);
+        }
+    }
 }
 
 .btn-box-tow {
@@ -786,6 +861,45 @@ const handlReapply = () => {
     justify-content: space-between;
     height: 100%;
     font-size: 28rpx;
+
+    /* 修改按钮颜色 - 使用多种选择器确保兼容性 */
+    :deep(.u-button),
+    :deep(.u-button__content),
+    :deep(.tig-button),
+    :deep(.tig-button .u-button) {
+        background-color: #3544BA !important;
+        border-color: #3544BA !important;
+        color: #ffffff !important;
+
+        &:hover {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+        }
+
+        &:active {
+            background-color: #2A3A9F !important;
+            border-color: #2A3A9F !important;
+            transform: scale(0.98);
+        }
+    }
+
+    /* 朴素按钮样式 */
+    :deep(.u-button--plain),
+    :deep(.u-button.u-button--plain),
+    :deep(.tig-button .u-button--plain) {
+        background-color: transparent !important;
+        border-color: #3544BA !important;
+        color: #3544BA !important;
+
+        &:hover {
+            background-color: rgba(53, 68, 186, 0.1) !important;
+        }
+
+        &:active {
+            background-color: rgba(53, 68, 186, 0.2) !important;
+            transform: scale(0.98);
+        }
+    }
 }
 
 .status-box {
@@ -811,6 +925,36 @@ const handlReapply = () => {
     border-radius: 20rpx;
     padding: 20rpx 30rpx;
     margin: 20rpx;
+
+    /* 为输入框添加下划线样式 */
+    :deep(.u-form-item__body__right__content__slot) {
+        border-bottom: 1rpx solid #e9ecef;
+        padding-bottom: 10rpx;
+    }
+
+    /* 输入框右对齐样式 - 多种选择器确保兼容性 */
+    :deep(.u-input__content__field-wrapper__field),
+    :deep(.u-input__content__field-wrapper input),
+    :deep(.u-input input),
+    :deep(.uni-input-input),
+    :deep(input) {
+        text-align: right !important;
+    }
+
+    /* textarea右对齐样式 */
+    :deep(.u-textarea__content__field),
+    :deep(.u-textarea textarea),
+    :deep(.uni-textarea-textarea),
+    :deep(textarea) {
+        text-align: right !important;
+    }
+
+    /* 显示文本右对齐 */
+    :deep(.type-text),
+    :deep(.u-form-item__body__right__content__slot) {
+        text-align: right !important;
+        justify-content: flex-end !important;
+    }
     .type-text {
         width: 100%;
         display: flex;

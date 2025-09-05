@@ -43,8 +43,21 @@
     </view>
     <tig-fixed-placeholder background-color="#fff">
         <view class="btn-box">
-            <tig-button class="btn" plain @click="backDetail"> {{ $t("返回列表") }} </tig-button>
-            <tig-button class="btn" @click="onSubmit"> {{ $t("提交申请") }} </tig-button>
+            <tig-button
+                class="btn cancel-btn"
+                plain
+                style="background-color: white !important; color: #666666 !important; border: 2rpx solid #e5e5e5 !important; border-radius: 50rpx !important;"
+                @click="backDetail"
+            >
+                {{ $t("返回列表") }}
+            </tig-button>
+            <tig-button
+                class="btn submit-btn"
+                style="background-color: #3544BA !important; color: white !important; border: none !important; border-radius: 50rpx !important;"
+                @click="onSubmit"
+            >
+                {{ $t("提交申请") }}
+            </tig-button>
         </view>
     </tig-fixed-placeholder>
 </template>
@@ -320,10 +333,96 @@ const backDetail = () => {
     align-items: center;
     justify-content: center;
     height: 100%;
+    gap: 20rpx;
 
     .btn {
         width: 48%;
         font-size: 28rpx;
     }
+
+    .custom-cancel-btn,
+    .custom-submit-btn {
+        width: 48%;
+        height: 88rpx;
+        font-size: 28rpx;
+        border-radius: 50rpx;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .custom-cancel-btn {
+        background-color: white;
+        color: #666666;
+        border: 2rpx solid #e5e5e5;
+
+        &:hover {
+            background-color: #f5f5f5;
+        }
+
+        &:active {
+            opacity: 0.7;
+        }
+    }
+
+    .custom-submit-btn {
+        background-color: #3544BA;
+        color: white;
+
+        &:hover {
+            background-color: #2a3a9f;
+        }
+
+        &:active {
+            opacity: 0.9;
+        }
+    }
+}
+
+/* 按钮样式优化 */
+.btn-box .btn {
+    border-radius: 50rpx !important;
+    height: 88rpx !important;
+}
+
+.btn-box .btn:first-child {
+    background-color: white !important;
+    color: #666666 !important;
+    border: 2rpx solid #e5e5e5 !important;
+}
+
+.btn-box .btn:last-child {
+    background-color: #3544BA !important;
+    color: white !important;
+    border: none !important;
+}
+
+:deep(.btn-box .btn:first-child) {
+    background: white !important;
+    border: 2rpx solid #e5e5e5 !important;
+}
+
+:deep(.btn-box .btn:last-child) {
+    background: #3544BA !important;
+    border: none !important;
+
+    .btn {
+        border-radius: 50rpx !important;
+        height: 88rpx !important;
+    }
+}
+
+/* 按钮样式覆盖 */
+:deep(.btn-box .btn:first-child) {
+    background-color: white !important;
+    color: #666666 !important;
+    border: 2rpx solid #e5e5e5 !important;
+}
+
+:deep(.btn-box .btn:last-child) {
+    background-color: #3544BA !important;
+    color: white !important;
+    border: none !important;
 }
 </style>

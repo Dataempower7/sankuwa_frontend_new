@@ -13,10 +13,10 @@
                     <template v-for="(item, index) in list" :key="item?.rankId">
                         <view class="list_item">
                             <view class="level_icon">
-                                <view
+                                <image
                                     class="icon"
-                                    :class="`card${item?.rankLevel}`"
-                                    :style="{ 'background-image': `url(${staticResource(`user/level_${item?.rankLevel}.png`)})` }"
+                                    :src="item?.rankLogo"
+                                    mode="aspectFit"
                                 />
                             </view>
                             <view class="level_name">{{ $t(item?.rankName) }}</view>
@@ -105,85 +105,105 @@ const handelGrowth = (growth: number) => {
         width: 100%;
         padding: 40rpx 24rpx;
         background: #fff;
-        border-radius: 14rpx;
+        border-radius: 16rpx;
+        box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+
         .card_title {
-            color: #323233;
-            font-size: 32rpx;
-            font-weight: bold;
-            margin-bottom: 48rpx;
+            color: #333;
+            font-size: 36rpx;
+            font-weight: 600;
+            margin-bottom: 40rpx;
             text-align: center;
         }
+
         .list {
             width: 100%;
+            border: 2rpx solid #f0f0f0;
+            overflow: hidden;
+
             .list_item {
                 display: flex;
-                height: 72rpx;
-                font-size: 24rpx;
-                color: #724804;
+                height: 100rpx;
+                font-size: 28rpx;
+                color: #666;
                 text-align: center;
-                &:nth-child(2n) {
-                    background-color: #fcf5e8;
+                border-bottom: 2rpx solid #f0f0f0;
+
+                &:last-child {
+                    border-bottom: none;
                 }
+
                 .level_icon {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    height: 72rpx;
-                    width: 96rpx;
-                    padding: 20rpx;
+                    height: 100rpx;
+                    width: 120rpx;
+                    border-right: 2rpx solid #f0f0f0;
+                    background: #fafafa;
+
                     .icon {
-                        width: 44rpx;
-                        height: 32rpx;
+                        width: 48rpx;
+                        height: 44rpx;
                         background-repeat: no-repeat;
                         background-size: 100% 100%;
                     }
                 }
 
                 .level_name {
-                    width: 184rpx;
-                    // padding: 20rpx;
+                    width: 240rpx;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    border-right: 2rpx solid #f0f0f0;
+                    background: #fff;
+                    font-weight: 500;
+                    color: #333;
                 }
+
                 .level_condition {
-                    text-align: left;
                     flex: 1;
-                    min-width: 184rpx;
-                    // padding: 20rpx;
-                    white-space: nowrap;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    background: #fff;
+                    color: #666;
                 }
             }
         }
+
         .list_head {
             display: flex;
             align-items: center;
-            font-size: 24rpx;
+            font-size: 28rpx;
             text-align: center;
-            color: #724804;
-            background-color: #fcf5e8;
+            color: #333;
+            background-color: #f8f9fa;
+            height: 80rpx;
+            font-weight: 600;
+            border-bottom: 2rpx solid #e9ecef;
+
             .level_icon_label {
-                width: 96rpx;
-                padding: 20rpx;
+                width: 120rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-right: 2rpx solid #e9ecef;
             }
+
             .level_name_label {
-                width: 184rpx;
+                width: 240rpx;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 20rpx;
+                border-right: 2rpx solid #e9ecef;
             }
+
             .level_condition_label {
-                text-align: left;
                 flex: 1;
-                min-width: 184rpx;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                // padding: 20rpx;
             }
         }
     }

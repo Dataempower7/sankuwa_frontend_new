@@ -926,7 +926,7 @@ const checkOutBarStyle = computed(() => {
     padding-bottom: 40rpx;
 }
 .cart_list_wrap .cart_table {
-    border-radius: 10rpx;
+    border-radius: 30rpx;
     background: #fff;
     padding-bottom: 20rpx;
 }
@@ -1091,7 +1091,7 @@ const checkOutBarStyle = computed(() => {
     position: relative;
 
     &.cart-price-margin {
-        margin-top: 20rpx;
+        margin-top: -10rpx;
     }
 }
 .origin-price {
@@ -1273,7 +1273,7 @@ const checkOutBarStyle = computed(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20rpx;
+    padding: 26rpx 25rpx 0rpx 0rpx;
     min-height: 100rpx;
     box-sizing: border-box;
 }

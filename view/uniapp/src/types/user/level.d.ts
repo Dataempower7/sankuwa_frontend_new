@@ -16,6 +16,7 @@ export interface Rank {
     showPrice: number;
     rankType: number;
     rankIco: string;
+    rankLogo: string;
     rankBg: string;
     rankPoint: string;
     freeShipping: number;

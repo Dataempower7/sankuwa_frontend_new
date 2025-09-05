@@ -1,15 +1,46 @@
 <template>
     <view class="container">
         <template v-if="loaded">
-            <tig-layout>
+            <tig-layout title="商家入驻" :border-bottom="true">
                 <view class="type-title">{{ $t("选择主体类型和经营类目") }}</view>
-                <view class="type-box" :class="{ active: type === 1 }" @click="type = 1"> <text class="iconfont-h5 icon-geren icon-size" /> 个人 </view>
-                <view class="type-box" :class="{ active: type === 2 }" @click="type = 2"><text class="iconfont-h5 icon-qiye icon-size" /> 企业 </view>
+                <view class="type-container">
+                    <view class="type-box" :class="{ active: type === 1 }" @click="type = 1">
+                        <view class="type-content">
+                            <view class="type-image">
+                                <image src="/static/images/merchanEnter/personal.png" mode="aspectFit" />
+                            </view>
+                            <view class="type-text">个人</view>
+                        </view>
+                        <view v-if="type === 1" class="check-icon">
+                            <image src="/static/images/common/dagou.png" mode="aspectFit" />
+                        </view>
+                    </view>
+                    <view class="type-box" :class="{ active: type === 2 }" @click="type = 2">
+                        <view class="type-content">
+                            <view class="type-image">
+                                <image src="/static/images/merchanEnter/business.png" mode="aspectFit" />
+                            </view>
+                            <view class="type-text">企业</view>
+                        </view>
+                        <view v-if="type === 2" class="check-icon">
+                            <image src="/static/images/common/dagou.png" mode="aspectFit" />
+                        </view>
+                    </view>
+                </view>
 
                 <tig-fixed-placeholder :border="false" background-color="#fff">
                     <view class="btn-box">
-                        <tig-button class="btn" @click="handleAffirm"> {{ $t("确认") }} </tig-button>
-                        <view class="agreement">
+                        <view
+                            ref="confirmBtn"
+                            class="custom-btn"
+                            :class="{
+                                'btn-active': isChecked
+                            }"
+                            @click="handleAffirm"
+                        >
+                            {{ $t("确认") }}
+                        </view>
+                        <view class="agreement" :class="{ 'agreement-shake': isShaking }">
                             <tig-checkbox v-model:checked="isChecked" />
                             <text class="agreement-text" @click="isChecked = !isChecked">{{ $t("我已阅读并同意") }}</text>
                             <text class="agreement-link" @click="handleLink">《{{ $t("商户入驻协议") }}》</text>
@@ -33,11 +64,30 @@ const type = ref(1);
 const isReapply = ref(false);
 const id = ref(0);
 const isChecked = ref(false);
+const isShaking = ref(false);
 const handleAffirm = () => {
     if (!isChecked.value) {
+        // 触发抖动效果
+        isShaking.value = true;
+        setTimeout(() => {
+            isShaking.value = false;
+        }, 600);
+
         uni.showToast({
             title: t("请先阅读并同意协议"),
             icon: "none"
+        });
+        return;
+    }
+
+    // 检查是否选择了个人类型
+    if (type.value === 1) {
+        uni.showModal({
+            title: t("温馨提示"),
+            content: t("很抱歉，平台暂不支持个体户入驻。我们正在努力完善相关功能，敬请期待！如有疑问，请联系客服咨询。"),
+            showCancel: false,
+            confirmText: t("我知道了"),
+            confirmColor: "#3544BA"
         });
         return;
     }
@@ -96,37 +146,82 @@ onShow(async () => {
     padding: 50rpx;
 }
 .type-title {
-    padding-top: 50rpx;
+    padding-top: 100rpx;
     font-weight: 600;
     font-size: 42rpx;
     line-height: 56rpx;
     display: block;
     padding-bottom: 63rpx;
     color: var(--general);
+    text-align: center;
 }
-.type-box {
-    width: 650rpx;
-    height: 270rpx;
-    background-color: rgba(255, 255, 255, 0.2); /* 白色背景，50%透明度 */
-    border-radius: 20rpx;
-    backdrop-filter: blur(4px);
-    margin-bottom: 40rpx;
+.type-container {
     display: flex;
+    justify-content: space-between;
+    gap: 20rpx;
+  //  padding: 0 20rpx;
+     margin-top: 90rpx;
+}
+
+.type-box {
+    flex: 1;
+    height: 320rpx;
+    background-color: #ffffff;
+    border: 5rpx solid #e9ecef;
+    border-radius: 20rpx;
+    position: relative;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 34rpx;
-    color: var(--general);
-    box-shadow: 0rpx 8rpx 18rpx 0rpx rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
 
     &.active {
-        background-color: rgba(255, 255, 255, 1); /* 白色背景，50%透明度 */
+        background-color: #fff;
+        border-color: #3743B5;
+        box-shadow: 0 4rpx 12rpx rgba(55, 67, 181, 0.15);
+    }
+
+    .type-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .type-image {
+            width: 120rpx;
+            height: 120rpx;
+            margin-bottom: 20rpx;
+
+            image {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .type-text {
+            font-size: 32rpx;
+            color: #333;
+            font-weight: 500;
+        }
+    }
+
+    .check-icon {
+        position: absolute;
+        top: -4rpx;
+        right: -4rpx;
+        width: 40rpx;
+        height: 40rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+       
     }
 }
 
-.icon-size {
-    font-size: 40rpx;
-    padding-right: 10rpx;
-}
+
 
 .btn-box {
     padding: 25rpx;
@@ -135,6 +230,31 @@ onShow(async () => {
     .btn {
         font-size: 28rpx;
     }
+
+    .custom-btn {
+        width: 100%;
+        height: 88rpx;
+        background-color: #9AA0DC;
+        border-radius: 44rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32rpx;
+        color: #fff;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
+
+        &.btn-active {
+            background-color: #3544BA;
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+}
 
     .agreement {
         position: absolute;
@@ -150,8 +270,25 @@ onShow(async () => {
         justify-content: center;
 
         .agreement-link {
-            color: var(--general);
+            color: #6161BE;
         }
+
+        &.agreement-shake {
+            animation: shake 0.6s ease-in-out;
+        }
+    }
+
+
+/* 抖动动画 */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-8rpx);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(8rpx);
     }
 }
 </style>

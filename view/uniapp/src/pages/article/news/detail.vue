@@ -9,9 +9,14 @@
                 </template>
                 <view class="v-html" v-html="formArticleState.content" />
             </view>
-            <template v-else>
-                <empty-box mode="news" :text="$t('暂无内容')" />
-            </template>
+            <view v-else class="empty-state">
+                <view class="empty-image" style="width: 300rpx; height: 300rpx;">
+                    <img src="/static/images/missing_page/missing_address.png" />
+                </view>
+                <view class="empty-text" style="margin-top: -40rpx;">
+                    <text>暂无文章</text>
+                </view>
+            </view>
             <tig-fixed-placeholder height="70rpx" background-color="#fff">
                 <view class="navigation">
                     <view class="navigation-btn navigation-btn-left">
@@ -120,6 +125,35 @@ page {
     padding: 48rpx 0;
     text-align: center;
     font-size: 28rpx;
+}
+
+/* 空状态样式 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100rpx 40rpx;
+    text-align: center;
+    min-height: 400rpx;
+
+    .empty-image {
+        margin-bottom: 40rpx;
+
+        img {
+            width: 200rpx;
+            height: 200rpx;
+            display: block;
+        }
+    }
+
+    .empty-text {
+        text {
+            font-size: 28rpx;
+            color: #999;
+            line-height: 1.5;
+        }
+    }
 }
 .navigation {
     display: flex;

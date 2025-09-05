@@ -1,5 +1,5 @@
 <template>
-    <tig-layout title="站内信">
+    <tig-layout title="站内消息">
         <view class="message-main">
             <view class="head-tabs-box">
                 <view class="tabs flex align-center justify-between">
@@ -41,8 +41,8 @@
                 </uni-swipe-action>
             </view>
             <view v-if="!isLoading && total === 0" class="empty-box">
-                <view class="pictrue"><image :src="staticResource('common/data_empty.png')" /></view>
-                <view class="txt">{{ $t("暂无站内消息！") }}</view>
+                <view class="pictrue"><image src="/static/images/missing_page/missing_address.png" /></view>
+                <view class="txt">{{ $t("暂无站内消息") }}</view>
             </view>
             <loading-box :model-value="!isLoading" :page="filterParams.page" :length="messageList.length" />
         </view>
@@ -175,11 +175,29 @@ const readReadFn = async (type: number) => {
             font-size: 22rpx;
             margin-right: 40rpx;
             color: #666;
+            position: relative;
+            padding-bottom: 10rpx;
+            transition: all 0.3s ease;
+            transform: translateY(12rpx);
         }
-        .active {
-            color: var(--general);
-            font-weight: bold;
-            font-size: 26rpx;
+
+        .tab.active {
+            color: #000000 !important;
+            font-weight: bold !important;
+            font-size: 26rpx !important;
+            transform: translateY(12rpx);
+        }
+
+        .tab.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5rpx;
+            background-color: #3743b5;
+            border-radius: 6rpx;
+            top: 59rpx;
         }
         .clear-unread {
             font-size: 26rpx;
@@ -220,7 +238,7 @@ const readReadFn = async (type: number) => {
                     width: 10rpx;
                     height: 10rpx;
                     border-radius: 100rpx;
-                    background-color: var(--general);
+                    background-color: red;
                     margin-right: 10rpx;
                 }
             }
@@ -269,6 +287,33 @@ const readReadFn = async (type: number) => {
         vertical-align: middle;
         display: table-cell;
         position: relative;
+    }
+}
+
+/* 空状态样式 */
+.empty-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100rpx 40rpx;
+    text-align: center;
+    min-height: 400rpx;
+
+    .pictrue {
+        margin-bottom: 40rpx;
+
+        image {
+            width: 200rpx;
+            height: 200rpx;
+            display: block;
+        }
+    }
+
+    .txt {
+        font-size: 28rpx;
+        color: #999;
+        line-height: 1.5;
     }
 }
 </style>

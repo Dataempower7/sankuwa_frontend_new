@@ -1,143 +1,146 @@
 <template>
     <view>
         <tig-layout :title="navbarTitle">
-            <block v-if="couponList && couponList.length">
+            <!-- 分类栏 -->
+            <view v-if="pageType == 2" class="coupon-tabs">
+                <view class="tab-container">
+                    <view
+                        v-for="(tab, index) in tabList"
+                        :key="index"
+                        class="tab-item"
+                        :class="{ active: currentTabIndex === index }"
+                        @click="onTabChange(index)"
+                    >
+                        {{ tab.name }}
+                    </view>
+                </view>
+            </view>
+
+            <block v-if="filteredCouponList && filteredCouponList.length">
                 <view class="tmcscoupon-list">
                     <block v-if="pageType == 1">
                         <view class="coupon-box">
-                            <view v-for="(item, index) in couponList" :key="index" class="coupon-item">
-                                <view class="left">
-                                    <view class="col-1">
-                                        <view class="title line2">{{ item.couponName }}</view>
+                            <view v-for="(item, index) in filteredCouponList" :key="index" class="coupon-item">
+                                <!-- 左侧折扣区域 -->
+                                <view class="left-section">
+                                    <view class="discount-area">
+                                        <!-- 优惠金额方块框 -->
+                                        <view class="discount-box">
+                                            <view v-if="item.couponType === 2" class="discount-text">
+                                                {{ item.couponDiscount }}
+                                            </view>
+                                            <view v-else class="discount-text">
+                                                ¥{{ item.couponMoney }}
+                                            </view>
+                                            <view class="discount-unit">
+                                                {{ item.couponType === 2 ? '折' : '' }}
+                                            </view>
+                                        </view>
                                     </view>
-                                    <view v-if="item.couponDesc" class="col-2">
-                                        {{ item.couponDesc }}
-                                    </view>
-                                    <view v-if="item.sendType === 1" class="col-3"> {{ $t("有效期") }}：{{ item.useEndDate }} </view>
-                                    <view v-if="item.sendType === 0 && item.delayDay > 0" class="col-3">
-                                        {{
-                                            isOverseas()
-                                                ? $t("领券{0}天后生效，有效期{1}天", [item.delayDay, item.useDay])
-                                                : `领券${item.delayDay}天后生效，有效期{1}天`
-                                        }}
-                                    </view>
-                                    <view v-if="item.sendType === 0 && item.delayDay === 0" class="col-3">
-                                        {{ isOverseas() ? $t("领券当日起{0}天内可用", [item.useDay]) : `领券当日起${item.useDay}天内可用` }}
-                                    </view>
-                                </view>
-                                <view class="right">
-                                    <view class="right-1">
-                                        <block v-if="item.couponType === 2">
-                                            <view class="zhekou"> {{ item.couponDiscount }}</view>
-                                            <view class="zhe">{{ $t("折") }}</view>
-                                        </block>
-                                        <block v-else>
-                                            <format-price
-                                                :show-text="false"
-                                                :currency-style="{ 'justify-content': 'flex-end', fontSize: '24rpx', 'padding-bottom': '8rpx' }"
-                                                :is-bottom="false"
-                                                :font-style="{ fontSize: '48rpx' }"
-                                                :price-data="item.couponMoney"
-                                            />
-                                        </block>
-                                    </view>
-                                    <view class="right-2">
-                                        <view>
-                                            <tig-button
-                                                :custom-style="{ height: '55rpx' }"
-                                                plain-main-color
-                                                :disabled="couponStatus(item.isReceive, item.limitNum, item.receiveNum) === '已领取'"
-                                                @click="handleReceiveCoupon(item)"
-                                            >
-                                                {{ $t(couponStatus(item.isReceive, item.limitNum, item.receiveNum)) }}
-                                            </tig-button>
+
+                                    <view class="coupon-info">
+                                        <view class="coupon-title">{{ item.couponName }}</view>
+                                        <view class="validity-text">
+                                            <view v-if="item.sendType === 1">{{ $t("有效期至") }}：{{ item.useEndDate }}</view>
+                                            <view v-if="item.sendType === 0 && item.delayDay > 0">
+                                                {{ isOverseas() ? $t("领券{0}天后生效，有效期{1}天", [item.delayDay, item.useDay]) : `领券${item.delayDay}天后生效，有效期${item.useDay}天` }}
+                                            </view>
+                                            <view v-if="item.sendType === 0 && item.delayDay === 0">
+                                                {{ isOverseas() ? $t("领券当日起{0}天内可用", [item.useDay]) : `领券当日起${item.useDay}天内可用` }}
+                                            </view>
                                         </view>
                                     </view>
                                 </view>
-                                <view class="dotted-line" />
+
+                                <!-- 右侧按钮区域 -->
+                                <view class="right-section">
+                                    <button
+                                        class="action-btn"
+                                        :class="{ disabled: couponStatus(item.isReceive, item.limitNum, item.receiveNum) === '已领取' }"
+                                        :disabled="couponStatus(item.isReceive, item.limitNum, item.receiveNum) === '已领取'"
+                                        @click="handleReceiveCoupon(item)"
+                                    >
+                                        {{ $t(couponStatus(item.isReceive, item.limitNum, item.receiveNum)) }}
+                                    </button>
+                                </view>
                             </view>
                         </view>
                     </block>
                     <block v-if="pageType == 2">
                         <view class="coupon-box">
                             <view
-                                v-for="(item, index) in couponList"
+                                v-for="(item, index) in filteredCouponList"
                                 :key="index"
-                                :class="{
-                                    grayScaleDiv: item.status != 1 && item.status != 2 && item.status != 3,
-                                    pastDue: item.status === 5,
-                                    haveBeenUsed: item.status === 4,
-                                    comingIntoEffect: item.status === 3
-                                }"
                                 class="coupon-item"
+                                :class="{
+                                    used: item.status === 4,
+                                    expired: item.status === 5
+                                }"
                             >
-                                <block v-if="item.status != 1 && item.status != 2 && item.status != 3">
-                                    <view class="tag-box">
-                                        <block v-if="item.status === 5">
-                                            <tag />
-                                        </block>
-                                        <block v-else>
-                                            <tag>{{ item.status === 3 ? $t("即将生效") : $t("已使用") }}</tag>
-                                        </block>
+                                <!-- 左侧折扣区域 -->
+                                <view class="left-section">
+                                    <view class="discount-area">
+                                        <!-- 优惠金额方块框 -->
+                                        <view class="discount-box">
+                                            <view v-if="item.couponType === 2" class="discount-text">
+                                                {{ item.couponDiscount }}
+                                            </view>
+                                            <view v-else class="discount-text">
+                                                ¥{{ item.couponMoney }}
+                                            </view>
+                                            <view class="discount-unit">
+                                                {{ item.couponType === 2 ? '折' : '' }}
+                                            </view>
+                                        </view>
                                     </view>
-                                </block>
 
-                                <view class="left">
-                                    <view class="col-1">
-                                        <view class="title line2">{{ item.couponName }}</view>
-                                    </view>
-                                    <view v-if="item.couponDesc" class="col-2">
-                                        {{ item.couponDesc }}
-                                    </view>
-                                    <view class="col-3"> {{ $t("有效期") }}：{{ item.endDate }} </view>
-                                </view>
-                                <view class="right">
-                                    <view class="right-1">
-                                        <block v-if="item.couponType === 2">
-                                            <view class="zhekou"> {{ item.couponDiscount }}</view>
-                                            <view class="zhe">{{ $t("折") }}</view>
-                                        </block>
-                                        <block v-else>
-                                            <format-price
-                                                :show-text="false"
-                                                :currency-style="{ 'justify-content': 'flex-end', fontSize: '24rpx', 'padding-bottom': '8rpx' }"
-                                                :is-bottom="false"
-                                                :font-style="{ fontSize: '48rpx' }"
-                                                :price-data="item.couponMoney"
-                                            />
-                                        </block>
-                                    </view>
-                                    <view class="right-2">
-                                        <view>
-                                            <tig-button
-                                                v-if="item.status === 1 || item.status === 2"
-                                                :custom-style="{ height: '55rpx' }"
-                                                @click="toPages(item)"
-                                                >{{ $t("立即使用") }}</tig-button
-                                            >
-                                            <tig-button v-if="item.status === 3" :disabled="true" :custom-style="{ height: '55rpx' }">
-                                                {{ $t("即将生效") }}
-                                            </tig-button>
-                                            <tig-button v-if="item.status === 4" :disabled="true" :custom-style="{ height: '55rpx' }">
-                                                {{ $t("已使用") }}
-                                            </tig-button>
-                                            <tig-button v-if="item.status === 5" :disabled="true" :custom-style="{ height: '55rpx' }">
-                                                {{ $t("已过期") }}
-                                            </tig-button>
+                                    <view class="coupon-info">
+                                        <view class="coupon-title">{{ item.couponName }}</view>
+                                        <view class="validity-text">
+                                            {{ $t("有效期至") }}：{{ item.endDate }}
                                         </view>
                                     </view>
                                 </view>
-                                <view class="dotted-line" />
+
+                                <!-- 右侧按钮区域 -->
+                                <view class="right-section">
+                                    <button
+                                        v-if="item.status === 1 || item.status === 2"
+                                        class="action-btn"
+                                        @click="toPages(item)"
+                                    >
+                                        {{ $t("去使用") }}
+                                    </button>
+                                    <button
+                                        v-if="item.status === 3"
+                                        class="action-btn disabled"
+                                        disabled
+                                    >
+                                        {{ $t("即将生效") }}
+                                    </button>
+                                    <image
+                                        v-if="item.status === 4"
+                                        class="status-image"
+                                        src="/static/images/common/used.png"
+                                        mode="aspectFit"
+                                    />
+                                    <image
+                                        v-if="item.status === 5"
+                                        class="status-image"
+                                        src="/static/images/common/expired.png"
+                                        mode="aspectFit"
+                                    />
+                                </view>
                             </view>
                         </view>
                     </block>
                 </view>
             </block>
-            <view v-if="!loading && couponList && couponList.length === 0" class="empty-box">
+            <view v-if="!loading && filteredCouponList && filteredCouponList.length === 0" class="empty-box">
                 <view class="pictrue">
-                    <image lazy-load :src="staticResource('common/data_empty.png')" />
+                    <image src="@/static/images/missing_page/coupons.png" />
                 </view>
-                <view class="txt">{{ $t("暂无优惠券！") }}</view>
+                <view class="txt">{{ $t("暂无优惠券") }}</view>
             </view>
         </tig-layout>
     </view>
@@ -145,7 +148,7 @@
 
 <script lang="ts" setup>
 import tag from "./src/tag.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { addCoupon, getCouponList, getMyCouponList } from "@/api/coupon/coupon";
 import type { CouponFilterParams, CouponFilterResult, CouponData } from "@/types/coupon/coupon";
 import { onLoad, onReachBottom, onShow } from "@dcloudio/uni-app";
@@ -165,6 +168,34 @@ const pageType = ref<number>(1);
 const total = ref(0);
 const couponList = ref<CouponFilterResult[]>([]);
 const loading = ref(true);
+
+// 分类栏相关
+const currentTabIndex = ref(0);
+const tabList = ref([
+    { name: "待使用", status: [1, 2] },
+    { name: "已使用", status: [4] },
+    { name: "已过期", status: [5] }
+]);
+
+// 计算属性：根据当前选中的tab过滤优惠券列表
+const filteredCouponList = computed(() => {
+    if (pageType.value === 1) {
+        // 优惠券中心页面，显示所有优惠券
+        return couponList.value;
+    } else {
+        // 我的优惠券页面，根据当前选中的状态过滤
+        const currentStatuses = tabList.value[currentTabIndex.value].status;
+        return couponList.value.filter(item =>
+            currentStatuses.includes(item.status || 1)
+        );
+    }
+});
+
+// Tab切换方法
+const onTabChange = (index: number) => {
+    currentTabIndex.value = index;
+};
+
 const __getCouponList = async () => {
     uni.showLoading({
         title: t("加载中")
@@ -278,6 +309,45 @@ onReachBottom(() => {
 </script>
 
 <style lang="scss" scoped>
+/* 分类栏样式 */
+.coupon-tabs {
+    background-color: #fff;
+    border-bottom: 1px solid #f5f5f5;
+
+    .tab-container {
+        display: flex;
+        align-items: center;
+        padding: 0 30rpx;
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 30rpx 0;
+            font-size: 28rpx;
+            color: #666;
+            position: relative;
+            cursor: pointer;
+
+            &.active {
+                color: var(--general, #007aff);
+                font-weight: 500;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translate(-50%);
+                    width: 80rpx;
+                    height: 7rpx;
+                    background-color: #3344BC;
+                    border-radius: 55rpx;
+                }
+            }
+        }
+    }
+}
+
 /* 优惠券 */
 .price {
     font-size: 48rpx;
@@ -495,28 +565,40 @@ onReachBottom(() => {
     }
 }
 
-/*通用暂无数据样式*/
+/*通用暂无数据样式 文字和图片居中显示*/
 .empty-box {
-    background-color: #fff;
-    padding: 60rpx 0;
+    // background-color: #fff;
+    padding: 350rpx 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400rpx;
 }
 
 .empty-box .pictrue {
     width: 200rpx;
     height: 200rpx;
-    margin: 0 auto;
+    margin: 0 auto 30rpx auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .empty-box .pictrue image {
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
 
 .empty-box .txt {
     color: #999;
     text-align: center;
+    font-size: 28rpx;
+    line-height: 1.5;
 }
 
+/* 原来的优惠券样式 - 已注释
 .coupon-box {
     display: flex;
     flex-direction: column;
@@ -524,7 +606,7 @@ onReachBottom(() => {
     padding: 30rpx;
 
     .grayScaleDiv {
-        filter: grayscale(100%); /* 全部转为灰度 */
+        filter: grayscale(100%);
     }
 
     .coupon-item {
@@ -536,121 +618,185 @@ onReachBottom(() => {
         overflow: hidden;
         display: flex;
         justify-content: space-between;
+*/
 
-        .left {
-            padding: 30rpx;
-            display: flex;
-            flex-direction: column;
-            width: 60%;
+/* 新的优惠券样式 */
+.coupon-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx;
+    padding: 15rpx 10rpx 15rpx 15rpx;
 
-            .col-1 {
-                display: flex;
-                gap: 8px;
-                align-items: center;
-                width: 100%;
-                margin-bottom: 10rpx;
+    .coupon-item {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 30rpx;
+        box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        min-height: 160rpx;
 
-                .tag {
-                    background-color: var(--general);
-                    color: white;
-                    font-size: 18rpx;
-                    border-radius: 5rpx;
-                    padding: 2rpx 6rpx;
-                    min-width: 70rpx;
+        /* 已使用和已过期的灰色样式 */
+        &.used, &.expired {
+            background: linear-gradient(135deg, #ffffff 40%, #ffffff 100%);
+
+            .left-section {
+                .discount-area {
+                    .discount-box {
+                        background-color: #f0f0f0 !important;
+                        border-color: #ccc !important;
+                        box-shadow: 0 4rpx 12rpx rgba(204, 204, 204, 0.15) !important;
+                            
+                        .discount-text {
+                            color: #999 !important;
+                        }
+
+                        .discount-unit {
+                            color: #999 !important;
+                        }
+                    }
                 }
 
-                .title {
+                .coupon-title {
+                    color: #999 !important;
+                }
+                .validity-text {
+                    color: #ccc !important;
+                }
+            }
+
+            .right-section {
+                .action-btn {
+                    background-color: #ccc !important;
+                    color: #999 !important;
+                }
+            }
+        }
+
+        /* 左侧折扣区域 */
+        .left-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 15rpx 10rpx 15rpx 15rpx;
+            position: relative;
+
+            .discount-area {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                margin-right: 30rpx;
+
+                .discount-box {
+                    background-color: #FEF6F2;
+                    border-radius: 28rpx;
+                    padding: 30rpx;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: 160rpx;
+                    height: 160rpx;
+
+                    .discount-text {
+                        font-size: 56rpx;
+                        font-weight: bold;
+                        color: #ff4757;
+                        line-height: 1;
+                        margin-bottom: 4rpx;
+                    }
+
+                    .discount-unit {
+                        font-size: 28rpx;
+                        color: #ff4757;
+                        font-weight: 500;
+                        line-height: 1;
+                    }
+                }
+            }
+
+            .coupon-info {
+                flex: 1;
+
+                .coupon-title {
+                    font-size: 32rpx;
                     font-weight: bold;
-                    font-size: 28rpx;
-                }
-            }
-
-            .col-2 {
-                font-size: 24rpx;
-                color: #333;
-                margin-bottom: 20rpx;
-            }
-
-            .col-3 {
-                font-size: 22rpx;
-            }
-        }
-
-        .right {
-            padding: 30rpx;
-            display: flex;
-            flex-direction: column;
-            width: 40%;
-            gap: 18rpx;
-            justify-content: center;
-
-            .right-1 {
-                color: var(--general);
-                display: flex;
-                flex-direction: row;
-                font-weight: bold;
-                justify-content: center;
-                align-items: flex-end;
-
-                .zhekou {
-                    font-size: 48rpx;
-                    line-height: 1; /* 添加这行 */
+                    color: #333;
+                    margin-bottom: 12rpx;
+                    line-height: 1.3;
                 }
 
-                .zhe {
-                    margin-left: 8rpx;
+                .validity-text {
                     font-size: 24rpx;
-                    self-align: end; /* 添加这行 */
+                    color: #666;
+                    line-height: 1.4;
+                }
+            }
+        }
+
+        /* 右侧按钮区域 */
+        .right-section {
+            width: 200rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30rpx 20rpx;
+
+            .action-btn {
+                width: 140rpx;
+                height: 60rpx;
+                background: #3544BA;
+                border-radius: 30rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 26rpx;
+                font-weight: 500;
+                border: none;
+                transition: all 0.3s ease;
+
+                &:active {
+                    transform: scale(0.95);
+                }
+
+                &.disabled {
+                    background: #ccc;
+                    color: #999;
+                    box-shadow: none;
                 }
             }
 
-            .right-2 {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+            .status-image {
+                width: 140rpx;
+                height: 140rpx;
+                object-fit: contain;
             }
         }
 
-        .dotted-line {
+        /* 分隔线装饰 */
+        &::before {
+            content: '';
             position: absolute;
-            top: 20rpx;
-            bottom: 20rpx;
-            left: 60%;
-            border-left: 1px dashed #ddd; /* 设置为虚线 */
-            transform: translateX(-50%);
+            right: 200rpx;
+            top: 0;
+            bottom: 0;
+            width: 2rpx;
+            background: linear-gradient(to bottom, transparent 20%, #e0e0e0 50%, transparent 80%);
         }
-    }
 
-    .coupon-item::before {
-        content: "";
-        position: absolute;
-        top: 0; /* 将圆形定位到元素顶部的60%位置 */
-        left: 60%; /* 将圆形定位到元素左侧的50%位置 */
-        transform: translate(-50%, -50%); /* 保证圆形正好在这个位置上 */
-        width: 30rpx; /* 圆形的宽度，可以根据需要调整 */
-        height: 30rpx; /* 圆形的高度，可以根据需要调整 */
-        background-color: #f5f5f5; /* 圆形的颜色，可以根据需要调整 */
-        border-radius: 50%; /* 使元素成为完美的圆形 */
-    }
-
-    .coupon-item::after {
-        content: "";
-        position: absolute;
-        bottom: -30rpx; /* 将圆形定位到元素底部的40%位置 */
-        left: 60%; /* 将圆形定位到元素左侧的50%位置 */
-        transform: translate(-50%, -50%); /* 保证圆形正好在这个位置上 */
-        width: 30rpx; /* 圆形的宽度，可以根据需要调整 */
-        height: 30rpx; /* 圆形的高度，可以根据需要调整 */
-        background-color: #f5f5f5; /* 圆形的颜色，可以根据需要调整 */
-        border-radius: 50%; /* 使元素成为完美的圆形 */
-    }
-
-    .grayScaleDiv {
-        .tag-box {
+        /* 右侧装饰圆点 */
+        &::after {
+            content: '';
             position: absolute;
-            top: 25%;
-            left: 50%;
-            transform: translateX();
+            right: 190rpx;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20rpx;
+            height: 20rpx;
+            background-color: #f8f9fa;
+            border: 2rpx solid #e0e0e0;
+            border-radius: 50%;
         }
     }
 }

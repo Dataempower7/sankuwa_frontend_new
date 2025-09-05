@@ -68,6 +68,9 @@ page {
         flex: 1;
         padding: 24rpx;
         background: #f8f8f8;
+        border-radius: 45rpx 45rpx;
+        z-index: 100;
+
         &.task_mode {
             border-radius: 40rpx 40rpx 0 0;
         }

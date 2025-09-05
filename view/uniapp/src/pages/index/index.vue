@@ -4,6 +4,74 @@
         <SplashAd :ad-type="adType" :ad-url="adUrl" :duration="duration" :redirect-type="redirectType" :redirect-url="redirectUrl" @close="onSplashClose" />
     </template>
     <view v-else class="index-page">
+        <!-- 侧边栏遮罩 -->
+        <view v-if="sidebarVisible" class="sidebar-mask" @click="closeSidebar"></view>
+
+        <!-- 侧边栏 -->
+        <view class="sidebar" :class="{ 'sidebar-open': sidebarVisible }">
+            <view class="sidebar-content">
+                <!-- 用户信息模块 -->
+                <view class="user-section">
+                    <view class="user-info">
+                        <image
+                            class="user-avatar"
+                            :src="userStore.token ? userStore.userInfo.avatar || '/static/images/common/avatar_empty.png' : '/static/images/common/avatar_empty.png'"
+                            mode="aspectFill"
+                            @click="handleAvatarClick"
+                        />
+                        <view class="user-details" @click="handleUserNameClick">
+                            <text class="user-name">{{ userStore.token ? (userStore.userInfo.nickname || userStore.userInfo.mobile) : $t('立刻登录') }}</text>
+                            <text v-if="userStore.token" class="user-phone">{{  'Hi, 欢迎来到森酷玩' }}</text>
+                        </view>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                </view>
+
+                <!-- 分类模块 -->
+                <view class="menu-section">
+                    <view class="menu-item" @click="goToCategory">
+                        <image class="menu-icon" src="/static/images/common/icon_11.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('分类') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                </view>
+
+                <!-- 功能模块 -->
+                <view class="menu-section">
+                    <view class="menu-item" @click="goToOrders">
+                        <image class="menu-icon" src="/static/images/common/icon_12.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('订单') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                    <view class="menu-item" @click="goToMessages">
+                        <image class="menu-icon" src="/static/images/common/icon_13.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('消息') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                    <view class="menu-item" @click="goToWishlist">
+                        <image class="menu-icon" src="/static/images/common/icon_14.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('心愿单') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                    <view class="menu-item" @click="goToCoupons">
+                        <image class="menu-icon" src="/static/images/common/icon_15.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('优惠券') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                    <view class="menu-item" @click="goToAddress">
+                        <image class="menu-icon" src="/static/images/common/icon_16.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('地址') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                    <view class="menu-item" @click="goToSettings">
+                        <image class="menu-icon" src="/static/images/common/icon_17.png" mode="aspectFit" />
+                        <text class="menu-text">{{ $t('设置') }}</text>
+                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
+                </view>
+            </view>
+        </view>
+
         <template v-if="configStore.previewId > 0">
             <previewTip />
         </template>
@@ -11,7 +79,7 @@
         <!-- 自定义导航栏/ 列表 + logo  -->
         <view class="custom-navbar">
             <view class="navbar-content">
-                <view class="nav-left">
+                <view class="nav-left" @click="toggleSidebar">
                     <image class="nav-icon" src="/static/images/home/list@3x.png" mode="aspectFit" />
                 </view>
                 <view class="nav-center">
@@ -22,7 +90,7 @@
 
         <template v-if="loading">
             <view class="index_empty">
-                <image lazy-load src="/static/images/common/index_empty.png" mode="widthFix" />
+                <!-- <image lazy-load src="/static/images/common/index_empty.png" mode="widthFix" /> -->
             </view>
         </template>
         
@@ -272,7 +340,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { onLoad, onReachBottom, onPullDownRefresh, onShow, onShareAppMessage, onShareTimeline, onUnload, onPageScroll } from "@dcloudio/uni-app";
+import { onLoad, onReachBottom, onShow, onShareAppMessage, onShareTimeline, onUnload, onPageScroll } from "@dcloudio/uni-app";
 import { getIndex, getSplashAd, getCateProduct, getHomeSeckill } from "@/api/home/home";
 import { getArticleList } from "@/api/article/article";
 import { getCategoryAll } from "@/api/productCate/productCate";
@@ -285,6 +353,7 @@ import type { SeckillFilterState } from "@/types/seckill/seckill";
 import type { filterSeleted } from "@/types/productCate/productCate";
 import { useConfigStore } from "@/store/config";
 import { usecatnavStore } from "@/store/catnav";
+import { useUserStore } from "@/store/user";
 import { staticResource } from "@/utils";
 import checkAppUpdate from "@/utils/checkAppUpdate";
 import { useScrollTop } from "@/hooks";
@@ -293,6 +362,7 @@ const { scrollTop } = useScrollTop(onPageScroll);
 
 const configStore = useConfigStore();
 const catnavStore = usecatnavStore();
+const userStore = useUserStore();
 
 // 开屏广告相关
 const adType = ref<"image" | "video">("image");
@@ -301,6 +371,9 @@ const duration = ref(0);
 const state = ref(false);
 const redirectType = ref("");
 const redirectUrl = ref("");
+
+// 侧边栏状态
+const sidebarVisible = ref(false);
 
 // 页面数据
 const loading = ref(false);
@@ -474,7 +547,6 @@ const getIndexData = async () => {
         await getProductList();
         
         configStore.pageModules = res.pageModule;
-        uni.stopPullDownRefresh();
     } catch (error) {
         console.error(error);
     } finally {
@@ -687,6 +759,217 @@ const backToTop = () => {
     });
 };
 
+// 侧边栏相关方法
+const toggleSidebar = () => {
+    sidebarVisible.value = !sidebarVisible.value;
+};
+
+const closeSidebar = () => {
+    sidebarVisible.value = false;
+};
+
+// 头像点击处理 - 换头像
+const handleAvatarClick = () => {
+    if (!userStore.token) {
+        // 未登录时触发登录
+        handleLogin();
+        return;
+    }
+
+    // 已登录时选择头像
+    uni.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+            const tempFilePath = res.tempFilePaths[0];
+            // 关闭侧边栏
+            closeSidebar();
+            // 上传头像
+            uploadAvatar(tempFilePath);
+        },
+        fail: (err) => {
+            console.error('选择图片失败:', err);
+            // 选择失败时也关闭侧边栏
+            closeSidebar();
+        }
+    });
+};
+
+// 上传头像
+const uploadAvatar = (filePath: string) => {
+    uni.showLoading({
+        title: '上传中...'
+    });
+
+    let apiBaseUrl;
+    // #ifdef H5
+    apiBaseUrl = import.meta.env.VITE_API_URL || location.origin;
+    // #endif
+    // #ifndef H5
+    apiBaseUrl = import.meta.env.VITE_API_URL;
+    // #endif
+
+    uni.uploadFile({
+        url: apiBaseUrl + import.meta.env.VITE_API_PREFIX + 'user/user/modifyAvatar',
+        filePath: filePath,
+        name: 'file',
+        header: {
+            'Authorization': userStore.token
+        },
+        success: (uploadFileRes) => {
+            try {
+                const result = JSON.parse(uploadFileRes.data);
+                if (result.code === 200 || result.success) {
+                    uni.showToast({
+                        title: '头像更新成功',
+                        icon: 'success'
+                    });
+                    // 重新获取用户信息以更新头像
+                    userStore.getUserInfo();
+                } else {
+                    uni.showToast({
+                        title: result.message || '上传失败',
+                        icon: 'none'
+                    });
+                }
+            } catch (error) {
+                console.error('解析上传结果失败:', error);
+                uni.showToast({
+                    title: '上传失败',
+                    icon: 'none'
+                });
+            }
+        },
+        fail: (error) => {
+            console.error('上传头像失败:', error);
+            uni.showToast({
+                title: '上传失败',
+                icon: 'none'
+            });
+        },
+        complete: () => {
+            uni.hideLoading();
+        }
+    });
+};
+
+// 用户名点击处理 - 跳转个人中心
+const handleUserNameClick = () => {
+    if (!userStore.token) {
+        // 未登录时触发登录
+        handleLogin();
+        return;
+    }
+
+    // 已登录时跳转到个人中心
+    uni.navigateTo({
+        url: '/pages/user/index'
+    });
+    closeSidebar();
+};
+
+// 用户登录处理
+const handleLogin = () => {
+    if (!userStore.token) {
+        // 在微信生态下触发微信快捷登录
+        if (
+            configStore.openWechatOauth === 1 &&
+            configStore.openWechatRegister === 1 &&
+            (configStore.XClientType === "miniProgram" || configStore.XClientType === "wechat")
+        ) {
+            userStore.setAuthType("wechatLogin");
+        } else {
+            // 其他情况跳转到登录页面
+            uni.navigateTo({
+                url: '/pages/login/index'
+            });
+        }
+    }
+    closeSidebar();
+};
+
+// 导航方法
+const goToCategory = () => {
+    uni.navigateTo({
+        url: '/pages/productCate/index'
+    });
+    closeSidebar();
+};
+
+// 需要登录的功能统一处理
+const handleLoginRequired = (callback: () => void) => {
+    if (!userStore.token) {
+        // 在微信生态下触发微信快捷登录
+        if (
+            configStore.openWechatOauth === 1 &&
+            configStore.openWechatRegister === 1 &&
+            (configStore.XClientType === "miniProgram" || configStore.XClientType === "wechat")
+        ) {
+            userStore.setAuthType("wechatLogin");
+        } else {
+            // 其他情况跳转到登录页面
+            uni.navigateTo({
+                url: '/pages/login/index'
+            });
+        }
+        return;
+    }
+    callback();
+};
+
+const goToOrders = () => {
+    handleLoginRequired(() => {
+        uni.navigateTo({
+            url: '/pages/user/order/index'
+        });
+    });
+    closeSidebar();
+};
+
+const goToMessages = () => {
+    handleLoginRequired(() => {
+        uni.navigateTo({
+            url: '/pages/user/messageLog/index'
+        });
+    });
+    closeSidebar();
+};
+
+const goToWishlist = () => {
+    handleLoginRequired(() => {
+        uni.navigateTo({
+            url: '/pages/user/collectProduct/index'
+        });
+    });
+    closeSidebar();
+};
+
+const goToCoupons = () => {
+    handleLoginRequired(() => {
+        uni.navigateTo({
+            url: '/pages/coupon/index'
+        });
+    });
+    closeSidebar();
+};
+
+const goToAddress = () => {
+    handleLoginRequired(() => {
+        uni.navigateTo({
+            url: '/pages/address/list'
+        });
+    });
+    closeSidebar();
+};
+
+const goToSettings = () => {
+    uni.navigateTo({
+        url: '/pages/user/profile/index'
+    });
+    closeSidebar();
+};
+
 
 // 获取秒杀数据
 // const getSeckillData = async () => {
@@ -827,10 +1110,7 @@ onUnload(() => {
     stopNoticeRotation();
     stopCountdown();
 });
-onPullDownRefresh(() => {
-    catnavStore.reset();
-    getIndexData();
-});
+
 
 onReachBottom(() => {
     if (!loading.value && !loadend.value) {
@@ -1063,6 +1343,137 @@ page {
 .index-page {
     background-color: #F5F5F5;
     min-height: 100vh;
+    position: relative;
+}
+
+/* 侧边栏遮罩 */
+.sidebar-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* 侧边栏 */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -600rpx;
+    width: 600rpx;
+    height: 100%;
+    background-color: #fff;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    border-radius: 0 20rpx 20rpx 0;
+    box-shadow: 2rpx 0 20rpx rgba(0, 0, 0, 0.1);
+
+    &.sidebar-open {
+        left: 0;
+    }
+}
+
+.sidebar-content {
+    padding: 250rpx 0;
+    height: 100%;
+    overflow-y: auto;
+    background-color: #F6F6F6;
+}
+
+/* 用户信息区域 */
+.user-section {
+    border-radius: 20rpx;
+    margin: -50rpx 23rpx 20rpx -18rpx;
+    padding: 30rpx;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 15rpx 5rpx 0 15rpx;
+}
+
+.user-avatar {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 60rpx;
+    margin-right: 30rpx;
+    background-color: #f5f5f5;
+    position: relative;
+
+   
+}
+
+.user-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    &:active {
+        opacity: 0.7;
+    }
+}
+
+.user-name {
+    font-size: 36rpx;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10rpx;
+}
+
+.user-phone {
+    font-size: 26rpx;
+    color: #999;
+}
+
+.arrow-icon {
+    width: 24rpx;
+    height: 24rpx;
+}
+
+/* 菜单区域 */
+.menu-section {
+    margin-bottom: 20rpx;
+    margin-left: 20rpx;
+    margin-right: 20rpx;
+    border-radius: 30rpx;
+    background-color: #fff;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    &:last-child {
+        margin-bottom: 20rpx;
+    }
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 30rpx 40rpx;
+    border-bottom: 1rpx solid #f8f8f8;
+
+    &:active {
+        background-color: #f8f8f8;
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.menu-icon {
+    width: 40rpx;
+    height: 40rpx;
+    margin-right: 30rpx;
+}
+
+.menu-text {
+    flex: 1;
+    font-size: 30rpx;
+    color: #333;
 }
 
 /* 自定义导航栏 */
@@ -1101,9 +1512,11 @@ page {
             // align-items: center;
             
             .logo-text {
-                font-size: 33rpx;
-                font-weight: bold;
+                font-size: 38rpx;
+                font-weight: 500;
                 color: #333;
+                position: relative;
+                right: 15rpx;
             }
         }
     }
@@ -3284,3 +3697,4 @@ page {
 }
 }
 </style>
+    

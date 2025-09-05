@@ -26,8 +26,8 @@
         </block>
     </view>
     <view v-if="filterStateLog.length === 0 && loadend === true" class="empty-box">
-        <view class="pictrue"><image :src="staticResource('common/data_empty.png')" /></view>
-        <view class="txt">{{ $t("暂无数据") }}！</view>
+        <view class="pictrue"><image src="/static/images/missing_page/missing_address.png" /></view>
+        <view class="txt">{{ $t("暂无数据") }}</view>
     </view>
     <loading-box v-model="loaded" :page="filterParams.page" :length="filterStateLog.length" />
 </template>

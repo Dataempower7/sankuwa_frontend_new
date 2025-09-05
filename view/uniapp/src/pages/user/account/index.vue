@@ -1,24 +1,28 @@
 <template>
     <tig-layout title="资金管理">
         <view class="top-card">
-            <view class="balance-row"> {{ $t("可用余额") }} </view>
-            <view class="amount-row">
-                <format-price
-                    :show-text="false"
-                    :price-data="formState.balance"
-                    :decimals-style="{
-                        fontSize: '40rpx',
-                        fontWeight: 'bold'
-                    }"
-                    :currency-style="{
-                        fontSize: '38rpx',
-                        fontWeight: 'bold'
-                    }"
-                />
-            </view>
-            <view class="button-row">
-                <view class="round-button" :class="{ active: activeTab === 'deposit' }" @click="actionClick('deposit')">{{ $t("充值") }}</view>
-                <view class="round-button" :class="{ active: activeTab === 'raplytocard' }" @click="actionClick('raplytocard')">{{ $t("提现") }}</view>
+            <image class="card-bg" src="/static/images/common/balance.png" mode="aspectFill"></image>
+            <view class="card-content">
+                <view class="balance-row"> {{ $t("可用余额") }} </view>
+                <view class="amount-row">
+                    <format-price
+                        :show-text="false"
+                        :price-data="formState.balance"
+                        :decimals-style="{
+                            fontSize: '40rpx',
+                            fontWeight: 'bold'
+                        }"
+                        :currency-style="{
+                            fontSize: '38rpx',
+                            fontWeight: 'bold'
+                        }"
+                    />
+                </view>
+                <view class="button-row">
+                    <view class="round-button" :class="{ active: activeTab === 'deposit' }" @click="actionClick('deposit')">{{ $t("充值") }}</view>
+                    <view class="divider"></view>
+                    <view class="round-button" :class="{ active: activeTab === 'raplytocard' }" @click="actionClick('raplytocard')">{{ $t("提现") }}</view>
+                </view>
             </view>
         </view>
         <view v-if="activeTab === 'detail' || activeTab === 'log'" class="custom-tabs">
@@ -88,55 +92,78 @@ onLoad(() => {
 </script>
 <style lang="scss" scoped>
 .top-card {
-    background: var(--general);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 10rpx;
+    position: relative;
+    border-radius: 35rpx;
     margin: 20rpx;
-    color: #fff;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    padding: 60rpx;
+    overflow: hidden;
 
-    .balance-row,
-    .amount-row,
-    .button-row {
-        text-align: center;
-        margin: 20rpx 20rpx 0;
+    .card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
     }
 
-    .balance-row {
-        font-size: 36rpx;
-    }
-
-    .amount-row {
-        font-size: 52rpx;
-        font-weight: 400;
-    }
-
-    .button-row {
+    .card-content {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+        box-sizing: border-box;
         display: flex;
-        margin-top: 60rpx;
-        justify-content: space-evenly;
-        gap: 20rpx;
-        height: 60rpx;
+        flex-direction: column;
+        padding: 60rpx;
 
-        .round-button {
-            height: 60rpx;
-            line-height: 60rpx;
-            border-radius: 46rpx;
-            flex: 1;
-            border: 2rpx solid white;
-            color: white;
-            outline: none;
-            font-size: 24rpx;
-            background-color: var(--general);
-            &.active {
-                background-color: #fff;
-                color: var(--general);
-                font-weight: 700;
+        .balance-row {
+            text-align: left;
+            font-size: 32rpx;
+            margin-bottom: 20rpx;
+            opacity: 0.9;
+        }
+
+        .amount-row {
+            text-align: left;
+            font-size: 72rpx;
+            font-weight: bold;
+            margin-bottom: 60rpx;
+        }
+
+        .button-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80rpx;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 40rpx;
+            padding: 0 40rpx;
+
+            .round-button {
+                flex: 1;
+                text-align: center;
+                color: white;
+                font-size: 32rpx;
+                font-weight: 500;
+                background: none;
+                border: none;
+                outline: none;
+                padding: 20rpx;
+                transition: all 0.2s ease;
+
+                &:active {
+                    opacity: 0.7;
+                }
+
+                &.active {
+                    font-weight: bold;
+                }
+            }
+
+            .divider {
+                width: 2rpx;
+                height: 40rpx;
+                background-color: rgba(255, 255, 255, 0.4);
+                margin: 0 20rpx;
             }
         }
     }

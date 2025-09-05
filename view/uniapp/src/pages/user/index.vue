@@ -39,14 +39,14 @@
                 </view>
 
                 <!-- 会员等级卡片 -->
-                <view class="member-card" >
-                    <image src="@/static/images/member/huiyuan_background.png" class="card-bg" />
+                <view class="member-card" @click="goPages('/pages/user/levelCenter/index')">
+                    <image :src="getMemberCardBg(member?.rankName)" class="card-bg" />
                     <view class="card-content">
-                        <view class="member-level">
-                            <image src="@/static/images/member/huangguan-2@3x.png" class="crown-icon" />
-                            <text class="level-text">{{ member?.rankName  }}</text>
+                        <view class="member-level" @click.stop="goPages('/pages/user/levelCenter/index')">
+                            <image :src="member?.rankLogo" class="crown-icon" />
+                            <text class="level-text">{{ member?.rankName ||  '请先登录' }}</text>
                         </view>
-                        <view class="growth-value">{{member?.rankLevel || "-"}} 成长值</view>
+                        <view class="growth-value">{{member?.growthPoints || "-"}} 成长值</view>
 
                         <!-- 余额、优惠券、积分 -->
                         <view class="wallet-info" >
@@ -213,7 +213,17 @@ const goPages = (url: string) => {
     });
 };
 
-
+// 根据会员等级名称获取对应的背景图片
+const getMemberCardBg = (rankName: string) => {
+    const rankBgMap: { [key: string]: string } = {
+        '黄金会员': '/static/images/member/gold.png',
+        '铂金会员': '/static/images/member/platinum.png',
+        '黑金会员': '/static/images/member/black_gold.png',
+        '钻石会员': '/static/images/member/diamond.png',
+        '至尊会员': '/static/images/member/supreme.png'
+    };
+    return rankBgMap[rankName] || '/static/images/member/gold.png';
+};
 
 const resetUser = () => {
     member.value = {} as UserItem;
@@ -399,9 +409,10 @@ page {
                 margin-bottom: 20rpx;
 
                 .crown-icon {
-                    width: 48rpx;
-                    height: 48rpx;
+                    width: 45rpx;
+                    height: 40rpx;
                     margin-right: 16rpx;
+                    margin-top: -10rpx;
                 }
 
                 .level-text {

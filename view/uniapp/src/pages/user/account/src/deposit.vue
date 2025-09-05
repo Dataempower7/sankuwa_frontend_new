@@ -36,8 +36,21 @@
     </view>
     <tig-fixed-placeholder background-color="#fff">
         <view class="btn-box">
-            <tig-button class="btn" plain @click="backDetail"> {{ $t("取消充值") }} </tig-button>
-            <tig-button class="btn" @click="onSubmit"> {{ $t("提交申请") }} </tig-button>
+            <tig-button
+                class="btn cancel-btn"
+                plain
+                style="background-color: white !important; color: #666666 !important; border: 2rpx solid #e5e5e5 !important; border-radius: 50rpx !important;"
+                @click="backDetail"
+            >
+                {{ $t("取消充值") }}
+            </tig-button>
+            <tig-button
+                class="btn submit-btn"
+                style="background-color: #3544BA !important; color: white !important; border: none !important; border-radius: 50rpx !important;"
+                @click="onSubmit"
+            >
+                {{ $t("提交申请") }}
+            </tig-button>
         </view>
     </tig-fixed-placeholder>
 </template>
@@ -144,7 +157,7 @@ const backDetail = () => {
 .recharge-box {
     margin: 0 10px;
     margin-top: 20px;
-    border-radius: 10rpx;
+    border-radius: 30rpx;
     background: #fff;
     .recharge-wrap {
         padding: 20rpx;
@@ -152,16 +165,36 @@ const backDetail = () => {
         flex-wrap: wrap;
         align-content: flex-start;
         .recharge-item {
+            position: relative;
             width: 31.3%;
             border: 2rpx solid #eee;
             padding: 30rpx 0;
             text-align: center;
             font-size: 28rpx;
-            border-radius: 10rpx;
+            border-radius: 20rpx;
             color: var(--general);
             margin: 1%;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+
             &.selected {
-                border: 2rpx solid var(--general);
+                border: 2rpx solid #3544BA;
+                background-color: #f0f2ff;
+
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: -1rpx;
+                    right: -1rpx;
+                    width: 28rpx;
+                    height: 28rpx;
+                    background-image: url('/static/images/common/dagou.png');
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    z-index: 1;
+                }
             }
             &:last-child {
                 background: #fff;
@@ -200,10 +233,47 @@ const backDetail = () => {
     align-items: center;
     justify-content: center;
     height: 100%;
+    gap: 20rpx;
 
     .btn {
         width: 48%;
         font-size: 28rpx;
+        border-radius: 50rpx;
+        height: 88rpx;
     }
+
+
+}
+
+/* 使用深度选择器覆盖组件样式 */
+:deep(.cancel-btn) {
+    background-color: white !important;
+    color: #666666 !important;
+    border: 2rpx solid #e5e5e5 !important;
+}
+
+:deep(.cancel-btn .u-button__text) {
+    color: #666666 !important;
+}
+
+:deep(.submit-btn) {
+    background-color: #3544BA !important;
+    color: white !important;
+    border: none !important;
+}
+
+:deep(.submit-btn .u-button__text) {
+    color: white !important;
+}
+
+/* 如果上面的方式还不行，尝试更具体的选择器 */
+:deep(.btn-box .cancel-btn) {
+    background: white !important;
+    border: 2rpx solid #e5e5e5 !important;
+}
+
+:deep(.btn-box .submit-btn) {
+    background: #3544BA !important;
+    border: none !important;
 }
 </style>

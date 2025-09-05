@@ -33,9 +33,14 @@
                         </view>
                     </view>
                 </block>
-                <block v-else>
-                    <empty-box mode="news" text="暂无文章" />
-                </block>
+                <view v-else class="empty-state">
+                    <view class="empty-image">
+                        <img src="/static/images/missing_page/missing_address.png" />
+                    </view>
+                    <view class="empty-text">
+                        <text>暂无文章</text>
+                    </view>
+                </view>
                 <loading-box v-model="loaded" :page="filterParams.page" :length="articleList.length" />
             </view>
         </view>
@@ -124,7 +129,7 @@ onReachBottom(() => {
             background-color: #fff;
             padding: 24rpx;
             overflow: hidden;
-            border-radius: 8rpx;
+            border-radius: 30rpx;
             margin-bottom: 20rpx;
             display: flex;
             flex-direction: column;
@@ -174,11 +179,11 @@ onReachBottom(() => {
                 align-items: center;
                 justify-content: space-between;
                 .evaluate {
-                    border: 1rpx solid #e3e3e3;
-                    border-radius: 10rpx;
+                  
                     height: 46rpx;
                     line-height: 46rpx;
-                    margin-right: 16rpx;
+                   // margin-right: 16rpx;
+                    margin-left: -13rpx;
                     .time {
                         padding-left: 20rpx;
                         color: #9b9b9b;
@@ -194,6 +199,7 @@ onReachBottom(() => {
                     line-height: 46rpx;
                     text-align: center;
                     color: #fff;
+                    
                 }
             }
         }
@@ -210,11 +216,41 @@ onReachBottom(() => {
     max-width: none;
     display: inline-block;
     padding: 0 16rpx;
+    border-radius: 8rpx;
 }
 .empty {
     color: #999;
     padding: 48rpx 0;
     text-align: center;
     font-size: 28rpx;
+}
+
+/* 空状态样式 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100rpx 40rpx;
+    text-align: center;
+    min-height: 400rpx;
+
+    .empty-image {
+        margin-bottom: 40rpx;
+
+        img {
+            width: 200rpx;
+            height: 200rpx;
+            display: block;
+        }
+    }
+
+    .empty-text {
+        text {
+            font-size: 28rpx;
+            color: #999;
+            line-height: 1.5;
+        }
+    }
 }
 </style>
