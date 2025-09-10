@@ -277,9 +277,10 @@
                 </up-form>
             </template>
             <template v-if="currentStep === 4">
-                <view class="status-box">
+
+                <view class="status-box" v-if="formData.status == 1">
                     <view class="status-text">
-                        <template v-if="formData.status == 1">
+                        <template >
                             <view style="color: #EAA034"> {{ $t("申请已受理") }}（{{ formData.addTime }}）,{{ $t("将在1-3个工作日内完成审核。以下为本次申请内容") }}：</view>
                         </template>
                         <!-- <template v-if="formData.status == 10">
@@ -289,16 +290,22 @@
                             </view>
                             <view v-if="formData.auditRemark"> {{ $t("备注") }}：{{ formData.auditRemark }} </view>
                         </template> -->
-                        <template v-if="formData.status == 20">
-                            <view >
-                                {{ $t("很遗憾") }}，{{ $t("您的申请审核") }}<text class="specaial-text">{{ $t("未通过") }}</text
+                    </view>
+                </view>
+
+                <!-- 审核未通过 -->
+                <view class="status-box_error" v-if="formData.status == 20">
+                    <view class="status-text_error">
+                        <template >
+                            <view style="color: red;">
+                                {{ $t("!!很遗憾") }}，{{ $t("您的申请审核") }}<text class="specaial-text">{{ $t("未通过") }}</text
                                 >。</view
                             >
-                            <div v-if="formData.auditRemark" >{{ $t("备注") }}：{{ formData.auditRemark }}</div>
-                            <view>{{ $t("重新审核") }} </view>
+                            <div v-if="formData.auditRemark" style="color: red;">{{ $t("备注") }}：{{ formData.auditRemark }}，{{ $t("请修改后重新提交审核") }} </div>
                         </template>
                     </view>
                 </view>
+
                 <up-form label-position="left" label-width="115">
                     <view class="form-box">
                         <view class="form-title">{{ $t("联系人信息") }}</view>
@@ -1182,8 +1189,24 @@ const handlReapply = () => {
     }
 }
 
+.status-box_error{
+    background: none repeat scroll 0 0 #FFF0F0;
+    border: 1px solid #FC7D84;
+    padding: 20rpx;
+    font-size: 28rpx;
+    margin: 20rpx 20rpx;
+    border-radius: 35rpx;
+
+    .status-text_error{
+        padding-bottom: 15rpx;
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+}
+
 .specaial-text {
-    color: black;
+    color: rgb(255, 0, 0);
 }
 
 .form-box {

@@ -637,24 +637,19 @@ const loadTabProducts = async () => {
     if (productLoading.value) return;
 
     productLoading.value = true;
-    console.log('开始加载商品数据，当前标签:', activeTabIndex.value);
 
     try {
         const currentTab = productTabs.value[activeTabIndex.value];
         const params = {
             page: currentPage.value,
-            size: 8,
+            size: 12,
             ...currentTab.params
         };
 
-        console.log('请求参数:', params);
         const result = await getCateProduct(params);
-        console.log('商品数据加载结果:', result);
 
         currentProducts.value = result.records || [];
-        console.log('当前商品列表:', currentProducts.value);
     } catch (error) {
-        console.error('加载商品失败:', error);
         uni.showToast({
             title: '加载商品失败',
             icon: 'none'
@@ -678,7 +673,7 @@ const refreshProducts = async () => {
         const currentTab = productTabs.value[activeTabIndex.value];
         const params = {
             page: currentPage.value,
-            size: 8,
+            size: 12,
             ...currentTab.params
         };
 
@@ -921,7 +916,7 @@ const handleLoginRequired = (callback: () => void) => {
 const goToOrders = () => {
     handleLoginRequired(() => {
         uni.navigateTo({
-            url: '/pages/user/order/index'
+            url: '/pages/user/order/list'
         });
     });
     closeSidebar();

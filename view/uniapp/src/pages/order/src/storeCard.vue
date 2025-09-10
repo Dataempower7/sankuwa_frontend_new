@@ -709,6 +709,14 @@ const handleAttribute = () => {
                 width: 100%;
             }
 
+            .line2{
+                    word-break: break-all;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+            }
+
             .right-price-box {
                 width: 100%;
                 display: flex;

@@ -19,6 +19,7 @@ export interface OrderListFilterParams {
     size: number;
     orderStatus: number;
     commentStatus: number;
+    isAfterSaleCompleted?: boolean;
 }
 
 export interface OrderListResponse {
@@ -110,6 +111,7 @@ export interface OrderListFilterResult {
     items: OrderListItem[];
     autoDeliveryDays: number | null;
     shop: Shop;
+    isAfterSaleCompleted?: boolean;
 }
 export interface Shop {
     description: string;

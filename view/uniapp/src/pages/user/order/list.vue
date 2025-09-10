@@ -197,19 +197,19 @@
                                         </view>
                                         <view
                                             class="logistics-btn"
-                                            style="padding: 16rpx 32rpx; border: 1rpx solid #808080; border-radius: 50rpx; background-color: #fff;"
-                                            @tap="handleLogisticsDetail(item.orderId)"
-                                            @click="handleLogisticsDetail(item.orderId)"
+                                            style="padding: 16rpx 32rpx; border: 1rpx solid #3544BA; border-radius: 50rpx; background-color: #3544BA;"
+                                            @tap="handleAfterSales(item.orderId)"
+                                            @click="handleAfterSales(item.orderId)"
                                         >
-                                            <text class="logistics-btn-text" style="font-size: 28rpx; color: #1c1c1c;">物流详情</text>
+                                            <text class="logistics-btn-text" style="font-size: 28rpx; color: #ffffff;">申请售后</text>
                                         </view>
                                     </view>
                                 </view>
                             </view>
                         </template>
 
-                        <!-- 待评价订单的特殊底部样式 -->
-                        <template v-else-if="item.availableActions.toComment">
+                        <!-- 待评价订单的特殊底部样式：只有确认收货后且没有售后完成的订单才显示 -->
+                        <template v-else-if="item.payStatus === 2 && item.orderStatus === 5 && item.shippingStatus === 2">
                             <view class="order-pay-footer">
                                 <!-- 商品统计和总价 -->
                                 <view class="pay-summary">
@@ -298,7 +298,7 @@
                                     <text class="summary-text">共{{ getTotalQuantity(item.items) }}件商品</text>
                                     <view class="summary-price">
                                         <text style="font-size: 28rpx; color: #666;">实付款：</text>
-                                        <text class="price-amount">¥{{ formatPrices(item.totalAmount || 0) }}</text>
+                                        <text class="price-amount">￥{{ formatPrices(item.totalAmount || 0) }}</text>
                                     </view>
                                 </view>
 
@@ -315,14 +315,28 @@
                                     </view>
 
                                     <view class="action-right">
-                                        <view
-                                            class="invoice-btn"
-                                            style="padding: 16rpx 32rpx; border: 1rpx solid #808080; border-radius: 50rpx; background-color: #fff;"
-                                            @tap="handleApplyInvoice(item.orderId)"
-                                            @click="handleApplyInvoice(item.orderId)"
-                                        >
-                                            <text class="invoice-btn-text" style="font-size: 28rpx; color: #1c1c1c;">申请开票</text>
-                                        </view>
+                                        <!-- 如果是售后完成订单，显示售后详情按钮 -->
+                                        <template v-if="item.isAfterSaleCompleted">
+                                            <view
+                                                class="after-sale-detail-btn"
+                                                style="padding: 16rpx 32rpx; border: 1rpx solid #808080; border-radius: 50rpx; background-color: #fff;"
+                                                @tap="handleAfterSaleDetail(item.orderId)"
+                                                @click="handleAfterSaleDetail(item.orderId)"
+                                            >
+                                                <text class="after-sale-detail-btn-text" style="font-size: 28rpx; color: #1c1c1c;">售后详情</text>
+                                            </view>
+                                        </template>
+                                        <!-- 普通已完成订单显示申请开票按钮 -->
+                                        <template v-else>
+                                            <view
+                                                class="invoice-btn"
+                                                style="padding: 16rpx 32rpx; border: 1rpx solid #808080; border-radius: 50rpx; background-color: #fff;"
+                                                @tap="handleApplyInvoice(item.orderId)"
+                                                @click="handleApplyInvoice(item.orderId)"
+                                            >
+                                                <text class="invoice-btn-text" style="font-size: 28rpx; color: #1c1c1c;">申请开票</text>
+                                            </view>
+                                        </template>
                                     </view>
                                 </view>
                             </view>
@@ -422,8 +436,9 @@
                                     >
                                         {{ $t("再次购买") }}
                                     </tig-button>
+                                    <!-- 只有在没有售后完成的情况下才显示去评价按钮 -->
                                     <tig-button
-                                        v-if="item.availableActions.toComment"
+                                        v-if="item.availableActions.toComment && !item.isAfterSaleCompleted"
                                         color="#333"
                                         class="btn-margin"
                                         :custom-style="{ height: '55rpx' }"
@@ -431,6 +446,17 @@
                                         @click="handleEvaluate(item.orderId)"
                                     >
                                         {{ $t("去评价") }}
+                                    </tig-button>
+                                    <!-- 如果是售后完成订单，显示售后详情按钮 -->
+                                    <tig-button
+                                        v-if="item.isAfterSaleCompleted"
+                                        color="#333"
+                                        class="btn-margin"
+                                        :custom-style="{ height: '55rpx' }"
+                                        :plain="true"
+                                        @click="handleAfterSaleDetail(item.orderId)"
+                                    >
+                                        {{ $t("售后详情") }}
                                     </tig-button>
                                     <tig-button
                                         v-if="item.availableActions.confirmReceipt"
@@ -484,10 +510,25 @@
                 <view class="dropdown-arrow"></view>
 
                 <!-- 根据订单状态显示不同的菜单项 -->
-                <template v-if="getExpandedOrder()?.availableActions?.toComment">
-                    <!-- 待评价订单的菜单项 -->
+                <template v-if="getExpandedOrder()?.availableActions?.toComment && !getExpandedOrder()?.isAfterSaleCompleted">
+                    <!-- 待评价订单的菜单项（仅限非售后完成订单） -->
                     <view class="dropdown-item" @tap="handleDropdownItemClick(handleAfterSales, expandedOrderId)" @click="handleDropdownItemClick(handleAfterSales, expandedOrderId)">
                         <text class="dropdown-text">申请售后</text>
+                    </view>
+                    <view class="dropdown-item" @tap="handleDropdownItemClick(handleAddToCart, expandedOrderId)" @click="handleDropdownItemClick(handleAddToCart, expandedOrderId)">
+                        <text class="dropdown-text">加入购物车</text>
+                    </view>
+                    <view class="dropdown-item" @tap="handleDropdownItemClick(handleLogisticsDetail, expandedOrderId)" @click="handleDropdownItemClick(handleLogisticsDetail, expandedOrderId)">
+                        <text class="dropdown-text">物流详情</text>
+                    </view>
+                    <view class="dropdown-item" @tap="handleDropdownItemClick(handleDelOrder, expandedOrderId)" @click="handleDropdownItemClick(handleDelOrder, expandedOrderId)">
+                        <text class="dropdown-text">删除订单</text>
+                    </view>
+                </template>
+                <template v-else-if="getExpandedOrder()?.isAfterSaleCompleted">
+                    <!-- 售后完成订单的菜单项 -->
+                    <view class="dropdown-item" @tap="handleDropdownItemClick(handleAfterSaleDetail, expandedOrderId)" @click="handleDropdownItemClick(handleAfterSaleDetail, expandedOrderId)">
+                        <text class="dropdown-text">售后详情</text>
                     </view>
                     <view class="dropdown-item" @tap="handleDropdownItemClick(handleAddToCart, expandedOrderId)" @click="handleDropdownItemClick(handleAddToCart, expandedOrderId)">
                         <text class="dropdown-text">加入购物车</text>
@@ -585,10 +626,12 @@ const changeMenu = (data: any) => {
     orderList.value = [];
     if (data.type === "awaitComment") {
         filterParams.commentStatus = 0;
-        filterParams.orderStatus = -1;
+        filterParams.orderStatus = 5; // 只显示已完成的订单
+        filterParams.isAfterSaleCompleted = false; // 排除售后完成的订单
     } else {
         filterParams.orderStatus = formatOrderStatus(data.type);
         filterParams.commentStatus = -1;
+        delete filterParams.isAfterSaleCompleted; // 其他类型不过滤售后状态
     }
     getList();
 };
@@ -700,6 +743,13 @@ const handleApplyInvoice = (orderId: number) => {
 const handleLogisticsDetail = (orderId: number) => {
     uni.navigateTo({
         url: `/pages/user/order/logistics?orderId=${orderId}`
+    });
+};
+
+// 处理售后详情
+const handleAfterSaleDetail = (orderId: number) => {
+    uni.navigateTo({
+        url: `/pages/user/afterSale/detail?orderId=${orderId}`
     });
 };
 
@@ -1401,13 +1451,13 @@ onUnmounted(() => {
             /* 待发货订单的物流详情按钮 */
             .logistics-btn {
                 padding: 16rpx 32rpx;
-                border: 1rpx solid #808080;
+                border: 1rpx solid #3544BA;
                 border-radius: 50rpx;
-                background-color: #fff;
+                background-color: #3544BA;
 
                 .logistics-btn-text {
                     font-size: 28rpx;
-                    color: #1c1c1c;
+                    color: #ffffff;
                     font-weight: 500;
                 }
 

@@ -1,85 +1,75 @@
 <template>
-    <view v-if="formState.registType === 'mobile'">
-        <view class="item">
-            <view class="text mobileareacode-box">
-                <template v-if="configStore.isOpenMobileAreaCode">
-                    <tig-mobile-areacode v-model="mobileAreaCode" />
-                </template>
-                <input type="text" :value="mobile" :placeholder="$t('请输入手机号')" placeholder-class="placeholder" class="mobile-text" @input="mobileInput" />
-            </view>
-        </view>
-        <view class="item mobile_code_text">
-            <view style="flex: 1; margin-right: 10rpx">
-                <input
-                    type="text"
-                    :placeholder="$t('手机短信验证码')"
-                    placeholder-class="placeholder"
-                    :value="mobileCode"
-                    name="mobile_code"
-                    class="text"
-                    @input="mobileCodeInput"
+    <!-- 手机号输入 -->
+    <view class="input-group">
+        <template v-if="configStore.isOpenMobileAreaCode">
+            <view class="country-code">
+                <tig-mobile-areacode
+                    v-model="mobileAreaCode"
+                    :label-style="{ fontSize: '28rpx' }"
+                    :name-style="{ fontSize: '24rpx', padding: '0 2rpx 0 10rpx' }"
+                    :box-style="{ paddingRight: '0' }"
+                    :icon-style="{ fontSize: '22rpx' }"
                 />
             </view>
-            <verificationCode
-                v-model:is-checked="isChecked"
-                v-model:verify-token-data="verifyToken"
-                style="height: 65rpx"
-                :mobile="configStore.isOpenMobileAreaCode ? mobileAreaCode + mobile : mobile"
-                event="forgetPassword"
-                :request-api="sendMobileCode"
-                @mobile-error-callback="mobileErrorCallback"
-            />
-        </view>
-    </view>
-    <view v-else>
-        <view class="item">
-            <view class="text mobileareacode-box">
-                <input
-                    type="text"
-                    :placeholder="$t('请输入邮箱')"
-                    placeholder-class="placeholder"
-                    :value="email"
-                    name="mobile_code"
-                    class="mobile-text"
-                    @input="inputEmail"
-                />
-            </view>
-        </view>
-        <view class="item mobile_code_text">
-            <view style="flex: 1; margin-right: 10rpx">
-                <input
-                    type="text"
-                    :placeholder="$t('邮箱验证码')"
-                    placeholder-class="placeholder"
-                    :value="emailCode"
-                    name="mobile_code"
-                    class="text"
-                    @input="inputMobileCode"
-                />
-            </view>
-            <verificationCode
-                v-model:is-checked="isChecked"
-                v-model:email="email"
-                v-model:verify-token-data="verifyToken"
-                event="forgetPassword"
-                style="height: 65rpx"
-                :request-api="sendEmailCode"
-                @mobile-error-callback="mobileErrorCallback"
-            />
-        </view>
-    </view>
-    <view class="btn2-css3">
-        <tig-button :loading-text="$t('下 一 步')" :loading="isLoading" @click="handleNext">
-            {{ $t("下 一 步") }}
-        </tig-button>
-    </view>
-    <view class="bottom-bar">
-        <template v-if="configStore.openEmailRegister === 1">
-            <view class="change-btn" @click="registerTypeChange(formState.registType === 'email' ? 'mobile' : 'email')">
-                {{ formState.registType === "email" ? $t("手机号找回") : $t("邮箱找回") }}
-            </view>
+            <view class="divider">|</view>
         </template>
-        <view class="login-text" @click="handleToLogin">{{ $t("立即登录") }}</view>
+        <template v-else>
+            <view class="input-label">手机号</view>
+            <view class="divider">|</view>
+        </template>
+        <input 
+            type="number" 
+            :value="mobile" 
+            :placeholder="$t('请输入手机号')" 
+            placeholder-class="custom-placeholder" 
+            class="custom-input"
+            maxlength="11"
+            @input="mobileInput" 
+        />
+    </view>
+
+    <!-- 验证码输入 -->
+    <view class="input-group verification-group">
+        <view class="input-label">验证码</view>
+        <view class="divider">|</view>
+        <input
+            type="number"
+            :placeholder="$t('手机短信验证码')"
+            placeholder-class="custom-placeholder"
+            :value="mobileCode"
+            name="mobile_code"
+            class="custom-input verification-input"
+            maxlength="6"
+            @input="mobileCodeInput"
+        />
+        <verificationCode
+            v-model:is-checked="isChecked"
+            v-model:verify-token-data="verifyToken"
+            class="verification-btn"
+            btn-type="text"
+            :mobile="configStore.isOpenMobileAreaCode ? mobileAreaCode + mobile : mobile"
+            event="forgetPassword"
+            :request-api="sendMobileCode"
+            @mobile-error-callback="mobileErrorCallback"
+        />
+    </view>
+
+    <!-- 下一步按钮 -->
+    <tig-button 
+        :loading-text="$t('下 一 步')" 
+        :loading="isLoading" 
+        :disabled="isDisabled" 
+        class="next-button"
+        color="#2F3C51"
+        style="border-radius: 8px; height: 45px;"
+        @click="handleNext"
+    >
+        {{ $t("下 一 步") }}
+    </tig-button>
+
+    <!-- 登录链接 -->
+    <view class="login-link" @click="handleToLogin">
+        {{ $t("立即登录") }}
     </view>
 </template>
 
@@ -87,7 +77,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useConfigStore } from "@/store/config";
-import { sendMobileCode, checkMobile, sendEmailCode, checkEmail } from "@/api/login/login";
+import { sendMobileCode, checkMobile } from "@/api/login/login";
 import VerificationCode from "@/components/verificationCode/index.vue";
 
 const mobileKey = defineModel("mobileKey");
@@ -98,22 +88,19 @@ const { t } = useI18n();
 const mobileAreaCode = ref("86");
 const isChecked = ref(true);
 const verifyToken = ref("");
-const email = ref("");
-const emailCode = ref("");
-const inputEmail = (e: any) => {
-    email.value = e.detail.value;
-};
-const inputMobileCode = (e: any) => {
-    emailCode.value = e.detail.value;
-};
 
 const mobile = ref("");
 const mobileInput = (e: any) => {
-    mobile.value = e.detail.value;
+    // 只允许输入数字，最多11位
+    const numericValue = e.detail.value.replace(/\D/g, '').slice(0, 11);
+    mobile.value = numericValue;
 };
+
 const mobileCode = ref("");
 const mobileCodeInput = (e: any) => {
-    mobileCode.value = e.detail.value;
+    // 只允许输入数字，最多6位
+    const numericValue = e.detail.value.replace(/\D/g, '').slice(0, 6);
+    mobileCode.value = numericValue;
 };
 const mobileErrorCallback = (msg: string) => {
     uni.showToast({
@@ -122,75 +109,75 @@ const mobileErrorCallback = (msg: string) => {
         icon: "none"
     });
 };
-const registerTypeChange = (type: string) => {
-    formState.value.registType = type;
-    if (type === "email") {
-        email.value = "";
-        emailCode.value = "";
-    } else {
-        mobile.value = "";
-        mobileCode.value = "";
-        mobileAreaCode.value = "86"; // 重置手机号区号为默认值
-    }
-};
-const formState = ref({
-    registType: "mobile" // 默认是手机号找回
-});
+
 const isLoading = ref(false);
 const isDisabled = computed(() => {
     return !mobile.value || !mobileCode.value || isLoading.value;
 });
 
+// 手机号校验函数
+const validateMobile = (value: string) => {
+    if (!value) {
+        return t("手机号不能为空");
+    }
+    
+    // 中国大陆手机号校验：11位数字，1开头，第二位为3-9
+    const chinaPattern = /^1[3-9]\d{9}$/;
+    
+    if (!chinaPattern.test(value)) {
+        return t("请输入正确的11位手机号");
+    }
+    
+    return null;
+};
+
+// 验证码校验函数
+const validateCode = (value: string) => {
+    if (!value) {
+        return t("验证码不能为空");
+    } else if (value.length !== 6) {
+        return t("请输入6位验证码");
+    }
+    
+    return null;
+};
+
 const handleNext = async () => {
-    if (formState.value.registType === "email") {
-        if (!email.value) {
-            return uni.showToast({
-                title: t("请输入邮箱"),
-                duration: 1500,
-                icon: "none"
-            });
-        }
-        if (!emailCode.value) {
-            return uni.showToast({
-                title: t("请输入邮箱验证码"),
-                duration: 1500,
-                icon: "none"
-            });
-        }
-    } else {
-        if (!mobile.value) {
-            return uni.showToast({
-                title: t("请输入手机号"),
-                duration: 1500,
-                icon: "none"
-            });
-        }
-        if (!mobileCode.value) {
-            return uni.showToast({
-                title: t("请输入手机验证码"),
-                duration: 1500,
-                icon: "none"
-            });
-        }
+    // 手机号校验
+    const mobileError = validateMobile(mobile.value);
+    if (mobileError) {
+        return uni.showToast({
+            title: mobileError,
+            duration: 1500,
+            icon: "none"
+        });
+    }
+    
+    // 校验是否点击了获取验证码按钮
+    if (!verifyToken.value) {
+        return uni.showToast({
+            title: t("请先点击获取验证码"),
+            duration: 1500,
+            icon: "none"
+        });
+    }
+    
+    // 验证码校验
+    const codeError = validateCode(mobileCode.value);
+    if (codeError) {
+        return uni.showToast({
+            title: codeError,
+            duration: 1500,
+            icon: "none"
+        });
     }
     isLoading.value = true;
     try {
-        let temp = {
+        const result = await checkMobile({
             mobile: configStore.isOpenMobileAreaCode ? mobileAreaCode.value + mobile.value : mobile.value,
             code: mobileCode.value
-        };
-        let tempEmail = {
-            email: email.value,
-            code: emailCode.value
-        };
-        // 这里根据类型调用不同接口
-        let result;
-        if (formState.value.registType === "email") {
-            result = await checkEmail(tempEmail);
-        } else {
-            result = await checkMobile(temp);
-        }
-        mobileKey.value = formState.value.registType === "email" ? result : result;
+        });
+        mobileKey.value = result.item;
         step.value = 2;
     } catch (error: any) {
         console.error(error);
@@ -212,73 +199,84 @@ const handleToLogin = () => {
 </script>
 
 <style lang="scss" scoped>
-.login-text {
+/* 输入框组样式 */
+.input-group {
     display: flex;
     align-items: center;
-    justify-content: center;
+    background: #f5f7fa;
+    border-radius: 8rpx;
+    padding: 0 20rpx;
     height: 100rpx;
-    color: #999;
+    margin: 0 -20rpx 32rpx -20rpx;
 }
-.mobileareacode-box {
-    display: flex;
-    align-items: center;
-    .mobile-text {
-        flex: 1;
-    }
-}
-.item {
-    margin-bottom: 70rpx;
-    position: relative;
-    .text {
-        border: 0;
-        border-radius: 0;
-        background-color: transparent;
-        padding-left: 0rpx;
-        height: 88rpx;
-        line-height: normal;
-        font-size: 28rpx;
-        color: #252525;
-        padding: 0;
-        font-weight: normal;
-        border-bottom: 1rpx solid #eee;
-    }
-    .get-mobile {
-        background-color: transparent;
-        padding-left: 0rpx;
-        height: 88rpx;
-        line-height: normal;
-        font-size: 28rpx;
-        color: #252525;
-        padding: 0;
-        font-weight: normal;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: 88;
-    }
-    .parent {
-        position: relative;
-    }
 
-    &.mobile_code_text {
-        width: 100%;
-        /* padding-right: 200rpx; */
-        align-items: center;
-        display: flex;
-    }
+.country-code {
+    width: 100rpx;
+    margin-left: 10rpx;
 }
-.change-btn {
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--general);
+
+.input-label {
+    width: 100rpx;
+    font-size: 28rpx;
+    color: #333;
+    font-weight: 500;
+    margin-left: 10rpx;
 }
-.bottom-bar {
+
+.divider {
+    color: #5776B6;
+    margin: 0 20rpx;
+    font-size: 30rpx;
+}
+
+.custom-input {
+    flex: 1;
+    background: transparent;
+    font-size: 28rpx;
+    color: #333;
+    border: none;
+    outline: none;
+}
+
+.custom-placeholder {
+    color: #c0c4cc;
+    font-size: 28rpx;
+}
+
+/* 验证码相关样式 */
+.verification-group {
+    position: relative;
+}
+
+.verification-input {
+    padding-right: 0rpx;
+}
+
+.verification-btn {
+    position: absolute;
+    right: 20rpx;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 160rpx;
+}
+
+/* 按钮样式 */
+.next-button {
+    width: 100%;
+    height: 85rpx;
+    margin: 80rpx 0 24rpx 0;
+    border-radius: 8rpx;
+    font-size: 32rpx;
+    font-weight: 500;
+}
+
+/* 登录链接样式 */
+.login-link {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20rpx;
-    // background-color: #f9f9f9;
-    border-top: 1rpx solid #eee;
+    justify-content: center;
+    height: 80rpx;
+    color: #6B81B6;
+    font-size: 28rpx;
 }
 </style>

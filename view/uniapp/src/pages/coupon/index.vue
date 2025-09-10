@@ -121,13 +121,13 @@
                                     <image
                                         v-if="item.status === 4"
                                         class="status-image"
-                                        src="/static/images/common/used.png"
+                                        src="/static/images/common/expired.png"
                                         mode="aspectFit"
                                     />
                                     <image
                                         v-if="item.status === 5"
                                         class="status-image"
-                                        src="/static/images/common/expired.png"
+                                        src="/static/images/common/used.png"
                                         mode="aspectFit"
                                     />
                                 </view>

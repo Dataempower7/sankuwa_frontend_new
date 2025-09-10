@@ -546,10 +546,12 @@
                                         <text class="more-text-custom">更多</text>
                                     </view>
                                 </view>
-
-                                <view class="action-right-custom">
+                                <view class="comment-order-right-custom">
                                     <view class="invoice-btn-custom" @click="handleInvoice">
                                         <text class="invoice-btn-text-custom">申请开票</text>
+                                    </view>
+                                    <view class="go-comment-btn-custom" @click="handleAfterSale(null)">
+                                        <text class="go-comment-text-custom">申请售后</text>
                                     </view>
                                 </view>
                             </view>
@@ -614,6 +616,7 @@
                                     <view class="invoice-btn-custom" @click="handleInvoice">
                                         <text class="invoice-btn-text-custom">申请开票</text>
                                     </view>
+
                                     <view class="confirm-receive-btn-custom" @click="handleConfirmReceipt(orderInfo.orderId)">
                                         <text class="confirm-receive-text-custom">确认收货</text>
                                     </view>
@@ -656,6 +659,7 @@
                         orderInfo.availableActions.toAftersales
                     "
                 >
+                <!-- 
                     <tig-fixed-placeholder height="100rpx" background-color="#fff">
                         <view class="order-info-btn">
                             <view class="order-info-btn-box">
@@ -677,7 +681,7 @@
                                 >
                                     {{ $t("确认已收货") }}
                                 </tig-button>
-                                <tig-button
+                              <tig-button
                                     v-if="orderInfo.availableActions.toAftersales"
                                     color="#333"
                                     class="btn"
@@ -688,7 +692,7 @@
                                 </tig-button>
                             </view>
                         </view>
-                    </tig-fixed-placeholder>
+                    </tig-fixed-placeholder>  -->
                 </template>
             </template>
         </view>
@@ -700,7 +704,7 @@
             @tap="closeMoreActions"
             @click="closeMoreActions"
         >
-            <view class="more-actions-dropdown" :style="{ top: dropdownTop + 'px', right: '20rpx' }">
+            <view class="more-actions-dropdown" :style="{ bottom: dropdownBottom + 'px', right: '303px' }">
                 <view class="dropdown-arrow-border"></view>
                 <view class="dropdown-arrow"></view>
 
@@ -807,7 +811,7 @@ const showMore = ref(false);
 // 待支付订单相关变量
 const countdownTime = ref<string>("");
 const showMoreActions = ref(false);
-const dropdownTop = ref(0);
+const dropdownBottom = ref(0);
 let countdownTimer: any = null;
 
 const id = ref<null | number>();
@@ -987,8 +991,8 @@ const formatPrices = (price: number | string) => {
 const toggleMoreActions = () => {
     showMoreActions.value = !showMoreActions.value;
     if (showMoreActions.value) {
-        // 设置下拉菜单位置
-        dropdownTop.value = 100; // 可以根据实际需要调整
+        // 设置下拉菜单位置：固定在底部上方，菜单从下往上展开
+        dropdownBottom.value = 102; // 可根据底部栏高度微调
     }
 };
 
@@ -1662,6 +1666,20 @@ onUnload(() => {
     border-radius: 50rpx;
 }
 
+/* 申请售后按钮样式 */
+.after-sale-btn-custom {
+    padding: 16rpx 40rpx;
+    background: #fff;
+    border: 2rpx solid #333;
+    border-radius: 50rpx;
+}
+
+.after-sale-btn-text-custom {
+    font-size: 30rpx;
+    color: #333;
+    font-weight: 500;
+}
+
 .invoice-btn-text-custom {
     font-size: 30rpx;
     color: #333;
@@ -1855,29 +1873,29 @@ onUnload(() => {
     min-width: 200rpx;
     overflow: hidden;
 
-    /* 箭头边框层 */
+    /* 箭头边框层（指向下，菜单在上方） */
     .dropdown-arrow-border {
         position: absolute;
-        top: -17rpx;
+        bottom: -17rpx;
         left: 60rpx;
         width: 0;
         height: 0;
         border-left: 17rpx solid transparent;
         border-right: 17rpx solid transparent;
-        border-bottom: 17rpx solid #e0e0e0;
+        border-top: 17rpx solid #e0e0e0;
         z-index: 1001;
     }
 
     /* 箭头主体层 */
     .dropdown-arrow {
         position: absolute;
-        top: -16rpx;
+        bottom: -16rpx;
         left: 61rpx;
         width: 0;
         height: 0;
         border-left: 16rpx solid transparent;
         border-right: 16rpx solid transparent;
-        border-bottom: 16rpx solid #fff;
+        border-top: 16rpx solid #fff;
         z-index: 1002;
     }
 

@@ -168,7 +168,7 @@ page {
     gap: 15rpx;
 
     .search-icon {
-        font-size: 45rpx;
+        font-size: 35rpx;
         color: #999;
     }
 

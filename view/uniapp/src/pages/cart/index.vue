@@ -20,11 +20,12 @@
                                 <view class="cart_store_title noborder">
                                     <tig-checkbox v-model:checked="item.isChecked" size="20" @change="onCheckAllItem(index)"  />
                                     <view class="store_label" @click="handleToShop(item.shopId)">{{ item.shopTitle ? item.shopTitle : $t("自营") }}</view>
+                                    <img src="@/static/images/home/enter@3x.png"  style="    width: 25rpx;height: 27rpx;  margin-left: 5rpx;" alt="" @click="handleToShop(item.shopId)">
                                 </view>
                                 <view class="goods-list-cart">
                                     <uni-swipe-action>
                                         <template v-for="(goods, index) in item.carts" :key="goods.productId">
-                                            <view class="cart_item">
+                                            <view class="cart_item">    
                                                 <uni-swipe-action-item :threshold="0" auto-close>
                                                     <view class="cart_list_con" :class="{ cartItemDisabled: goods.isDisabled }">
                                                         <tig-checkbox
@@ -929,6 +930,7 @@ const checkOutBarStyle = computed(() => {
     border-radius: 30rpx;
     background: #fff;
     padding-bottom: 20rpx;
+    margin-top: 30rpx;
 }
 .cart_list_wrap .cart_store_title {
     min-height: 90rpx;
@@ -1046,16 +1048,20 @@ const checkOutBarStyle = computed(() => {
         display: flex;
     }
 }
-.goods-list-cart .cart_item .cart-row .name {
+.goods-list-cart .cart_item .cart-row .line2 {
     font-size: 27rpx;
     margin-bottom: 10rpx;
     overflow: hidden;
     color: #323233;
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
 }
 
 .goods-list-cart .cart_item {
     .sku-card-box {
-        height: 48rpx;
+        height: 80rpx;
         margin: 15rpx 0 8rpx;
         box-sizing: content-box;
     }
@@ -1087,12 +1093,7 @@ const checkOutBarStyle = computed(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 10rpx;
     position: relative;
-
-    &.cart-price-margin {
-        margin-top: -10rpx;
-    }
 }
 .origin-price {
     font-size: 21rpx;

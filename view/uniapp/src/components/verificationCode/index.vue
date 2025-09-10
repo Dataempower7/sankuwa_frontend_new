@@ -146,9 +146,17 @@ const okCallback = (e: any) => {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #9AA0DC !important;
+    border: 1px solid #9AA0DC !important;
+    color: #fff !important;
 }
 .verify-btn {
-    color: var(--general);
+    color: #9AA0DC;
     font-size: 28rpx;
+    background-color: transparent;
+    padding: 10rpx 20rpx;
+    //border: 1px solid #9AA0DC;
+    border-radius: 6rpx;
+    text-align: center;
 }
 </style>

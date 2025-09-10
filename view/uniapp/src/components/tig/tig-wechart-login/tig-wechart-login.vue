@@ -2,48 +2,95 @@
     <tig-popup v-model:show="show" :z-index="1000" @close="close">
         <template v-if="show">
             <view class="wechart-login-content">
+                <view class="popup-logo">
+                    <image class="logo-image" src="/static/images/common/logo.png" mode="aspectFit" />
+                    <text class="logo-text">SANKUWA</text>
+                </view>
                 <view class="wechart-login-box">
                     <!-- #ifdef MP-WEIXIN -->
                     <template v-if="isChecked">
                         <tig-button
-                            :custom-style="{ 'border-radius': '20rpx', height: '95rpx' }"
+                            :custom-style="{ 
+                                'border-radius': '50rpx', 
+                                height: '96rpx',
+                                'background-color': '#3544BA',
+                                'border': 'none',
+                                'color': '#fff',
+                                'font-size': '32rpx',
+                                'font-weight': '500'
+                            }"
                             open-type="getPhoneNumber"
                             shape="square"
                             :loading="loginLoading"
                             @get-phone-number="getPhoneNumber"
-                            >{{ $t("手机号快捷登入") }}</tig-button
+                            >{{ $t("手机号快捷登录") }}</tig-button
                         >
                     </template>
                     <template v-else>
-                        <tig-button :custom-style="{ 'border-radius': '20rpx', height: '95rpx' }" shape="square" @click="mobileLogin"
-                            >手机号快捷登入</tig-button
+                        <tig-button 
+                            :custom-style="{ 
+                                'border-radius': '50rpx', 
+                                height: '96rpx',
+                                'background-color': '#3544BA',
+                                'border': 'none',
+                                'color': '#fff',
+                                'font-size': '32rpx',
+                                'font-weight': '500'
+                            }" 
+                            shape="square" 
+                            @click="mobileLogin"
+                            >{{ $t("手机号快捷登录") }}</tig-button
                         >
                     </template>
                     <!-- #endif -->
                     <!-- #ifndef MP-WEIXIN -->
                     <template v-if="isChecked">
-                        <tig-button :custom-style="{ 'border-radius': '20rpx', height: '95rpx' }" shape="square" :loading="loginLoading" @click="wechatLogin">{{
+                        <tig-button 
+                            :custom-style="{ 
+                                'border-radius': '50rpx', 
+                                height: '96rpx',
+                                'background-color': '#3544BA',
+                                'border': 'none',
+                                'color': '#fff',
+                                'font-size': '32rpx',
+                                'font-weight': '500'
+                            }" 
+                            shape="square" 
+                            :loading="loginLoading" 
+                            @click="wechatLogin">{{
                             $t("微信授权")
                         }}</tig-button>
                     </template>
                     <template v-else>
-                        <tig-button :custom-style="{ 'border-radius': '20rpx', height: '95rpx' }" shape="square" @click="mobileLogin">{{
+                        <tig-button 
+                            :custom-style="{ 
+                                'border-radius': '50rpx', 
+                                height: '96rpx',
+                                'background-color': '#3544BA',
+                                'border': 'none',
+                                'color': '#fff',
+                                'font-size': '32rpx',
+                                'font-weight': '500'
+                            }" 
+                            shape="square" 
+                            @click="mobileLogin">{{
                             $t("微信授权")
                         }}</tig-button>
                     </template>
                     <!-- #endif -->
 
-                    <view class="rule-text">
-                        <tig-checkbox v-model:checked="isChecked" />
+                    <view class="rule-text" :class="{ 'shake-animation': showShake }">
+                        <tig-checkbox v-model:checked="isChecked" :custom-style="{'transform': 'scale(0.8)'}"/>
                         <view class="rule-xieyi">
-                            <text @click="isChecked = !isChecked">{{ $t("登录即为同意") }}</text>
+                            <text class="agreement-text" @click="isChecked = !isChecked">{{ $t("登录即为同意") }}</text>
                             <text class="special-color" @click="showAgreement">{{ $t("《商城用户服务协议》") }}</text>
                         </view>
                     </view>
 
                     <view class="other-login">
-                        <view class="mobile-login" @click="handleLink('mobile')">{{ $t("手机登录") }}</view>
-                        <view class="account-login" @click="handleLink('password')">{{ $t("账号登录") }}</view>
+                        <view class="login-option" @click="handleLink('mobile')">{{ $t("手机登录") }}</view>
+                        <view class="divider"></view>
+                        <view class="login-option" @click="handleLink('password')">{{ $t("账号登录") }}</view>
                     </view>
                 </view>
             </view>
@@ -76,6 +123,7 @@ const show = computed({
 
 const isChecked = ref(false);
 const loginLoading = ref(false);
+const showShake = ref(false);
 const showAgreement = () => {
     uni.navigateTo({
         url: "/pages/login/mallAgreement"
@@ -83,6 +131,10 @@ const showAgreement = () => {
 };
 const mobileLogin = () => {
     if (!isChecked.value) {
+        showShake.value = true;
+        setTimeout(() => {
+            showShake.value = false;
+        }, 500);
         return uni.showToast({
             title: t("请先同意用户协议"),
             duration: 1500,
@@ -124,6 +176,17 @@ const handleLink = (type: string) => {
 };
 
 const getPhoneNumber = async (e: any) => {
+    if (!isChecked.value) {
+        showShake.value = true;
+        setTimeout(() => {
+            showShake.value = false;
+        }, 500);
+        return uni.showToast({
+            title: t("请先同意用户协议"),
+            duration: 1500,
+            icon: "none"
+        });
+    }
     try {
         const result = await getWechartMobile({ code: e.detail.code });
         userStore.setToken(result);
@@ -184,11 +247,35 @@ onShow(() => {
 
 <style lang="scss" scoped>
 .wechart-login-content {
-    height: 25vh;
-    box-sizing: content-box;
-    padding: 30rpx;
+    height: auto;
+    box-sizing: border-box;
+    padding: 0;
+    background: #fff;
+    border-radius: 24rpx 24rpx 0 0;
+    
+    .popup-logo {
+        padding: 60rpx 0 40rpx;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .logo-image {
+            width: 120rpx;
+            height: 120rpx;
+            margin-bottom: 20rpx;
+        }
+        
+        .logo-text {
+            font-size: 40rpx;
+            font-weight: bold;
+            color: #3544BA;
+            letter-spacing: 2rpx;
+        }
+    }
+    
     .wechart-login-box {
-        margin-top: 80rpx;
+        padding: 0 40rpx 40rpx;
     }
 }
 
@@ -196,54 +283,86 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28rpx;
-    color: #999;
-    margin-top: 50rpx;
-    height: 30rpx;
-    font-size: 24rpx;
+    margin-top: 40rpx;
+    height: 48rpx;
     width: 100%;
-    .mobile-login {
-        padding-right: 25rpx;
-        position: relative;
-        &::after {
-            content: "";
-            display: inline-block;
-            width: 1rpx;
-            height: 28rpx;
-            background: #e5e5e5;
-            position: absolute;
-            right: 0;
+    
+    .login-option {
+        font-size: 28rpx;
+        color: #666;
+        padding: 0 30rpx;
+        cursor: pointer;
+        transition: color 0.3s;
+        
+        &:hover {
+            color: #3544BA;
         }
     }
-
-    .account-login {
-        padding-left: 25rpx;
+    
+    .divider {
+        width: 2rpx;
+        height: 28rpx;
+        background: #E5E5E5;
     }
-}
-
-.btn2-css3 {
-    width: 100%;
-    height: 90rpx;
-    line-height: 90rpx;
-    padding: 0;
-    font-size: 36rpx;
-    font-weight: normal;
 }
 
 .rule-text {
-    font-size: 26rpx;
+    font-size: 24rpx;
     color: #999;
-    margin-top: 10rpx;
+    margin-top: 25rpx;
+    margin-bottom: 80rpx;
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    .agreement-text {
+        color: #999;
+    }
 }
+
 .rule-xieyi {
     display: flex;
     align-items: center;
-    margin-left: 8rpx;
+    margin-left: 12rpx;
+    flex-wrap: wrap;
+    justify-content: center;
 }
+
 .special-color {
-    color: var(--general);
+    color: #3544BA;
+    margin-left: 4rpx;
+    cursor: pointer;
+    
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+:deep(.tig-button) {
+    width: 100%;
+    box-shadow: 0 4rpx 16rpx rgba(53, 68, 186, 0.2);
+    transition: all 0.3s;
+    
+    &:active {
+        transform: scale(0.98);
+        box-shadow: 0 2rpx 8rpx rgba(53, 68, 186, 0.15);
+    }
+}
+
+// 抖动动画
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10rpx);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10rpx);
+    }
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
 }
 </style>

@@ -273,8 +273,10 @@ const params = reactive({
     categoryId: 0, // 最终的分类ID（可能是一级、二级或三级）
     page: 1,
     size: 20,
-    sortBy: 'comprehensive',
-    sortOrder: 'desc'
+    sort: 'comprehensive',
+    order: 'desc',
+    sortField: '', // 添加后端期望的排序字段
+    sortOrder: 'desc', // 添加后端期望的排序顺序
 });
 
 // 计算属性
@@ -335,14 +337,39 @@ const selectThirdCategory = (tab: filterSeleted) => {
 };
 
 const selectSort = (sortValue: string) => {
-    selectedSort.value = sortValue;
-    
     if (sortValue === 'price') {
-        sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+        // 如果当前已经选中价格排序，则切换排序顺序
+        if (selectedSort.value === 'price') {
+            sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+        } else {
+            // 如果是第一次点击价格，默认从低到高排序
+            sortOrder.value = 'asc';
+        }
+    } else {
+        // 选择其他排序时，重置为默认排序顺序
+        sortOrder.value = 'desc';
     }
     
-    params.sortBy = sortValue;
+    selectedSort.value = sortValue;
+    
+    // 设置排序参数
+    params.sort = sortValue;
+    params.order = sortOrder.value;
+    
+    // 价格排序需要设置 sortField 参数
+    if (sortValue === 'price') {
+        params.sortField = 'product_price';
+    } else {
+        params.sortField = '';
+    }
     params.sortOrder = sortOrder.value;
+    
+    console.log('排序参数:', { 
+        sort: params.sort, 
+        order: params.order,
+        sortField: params.sortField, 
+        sortOrder: params.sortOrder 
+    });
     resetProducts();
 };
 
@@ -364,6 +391,7 @@ const loadProducts = async () => {
     
     loading.value = true;
     try {
+        console.log('发送到后端的参数:', JSON.stringify(params, null, 2));
         const result = await getCateProduct(params);
         
         if (params.page === 1) {

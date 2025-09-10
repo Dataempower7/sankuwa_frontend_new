@@ -44,7 +44,7 @@
                     <view class="card-content">
                         <view class="member-level" @click.stop="goPages('/pages/user/levelCenter/index')">
                             <image :src="member?.rankLogo" class="crown-icon" />
-                            <text class="level-text">{{ member?.rankName ||  '请先登录' }}</text>
+                            <text class="level-text">{{ member?.rankName ||  '登录立享会员权益' }}</text>
                         </view>
                         <view class="growth-value">{{member?.growthPoints || "-"}} 成长值</view>
 
@@ -127,7 +127,7 @@
                             </view>
                         </view>
                         <view class="order-all-item" @click="goPages('/pages/user/order/list')">
-                            <view class="order-divider"></view>
+                            <view class="order-divider"> <image src="@/static/images/member/all.png " style="    width: 27px;    height: 89px;   position: relative;  right: 20px;  top: -23px;" /></view>
                             <view class="order-all-text">全部</view>
                         </view>
                     </view>
@@ -216,13 +216,13 @@ const goPages = (url: string) => {
 // 根据会员等级名称获取对应的背景图片
 const getMemberCardBg = (rankName: string) => {
     const rankBgMap: { [key: string]: string } = {
-        '黄金会员': '/static/images/member/gold.png',
+        '黄金会员': '/static/images/member/golds.png',
         '铂金会员': '/static/images/member/platinum.png',
         '黑金会员': '/static/images/member/black_gold.png',
         '钻石会员': '/static/images/member/diamond.png',
         '至尊会员': '/static/images/member/supreme.png'
     };
-    return rankBgMap[rankName] || '/static/images/member/gold.png';
+    return rankBgMap[rankName] || '/static/images/member/golds.png';
 };
 
 const resetUser = () => {
@@ -400,7 +400,7 @@ page {
 
         .card-content {
             position: relative;
-            padding: 30rpx;
+            padding: 30rpx 0rpx 55rpx 30rpx;
             z-index: 2;
 
             .member-level {
@@ -541,7 +541,7 @@ page {
         /* 分割线 */
         .divider {
             height: 1rpx;
-            background: #f9f9f9;
+            background: #f5f5f5;
              margin: 0 70rpx;
         }
 
