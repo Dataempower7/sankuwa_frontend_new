@@ -159,9 +159,9 @@
                                     <view class="price-container">
                                         <view class="current-price">
                                             <format-price
-                                                :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold' }"
-                                                :currency-style="{ fontSize: '20rpx', fontWeight: 'bold' }"
-                                                :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#black' }"
+                                                :decimals-style="{ fontSize: '22rpx', fontWeight: 'bold', color: '#000' }"
+                                                :currency-style="{ fontSize: '22rpx', fontWeight: 'bold', color: '#000' }"
+                                                :font-style="{ fontSize: '32rpx', fontWeight: 'bold', color: '#000' }"
                                                 :price-data="product.productPrice"
                                             />
                                         </view>
@@ -894,9 +894,10 @@ onMounted(() => {
         
         .product-card {
             background-color: #fff;
-            border-radius: 12rpx;
+            border-radius: 33rpx;
             overflow: hidden;
             box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+            border: 1rpx solid #f0f0f0;
             transition: box-shadow 0.3s ease;
             
             &:active {
@@ -910,9 +911,17 @@ onMounted(() => {
                 height: 180rpx;
                 
                 .product-image {
-                    width: 180rpx;
-                    height: 180rpx;
+                    width: 170rpx;
+                    height: 170rpx;
                     flex-shrink: 0;
+                    border-radius: 22rpx;
+                    overflow: hidden;
+                    margin: 5rpx;
+                    position: relative;
+                    
+                    :deep(img), :deep(image) {
+                        border-radius: 22rpx;
+                    }
                     
                     .product-status {
                         position: absolute;
@@ -924,6 +933,7 @@ onMounted(() => {
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        border-radius: 22rpx;
                         
                         .status-text {
                             color: #fff;
@@ -935,23 +945,25 @@ onMounted(() => {
                 
                 .product-info {
                     flex: 1;
-                    padding: 15rpx 20rpx;
+                    padding: 6rpx 20rpx 15rpx;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
                     position: relative;
+                    background: #ffffff;
                     
                     .product-title {
                         font-size: 26rpx;
-                        color: #333;
-                        margin-bottom: 8rpx;
-                        height: 60rpx;
+                        color: #2a3145;
+                        margin-bottom: 10rpx;
+                        height: 80rpx;
                         display: -webkit-box;
                         -webkit-line-clamp: 2;
                         line-clamp: 2;
                         -webkit-box-orient: vertical;
                         overflow: hidden;
-                        line-height: 30rpx;
+                        line-height: 40rpx;
+                        font-weight: bold;
                     }
                     
                     .price-container {
@@ -995,6 +1007,7 @@ onMounted(() => {
                         .cart-icon {
                             width: 50rpx;
                             height: 50rpx;
+                            margin-top: -15rpx;
                         }
                     }
                 }
@@ -1007,8 +1020,16 @@ onMounted(() => {
                 
                 .product-image {
                     position: relative;
-                    width: 100%;
+                    width: calc(100% - 24rpx);
                     height: 280rpx;
+                    border-radius: 22rpx;
+                    overflow: hidden;
+                    margin: 12rpx;
+                    margin-bottom: 8rpx;
+                    
+                    :deep(img), :deep(image) {
+                        border-radius: 22rpx;
+                    }
                     
                     .product-status {
                         position: absolute;
@@ -1020,6 +1041,7 @@ onMounted(() => {
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        border-radius: 22rpx;
                         
                         .status-text {
                             color: #fff;
@@ -1030,23 +1052,25 @@ onMounted(() => {
                 }
                 
                 .product-info {
-                    padding: 10rpx 15rpx 0;
+                   padding: 5rpx 20rpx 0rpx;
                     position: relative;
                     flex: 1;
                     display: flex;
                     flex-direction: column;
+                    background: #ffffff;
                     
                     .product-title {
-                        font-size: 24rpx;
-                        color: #333;
-                        margin-bottom: 12rpx;
-                        height: 66rpx;
+                        font-size: 26rpx;
+                        color: #2a3145;
+                        margin-bottom: 10rpx;
+                        height: 80rpx;
                         display: -webkit-box;
                         -webkit-line-clamp: 2;
                         line-clamp: 2;
                         -webkit-box-orient: vertical;
                         overflow: hidden;
-                        line-height: 33rpx;
+                        line-height: 40rpx;
+                        font-weight: bold;
                     }
                     
                     .price-container {
@@ -1090,6 +1114,7 @@ onMounted(() => {
                         .cart-icon {
                             width: 50rpx;
                             height: 50rpx;
+
                         }
                     }
                 }

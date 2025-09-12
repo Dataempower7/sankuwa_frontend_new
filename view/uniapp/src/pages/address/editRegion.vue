@@ -50,8 +50,8 @@
 
                     <!-- 设为默认地址 -->
                     <uni-forms-item :label="$t('设为默认地址')" name="isDefault" ">
-                        <view class="switch">
-                            <u-switch v-model="isDefault" active-color="#3544BA" style="margin-left: 180px;" />
+                        <view class="switch" style="    justify-content: flex-end;">
+                            <u-switch v-model="isDefault" active-color="#3544BA"  />
                         </view>
                     </uni-forms-item>
                 </uni-forms>
@@ -203,11 +203,21 @@ const showManualInputTip = () => {
     });
 };
 
-// 处理位置导入
+// 处理位置导入（支持完整的省市区街道信息）
 const handleLocationImport = async (locationData: any) => {
     try {
+        console.log('处理位置导入数据:', locationData);
+
+        // 若包含收货人信息（来自 wx.chooseAddress），预填
+        if (locationData.consignee) {
+            form.consignee = locationData.consignee;
+        }
+        if (locationData.mobile) {
+            form.mobile = locationData.mobile;
+        }
+        
         if (locationData.regions && locationData.regions.length > 0) {
-            // 设置地区名称
+            // 设置地区名称（省市区）
             form.regionNames = locationData.regions.join(' ');
 
             // 尝试匹配地区ID
@@ -215,35 +225,78 @@ const handleLocationImport = async (locationData: any) => {
                 const regionIds = await findRegionIdsByNames(locationData.regions);
                 if (regionIds.length > 0) {
                     form.regionIds = regionIds;
+                    console.log('地区ID匹配成功:', regionIds);
                 }
             } catch (error) {
                 console.error('地区ID匹配失败:', error);
             }
         }
 
-        // 设置详细地址（如果有的话）
+        // 构建详细地址（包含街道信息）
+        let detailAddress = '';
+        
+        // 优先使用原始的detail字段
         if (locationData.detail) {
-            form.address = locationData.detail;
+            detailAddress = locationData.detail;
+        } else {
+            // 如果没有detail，尝试组合街道信息
+            const addressParts = [];
+            if (locationData.township) addressParts.push(locationData.township);
+            if (locationData.street) addressParts.push(locationData.street);
+            if (locationData.streetNumber) addressParts.push(locationData.streetNumber);
+            
+            if (addressParts.length > 0) {
+                detailAddress = addressParts.join('');
+            } else if (locationData.nearbyPois && locationData.nearbyPois.length > 0) {
+                // 如果还是没有，使用附近的POI信息
+                detailAddress = locationData.nearbyPois[0].name || '';
+            } else if (locationData.businessAreas && locationData.businessAreas.length > 0) {
+                // 最后使用商圈信息
+                detailAddress = locationData.businessAreas[0].name || '';
+            }
+        }
+        
+        if (detailAddress) {
+            form.address = detailAddress;
         }
 
         nextTick(() => {
             let message = t("位置信息已自动填入，请完善收货人和联系方式");
-
-            // 根据定位类型显示不同提示
-            if (locationData.type === 'gps') {
-                message = t("GPS定位成功！精确地址已自动填入，请完善收货人信息");
-            } else if (locationData.type === 'gps_basic') {
-                message = t("GPS定位完成，位置已填入，请核实地址并完善信息");
+            let iconType = "success";
+            
+            // 根据导入类型显示不同提示
+            if (locationData.type === 'wechat_address') {
+                // 微信地址簿导入
+                message = t("已导入成功");
+            } else if (locationData.type === 'location_address') {
+                // 定位获取的地址
+                message = t("定位成功！地址信息已自动填入，请完善收货人信息");
+            }
+            
+            // 如果有街道信息，给出特别提示
+            if (locationData.township || locationData.street) {
+                message += t("（已包含街道信息）");
             }
 
             uni.showToast({
                 title: message,
-                icon: "success",
-                duration: 3000
+                icon: iconType,
+                duration: 4000
             });
+            
+            // 如果有附加信息，在控制台输出
+            if (locationData.businessAreas || locationData.nearbyPois) {
+                console.log('附近商圈:', locationData.businessAreas);
+                console.log('附近POI:', locationData.nearbyPois);
+            }
         });
     } catch (error) {
         console.error('位置信息处理失败:', error);
+        uni.showToast({
+            title: t("位置信息处理失败，请手动输入"),
+            icon: "none",
+            duration: 3000
+        });
         showManualInputTip();
     }
 };

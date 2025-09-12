@@ -108,7 +108,8 @@
                         <view class="goods-ad-con">
                             <template v-for="item in productList" :key="item.productId">
                                 <view class="goods-ad-item">
-                                    <view class="item-content" :style="allFormat.goodsPadding">
+                                    <view class="item-content">
+                                          <!-- <view class="item-content" :style="allFormat.goodsPadding"></view> -->
                                         <view class="item-con">
                                             <view class="item-photo">
                                                 <navigator :url="urlFormat({ path: 'product', data: { id: item.productId } })" class="item-image-a">
@@ -145,9 +146,9 @@
                                                                 <template v-else-if="module.buyBtnStyle == 7 || module.buyBtnStyle == 8">
                                                                     <view>{{ $t("马上抢") }}</view>
                                                                 </template>
-                                                                <template v-else>
+                                                                <!-- <template v-else>
                                                                     <view class="module_ico" />
-                                                                </template>
+                                                                </template> -->
                                                             </view>
                                                         </view>
                                                     </view>
@@ -292,6 +293,7 @@ const selectColor = computed(() => {
 .goods-ad-warp .goods-ad-item .item-photo image {
     height: auto;
     width: 100%;
+    border-radius: 22rpx;
 }
 .goods-ad-warp .goods-ad-item .item-info {
     background: #ffffff;
@@ -630,7 +632,7 @@ const selectColor = computed(() => {
     background: transparent;
 }
 .ad-goods_radio_style__2 .goods-ad-warp .goods-ad-con .goods-ad-item .item-con {
-    border-radius: 12rpx;
+    border-radius: 32rpx;
 }
 .ad-goods_radio_style__2 .goods-ad-warp .goods-ad-con .goods-ad-item .item-con .item-photo {
     border-radius: 12rpx 12rpx 0 0;

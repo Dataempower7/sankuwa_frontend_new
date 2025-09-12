@@ -1,8 +1,8 @@
 <template>
     <view :class="'module-ad-con module-store_info ad-store_style__' + module.style">
-        <view v-if="module" class="module-ad-content">
+        <view v-if="module" class="module-ad-content" >
             <view class="cap-store-banner">
-                <view class="cap-store-banner__cover" :style="'background-image: url(' + backgroundImg + ');'">
+                <view class="cap-store-banner__cover" :style="backgroundStyle">
                     <view class="cap-store-banner__cover-mask" />
                 </view>
                 <view class="cap-store-nav-warp">
@@ -10,17 +10,19 @@
                         <view class="store-search-con">
                             <view id="search" @click="toSearchTransferPage">
                                 <text class="module_ico module-ico-sousuo" />
-                                <input type="text" class="search-input" :placeholder="$t('搜商品')" />
+                                <input type="text" class="search-input" :placeholder="$t('点击搜索商品')" />
                             </view>
                         </view>
                         <view class="store-nav-con">
-                            <view class="store-nav-item active">
+                            <view class="store-nav-item" :class="{ active: activeTab === 'featured' }" @click="setActiveTab('featured')">
                                 <a class="store-nav-item-a">{{ $t("精选") }}</a>
                             </view>
-                            <view class="store-nav-item">
+                            <view class="nav-divider">|</view>
+                            <view class="store-nav-item" :class="{ active: activeTab === 'products' }" @click="setActiveTab('products')">
                                 <a class="store-nav-item-a" @click="toSearch">{{ $t("商品") }}</a>
                             </view>
-                            <view class="store-nav-item">
+                            <view class="nav-divider">|</view>
+                            <view class="store-nav-item" :class="{ active: activeTab === 'category' }" @click="setActiveTab('category')">
                                 <a class="store-nav-item-a" @click="toCategory">{{ $t("分类") }}</a>
                             </view>
                         </view>
@@ -65,25 +67,68 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(["refreshShopDetail"]);
 
+// Tab functionality
+const activeTab = ref('featured');
+const setActiveTab = (tab: string) => {
+    activeTab.value = tab;
+};
+
 const imgList = computed(() => {
     let arr = [];
     for (let i = 1; i <= 10; i++) {
-        arr.push(`https://lyecs2.oss-cn-zhangjiakou.aliyuncs.com/static/mini/bg/${i}.jpg`);
+        arr.push(`https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/shopBackground.png`);
     }
     return arr;
 });
 const backgroundImg = computed(() => {
     let url;
-    if (props.module.backgroundDefault == 0 && props.module.customPic.picUrl) {
+    // 优先使用新的背景图片
+    url = '/static/images/shop/shopBackground.png';
+    
+    // 如果有自定义背景，则使用自定义背景
+    if (props.module.backgroundDefault == 0 && props.module.customPic?.picUrl) {
         url = imageFormat(props.module.customPic.picUrl);
-    } else {
+    } else if (props.module.backgroundDefault > 0) {
         url = imgList.value[props.module.backgroundDefault - 1];
     }
+    
     return url;
 });
 
+const backgroundStyle = computed(() => {
+    let style: any = {};
+    
+    // 尝试使用自定义背景或预设背景
+    if (props.module.backgroundDefault == 0 && props.module.customPic?.picUrl) {
+        // 使用自定义背景
+        style.backgroundImage = `url(${imageFormat(props.module.customPic.picUrl)})`;
+        style.backgroundSize = 'cover';
+        style.backgroundPosition = 'center';
+        style.backgroundRepeat = 'no-repeat';
+    } else if (props.module.backgroundDefault > 0 && imgList.value[props.module.backgroundDefault - 1]) {
+        // 使用预设背景
+        style.backgroundImage = `url(${imgList.value[props.module.backgroundDefault - 1]})`;
+        style.backgroundSize = 'cover';
+        style.backgroundPosition = 'center';
+        style.backgroundRepeat = 'no-repeat';
+    } else {
+        // 使用渐变背景作为默认/后备方案，多种渐变效果可选
+        const gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // 蓝紫渐变
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // 粉红渐变
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // 蓝色渐变
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // 绿色渐变
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // 粉黄渐变
+        ];
+        // 可以根据店铺ID或其他标识选择渐变，这里使用第一个作为默认
+        style.background = gradients[0];
+    }
+    
+    return style;
+});
+
 const collectText = computed(() => {
-    return props.shopInfo.collectShop ? t("已收藏") : t("收藏");
+    return props.shopInfo.collectShop ? t("已关注") : t("+ 关注");
 });
 
 const handleShopCollection = () => {
@@ -97,7 +142,7 @@ const collect = async () => {
     try {
         const result = await shopCollection({ shopId: props.shopInfo.shopId });
         uni.showToast({
-            title: t("收藏成功")
+            title: t("关注成功")
         });
         emit("refreshShopDetail", props.shopInfo.shopId);
     } catch (error) {
@@ -107,7 +152,7 @@ const collect = async () => {
 const cancelCollect = async () => {
     uni.showModal({
         title: t("提示"),
-        content: t("确认要取消收藏店铺吗？"),
+        content: t("确认要取消关注店铺吗？"),
         success: async (res) => {
             if (res.confirm) {
                 try {
@@ -147,14 +192,20 @@ const toCategory = () => {
 .module-store_info {
     position: relative;
     font-size: 24rpx;
-    background-color: #fff;
+  //  background-color: #fff;
 }
 .module-store_info .cap-store-banner .cap-store-banner__cover {
     position: relative;
-    height: 290rpx;
+    top: -190rpx;
+    height: 420rpx;
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: cover;
+    margin-bottom: -90rpx;
+    /* 确保渐变背景正常显示 */
+    background-attachment: scroll;
+    /* 为渐变背景添加后备颜色 */
+    background-color: #667eea;
 }
 .module-store_info .cap-store-banner .cap-store-banner__cover-mask {
     position: absolute;
@@ -162,11 +213,10 @@ const toCategory = () => {
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: rgba(0, 0, 0, 0.15);
 }
 .module-store_info .cap-store-banner .cap-store-banner__inner {
     position: absolute;
-    top: 30rpx;
+    top: 90rpx;
     width: 100%;
     color: #fff;
 }
@@ -195,12 +245,12 @@ const toCategory = () => {
 }
 .module-store_info .cap-store-banner .cap-store-banner__right-content .cap-store-banner__right-content-title--middle {
     max-width: 440rpx;
-    margin-top: 20rpx;
-    color: #fff;
+    margin-top: 10rpx;
+    color: #000000;
     font-weight: 700;
     font-size: 36rpx;
     line-height: 44rpx;
-    text-shadow: 0 2rpx 30rpx rgba(0, 0, 0, 0.5);
+    //text-shadow: 0 2rpx 30rpx rgba(0, 0, 0, 0.5);
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -209,8 +259,10 @@ const toCategory = () => {
 }
 .module-store_info .cap-store-banner .cap-store-banner__sum-content {
     margin-top: 30rpx;
-    line-height: 24rpx;
+    line-height: 7rpx;
     display: flex;
+    color: #4D6174;
+    font-size: 26rpx;
 }
 .module-store_info .cap-store-banner .cap-store-banner__sum-content-total {
     display: inline-block;
@@ -223,7 +275,7 @@ const toCategory = () => {
         right: 0;
         width: 4rpx;
         height: 24rpx;
-        color: #e5e5e5;
+        color: #4D6174;
         font-size: 20rpx;
         content: "|";
     }
@@ -234,7 +286,7 @@ const toCategory = () => {
 }
 .module-store_info .cap-store-banner .store-collect-button-con {
     position: absolute;
-    top: 14rpx;
+    top: 35rpx;
     right: 20rpx;
     display: block;
     text-align: center;
@@ -242,24 +294,26 @@ const toCategory = () => {
 .module-store_info .cap-store-banner .store-collect-button {
     position: relative;
     display: block;
-    background: #e93b3d;
-    border: 2rpx solid #e93b3d;
+    background:#3544BA;
+    border: 2rpx solid#3544BA;
     border-radius: 30rpx;
     overflow: hidden;
     box-sizing: border-box;
-    height: 56rpx;
-    line-height: 56rpx;
-    padding: 0 20rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    padding: 0 24rpx;
     white-space: nowrap;
-    font-size: 28rpx;
+    font-size: 26rpx;
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 500;
 }
 .module-store_info .cap-store-banner .store-collect-button.store-collect-button-collected {
-    border-color: #fff;
-    background: none;
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
 }
 .module-store_info .cap-store-banner .store-collect-button text {
     font-size: 28rpx;
@@ -274,35 +328,43 @@ const toCategory = () => {
 .module-store_info .cap-store-banner .cap-store-nav-warp .cap-store-nav-con {
     display: flex;
     flex-wrap: nowrap;
-    height: 100rpx;
+    height: 210rpx;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 35rpx;
 }
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-search-con {
-    width: 164rpx;
-    height: 60rpx;
-    margin: 0 20rpx;
-    padding: 0 20rpx 0 60rpx;
-    background: rgba(250, 250, 255, 0.8);
-    line-height: 60rpx;
-    border-radius: 60rpx;
+    width: 300rpx;
+    height: 80rpx;
+    margin: 0;
+    padding: 0 30rpx 0 80rpx;
+    background: white;
+    line-height: 80rpx;
+    border-radius: 40rpx;
     position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-search-con .module-ico-sousuo {
     position: absolute;
     left: 0;
     top: 0;
-    width: 60rpx;
+    width: 80rpx;
+    height: 80rpx;
+    line-height: 80rpx;
     text-align: center;
+    font-size: 32rpx;
+    color: #999;
 }
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-search-con .search-input {
     background: transparent;
     border: 0;
     padding: 0;
     width: 100%;
-    height: 60rpx;
-    line-height: 60rpx;
+    height: 80rpx;
+    line-height: 80rpx;
     display: block;
-    font-size: 24rpx;
+    font-size: 28rpx;
 }
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-search-con .search-input::-webkit-input-placeholder {
     color: #666;
@@ -314,39 +376,43 @@ const toCategory = () => {
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con {
     display: flex;
     flex-wrap: nowrap;
-    padding-left: 20rpx;
-    overflow-x: auto;
-    margin-right: 30rpx;
-    height: 60rpx;
+    align-items: center;
+    justify-content: flex-end;
+    height: 80rpx;
     position: relative;
-    top: 6rpx;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
-    color: #fff;
+    top: 0;
+    color: #999;
+    flex-shrink: 0;
+    gap: 8rpx;
 }
+
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .store-nav-item {
-    margin-right: 40rpx;
+    margin: 0 15rpx;
     flex: none;
-}
-.module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .store-nav-item.active:after {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 4rpx;
-    position: absolute;
-    left: 0;
-    bottom: -10rpx;
-    background: #fff;
-    border-radius: 10rpx;
-}
-.module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .store-nav-item {
     position: relative;
     display: inline-block;
-    height: 42rpx;
+    height: 50rpx;
+    font-size: 32rpx;
+    line-height: 50rpx;
+    font-weight: 400;
+    color: #999;
+    transition: all 0.3s ease;
+}
+
+.module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .store-nav-item.active {
+    color: #000;
+    font-size: 36rpx;
+    font-weight: 600;
+}
+
+.module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .store-nav-item.active .store-nav-item-a {
+    color: #000;
+}
+
+.module-store_info .cap-store-banner .cap-store-nav-warp .store-nav-con .nav-divider {
     font-size: 28rpx;
-    line-height: 42rpx;
-    font-weight: 700;
-    color: #fff;
+    margin: 0 8rpx;
+    color: #ddd;
 }
 .module-store_info .cap-store-banner .cap-store-nav-warp .store-all-cat-con {
     width: 52rpx;

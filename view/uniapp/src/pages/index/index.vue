@@ -1209,44 +1209,50 @@ page {
 .index-page .product-item {
     width: 48% !important;
     background-color: #ffffff !important;
-    border-radius: 16rpx !important;
+    border-radius: 33rpx !important;
     margin-bottom: 20rpx !important;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08) !important;
+    border: 1rpx solid #f0f0f0 !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
 .index-page .product-image-wrapper {
     position: relative !important;
-    width: 100% !important;
+    width: calc(100% - 24rpx) !important;
     height: 280rpx !important;
     overflow: hidden !important;
-    border-radius: 16rpx 16rpx 0 0 !important;
+    border-radius: 22rpx !important;
+    margin: 12rpx !important;
+    margin-bottom: 8rpx !important;
 }
 
 .index-page .product-image {
     width: 100% !important;
     height: 100% !important;
     display: block !important;
+    border-radius: 22rpx !important;
 }
 
 .index-page .product-info {
-    padding: 20rpx !important;
+    padding: 0 20rpx 20rpx !important;
     box-sizing: border-box !important;
 }
 
 .index-page .product-title {
     font-size: 26rpx !important;
-    color: #333333 !important;
-    line-height: 36rpx !important;
-    margin-bottom: 40rpx !important;
-    height: 36rpx !important;
+    color: #2a3145 !important;
+    line-height: 40rpx !important;
+    margin-bottom: 10rpx !important;
+    height: 80rpx !important;
     overflow: hidden !important;
-    white-space: nowrap !important;
     text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    display: block !important;
+    font-weight: bold !important;
 }
 
 /* 刷新商品按钮 - 微信小程序兼容 */
@@ -2123,23 +2129,28 @@ page {
 .product-item {
     width: 48%;
     background-color: #ffffff;
-    border-radius: 16rpx;
+    border-radius: 33rpx;
     margin-bottom: 20rpx;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+    border: 1rpx solid #f0f0f0;
+    overflow: hidden;
 }
 
 .product-image-wrapper {
     position: relative;
-    width: 100%;
+    width: calc(100% - 24rpx);
     height: 280rpx;
     overflow: hidden;
-    border-radius: 16rpx 16rpx 0 0;
+    border-radius: 22rpx;
+    margin: 12rpx;
+    margin-bottom: 8rpx;
 }
 
 .product-image {
     width: 100%;
     height: 100%;
     display: block;
+    border-radius: 22rpx;
 }
 
 .product-status {
@@ -2160,21 +2171,23 @@ page {
 }
 
 .product-info {
-    padding: 20rpx;
+    padding: 0 20rpx 20rpx;
 }
 
 .product-title {
     font-size: 26rpx;
-    color: #333333;
-    line-height: 36rpx;
-    margin-bottom: 20rpx;
-    height: 36rpx;
+    color: #2a3145;
+    line-height: 40rpx;
+    margin-bottom: 10rpx;
+    height: 80rpx;
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     width: 100%;
     box-sizing: border-box;
-    display: block;
+    font-weight: bold;
 }
 
 .product-price {

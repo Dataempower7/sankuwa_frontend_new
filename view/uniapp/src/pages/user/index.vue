@@ -16,7 +16,7 @@
                     <view class="user-avatar-section">
                         <template v-if="!hasToken">
                             <view class="avatar-wrapper" @click="handleLogin">
-                                <image class="avatar" src="@/static/images/member/default_avatar.png" />
+                                <image class="avatar" src="@/static/images/common/avatar_empty.png" />
                             </view>
                         </template>
                         <template v-else>
@@ -355,7 +355,6 @@ page {
                 height: 120rpx;
                 border-radius: 50%;
                 overflow: hidden;
-                border: 4rpx solid rgba(255, 255, 255, 0.3);
 
                 .avatar {
                     width: 100%;

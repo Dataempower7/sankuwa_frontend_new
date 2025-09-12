@@ -84,7 +84,7 @@ const handleAffirm = () => {
     if (type.value === 1) {
         uni.showModal({
             title: t("温馨提示"),
-            content: t("很抱歉，平台暂不支持个体户入驻。我们正在努力完善相关功能，敬请期待！如有疑问，请联系客服咨询。"),
+            content: t("很抱歉，平台暂不支持个体户入驻。敬请期待！如有疑问，请联系客服咨询。"),
             showCancel: false,
             confirmText: t("我知道了"),
             confirmColor: "#3544BA"

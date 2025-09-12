@@ -1,181 +1,103 @@
 /**
- * 高德地图位置服务工具
+ * 微信小程序一键导入地址功能 - 极简版
+ * 只保留必要功能
  */
 
-const AMAP_API_KEY = '5e67872c28ec5cefc13a85c4fae27c6a';
-
-// GPS定位获取经纬度
-export const getGPSLocation = async () => {
+// 最基本的定位获取功能
+export const getSimpleLocation = async () => {
     return new Promise((resolve) => {
         uni.getLocation({
-            type: 'gcj02', // 使用国测局坐标系，与高德地图一致
-            geocode: true,
-            isHighAccuracy: true, // 开启高精度定位
-            success: (res) => {
+            type: 'gcj02',
+            success: (res: any) => {
+                console.log('定位成功:', res);
                 resolve({
                     success: true,
                     latitude: res.latitude,
                     longitude: res.longitude,
-                    accuracy: res.accuracy,
+                    accuracy: res.accuracy || 0,
                     address: res.address || ''
                 });
             },
-            fail: (error) => {
-                console.error('GPS定位失败:', error);
+            fail: (error: any) => {
+                console.error('定位失败:', error);
                 resolve({
                     success: false,
-                    message: error.errMsg || 'GPS定位失败'
+                    message: error.errMsg || '定位失败'
                 });
             }
         });
     });
 };
 
-// 高德地图逆地理编码 - 根据经纬度获取详细地址
-export const getAddressByLocation = async (longitude: number, latitude: number) => {
+// 一键导入地址 - 优先使用微信原生地址簿
+export const importAddressOneClick = async () => {
+    console.log('开始一键导入地址...');
+    
     try {
-        const response = await uni.request({
-            url: 'https://restapi.amap.com/v3/geocode/regeo',
-            method: 'GET',
-            data: {
-                key: AMAP_API_KEY,
-                location: `${longitude},${latitude}`,
-                output: 'json',
-                radius: 1000,
-                extensions: 'all'
-            },
-            timeout: 10000
+        // 首先尝试使用微信原生地址簿
+        const addressResult = await new Promise((resolve) => {
+            uni.chooseAddress({
+                success: (res: any) => {
+                    console.log('微信地址簿获取成功:', res);
+                    resolve({
+                        success: true,
+                        type: 'wechat_address',
+                        userName: res.userName,
+                        telNumber: res.telNumber,
+                        provinceName: res.provinceName,
+                        cityName: res.cityName,
+                        countyName: res.countyName,
+                        detailInfo: res.detailInfo,
+                        nationalCode: res.nationalCode,
+                        postalCode: res.postalCode
+                    });
+                },
+                fail: (error: any) => {
+                    console.log('微信地址簿获取失败:', error);
+                    resolve({
+                        success: false,
+                        message: error.errMsg || '用户取消或没有权限'
+                    });
+                }
+            });
         });
-
-        if (response.statusCode === 200 && response.data) {
-            const data = response.data as any;
-            if (data.status === '1' && data.regeocode) {
-                const regeocode = data.regeocode;
-                const addressComponent = regeocode.addressComponent;
-
-                return {
-                    success: true,
-                    province: addressComponent.province,
-                    city: addressComponent.city,
-                    district: addressComponent.district,
-                    township: addressComponent.township,
-                    street: addressComponent.streetNumber?.street || '',
-                    streetNumber: addressComponent.streetNumber?.number || '',
-                    formatted_address: regeocode.formatted_address,
-                    addressComponent: addressComponent
-                };
-            } else {
-                return {
-                    success: false,
-                    message: data.info || '地址解析失败'
-                };
-            }
-        } else {
+        
+        if (addressResult.success) {
+            return addressResult;
+        }
+        
+        // 微信地址簿失败，尝试定位获取地址
+        console.log('尝试使用定位服务...');
+        const locationResult = await getSimpleLocation();
+        
+        if (locationResult.success && locationResult.address) {
+            // 简单解析地址信息
+            const address = locationResult.address;
+            const provinceMatch = address.match(/([\u4e00-\u9fa5]{2,}(?:省|市|自治区))/);
+            const cityMatch = address.match(/([\u4e00-\u9fa5]{2,}市)/);
+            const districtMatch = address.match(/([\u4e00-\u9fa5]{2,}(?:区|县))/);
+            
             return {
-                success: false,
-                message: '网络请求失败'
+                success: true,
+                type: 'location_address',
+                provinceName: provinceMatch ? provinceMatch[1] : '',
+                cityName: cityMatch ? cityMatch[1] : '',
+                countyName: districtMatch ? districtMatch[1] : '',
+                detailInfo: address,
+                fullAddress: address
             };
         }
-    } catch (error) {
-        console.error('逆地理编码失败:', error);
+        
         return {
             success: false,
-            message: '地址解析异常'
+            message: '无法获取地址信息，请手动输入'
         };
-    }
-};
-
-// 获取用户当前位置 - 使用GPS定位 + 高德地图解析
-export const getCurrentLocation = async () => {
-    try {
-        // 首先尝试GPS定位
-        const gpsResult: any = await getGPSLocation();
-
-        if (gpsResult.success) {
-            // GPS定位成功，使用高德地图获取详细地址
-            const addressResult = await getAddressByLocation(gpsResult.longitude, gpsResult.latitude);
-
-            if (addressResult.success) {
-                return {
-                    success: true,
-                    type: 'gps',
-                    province: addressResult.province,
-                    city: addressResult.city,
-                    district: addressResult.district,
-                    township: addressResult.township,
-                    street: addressResult.street,
-                    streetNumber: addressResult.streetNumber,
-                    formatted_address: addressResult.formatted_address,
-                    location: `${gpsResult.longitude},${gpsResult.latitude}`,
-                    accuracy: gpsResult.accuracy
-                };
-            } else {
-                // 高德地图解析失败，返回GPS基本信息
-                return {
-                    success: true,
-                    type: 'gps_basic',
-                    province: '',
-                    city: '',
-                    district: '',
-                    formatted_address: gpsResult.address || '当前位置',
-                    location: `${gpsResult.longitude},${gpsResult.latitude}`,
-                    accuracy: gpsResult.accuracy
-                };
-            }
-        } else {
-            // GPS定位失败
-            return {
-                success: false,
-                message: gpsResult.message || 'GPS定位失败'
-            };
-        }
+        
     } catch (error) {
-        console.error('获取当前位置失败:', error);
+        console.error('一键导入地址异常:', error);
         return {
             success: false,
-            message: '定位服务异常'
+            message: '地址导入失败，请重试'
         };
     }
-};
-
-// 格式化地址信息为标准格式
-export const formatLocationToAddress = (locationData: any) => {
-    const { province, city, district, township, street, streetNumber, formatted_address, type } = locationData;
-
-    // 构建地区数组
-    const regions = [];
-    if (province && province !== city) {
-        regions.push(province);
-    }
-    if (city) {
-        regions.push(city);
-    }
-    if (district) {
-        regions.push(district);
-    }
-
-    // 构建详细地址
-    let detailAddress = '';
-    if (type === 'gps' && (township || street || streetNumber)) {
-        // GPS定位获取的详细地址
-        const addressParts = [];
-        if (township) addressParts.push(township);
-        if (street) addressParts.push(street);
-        if (streetNumber) addressParts.push(streetNumber);
-        detailAddress = addressParts.join('');
-    } else if (formatted_address) {
-        // 从完整地址中提取详细地址部分
-        let detail = formatted_address;
-        if (province) detail = detail.replace(province, '');
-        if (city) detail = detail.replace(city, '');
-        if (district) detail = detail.replace(district, '');
-        detailAddress = detail.trim();
-    }
-
-    return {
-        regions,
-        detail: detailAddress || '',
-        fullAddress: formatted_address || `${province || ''}${city || ''}${district || ''}${detailAddress}`,
-        type: type || 'unknown'
-    };
 };

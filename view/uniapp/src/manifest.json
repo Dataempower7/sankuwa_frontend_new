@@ -131,14 +131,18 @@
         "usingComponents" : true,
         "permission" : {
             "scope.userLocation" : {
-                "desc" : "获取您的位置信息"
+                "desc" : "获取您的位置信息，用于自动识别收货地址"
+            },
+            "scope.address" : {
+                "desc" : "获取您的通讯录地址，用于快速导入收货信息"
             },
             "scope.writePhotosAlbum" : {
                 "desc" : "为了更好地为您提供服务"
             }
         },
         "lazyCodeLoading" : "requiredComponents",
-        "mergeVirtualHostAttributes" : true
+        "mergeVirtualHostAttributes" : true,
+        "requiredPrivateInfos" : [ "getLocation", "chooseAddress" ]
     },
     "mp-xhs" : {
         "appid" : "672b1c15f9dd180001b4af71",
@@ -153,13 +157,17 @@
         "usingComponents" : true,
         "permission" : {
             "scope.userLocation" : {
-                "desc" : "获取您的位置信息"
+                "desc" : "获取您的位置信息，用于自动识别收货地址"
+            },
+            "scope.address" : {
+                "desc" : "获取您的通讯录地址，用于快速导入收货信息"
             },
             "scope.writePhotosAlbum" : {
                 "desc" : "为了更好地为您提供服务"
             }
         },
-        "lazyCodeLoading" : "requiredComponents"
+        "lazyCodeLoading" : "requiredComponents",
+        "requiredPrivateInfos" : [ "getLocation", "chooseAddress" ]
     },
     "mp-alipay" : {
         "usingComponents" : true

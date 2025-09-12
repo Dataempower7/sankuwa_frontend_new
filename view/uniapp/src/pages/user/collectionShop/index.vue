@@ -7,16 +7,21 @@
                         <template v-for="item in collectionShopList" :key="item.shopId">
                             <view class="move-item">
                                 <uni-swipe-action-item :threshold="0" auto-close>
-                                    <view class="shop-item" @click="handleLink(item.shopId)">
-                                        <view class="shop-item-left">
+                                    <view class="shop-item">
+                                        <view class="shop-item-left" @click="handleLink(item.shopId)">
                                             <tig-image :src="item.shop.shopLogo" />
                                         </view>
-                                        <view class="shop-item-right">
+                                        <view class="shop-item-middle" @click="handleLink(item.shopId)">
                                             <view class="shop-name line1">{{ item.shop.shopTitle }}</view>
-                                            <view class="shop-desc line1">{{ item.shop.description ? item.shop.description : "" }}</view>
+                                            <view class="shop-desc line1">{{ item.shop.description ? item.shop.description : "店家比较懒，暂无店铺描述" }}</view>
                                             <view class="shop-info">
-                                                <text class="shop-info-text">上架商品：{{ item.productCount }}</text>
+                                                <text class="shop-info-text">上架商品：{{ item.productCount }}</text>   
                                                 <text class="shop-info-text">店铺收藏：{{ item.collectCount }}</text>
+                                            </view>
+                                        </view>
+                                        <view class="shop-item-right">
+                                            <view class="enter-shop-btn" @click="handleLink(item.shopId)">
+                                                <text>进店</text>
                                             </view>
                                         </view>
                                     </view>
@@ -128,8 +133,10 @@ onReachBottom(() => {
     .shop-item {
         padding: 30rpx 20rpx;
         background-color: #fff;
-        border-radius: 20rpx;
+        border-radius: 32rpx;
         display: flex;
+        align-items: center;
+        
         .shop-item-left {
             width: 130rpx;
             height: 130rpx;
@@ -138,17 +145,22 @@ onReachBottom(() => {
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
-        .shop-item-right {
-            width: calc(100% - 150rpx);
+        .shop-item-middle {
+            flex: 1;
             padding-left: 20rpx;
+            padding-right: 20rpx;
+            
             .shop-name {
-                font-size: 28rpx;
+                font-size: 32rpx;
                 width: 100%;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                color: black;
+                font-weight: 500;
             }
 
             .shop-desc {
@@ -158,6 +170,7 @@ onReachBottom(() => {
                 padding-top: 15rpx;
                 height: 50rpx;
             }
+            
             .shop-info {
                 font-size: 24rpx;
                 color: #999;
@@ -167,6 +180,26 @@ onReachBottom(() => {
                     &:first-child {
                         padding-right: 18rpx;
                     }
+                }
+            }
+        }
+        
+        .shop-item-right {
+            flex-shrink: 0;
+            
+            .enter-shop-btn {
+                padding: 16rpx 32rpx;
+                background-color: #fff;
+             //   border: 2rpx solid #000;
+                border-radius: 8rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                text {
+                    font-size: 28rpx;
+                    color: #000;
+                    font-weight: 500;
                 }
             }
         }

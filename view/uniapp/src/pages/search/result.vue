@@ -886,45 +886,99 @@ const handleRefresh = () => {
     min-height: 200rpx;
 
     :deep(.masonry) {
-        display: flex;
-        gap: 20rpx;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20rpx;
 
         .masonry-item {
-            flex: 1;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
 
             .item-li {
-                background-color: #fff;
-                border-radius: 10rpx;
+                width: 100%;
                 margin-bottom: 20rpx;
+                background: #fff;
+                border-radius: 33rpx;
                 overflow: hidden;
+                padding-bottom: 10rpx;
+                box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+                border: 1rpx solid #f0f0f0;
 
                 .photo {
+                    border-radius: 22rpx;
+                    overflow: hidden;
+                    margin: 12rpx;
+                    margin-bottom: 8rpx;
+                    text-align: center;
                     position: relative;
 
                     image {
+                        border-radius: 22rpx;
                         width: 100%;
+                        height: auto;
                         display: block;
                     }
                 }
 
                 .info {
-                    padding: 20rpx;
+                    background: #ffffff;
+                    padding: 0;
 
                     .detail {
-                        font-size: 28rpx;
-                        color: #333;
-                        line-height: 1.4;
-                        margin-bottom: 10rpx;
+                        margin: 0 16rpx 10rpx;
+                        display: block;
+                        line-height: 40rpx;
+                        height: 80rpx;
+                        overflow: hidden;
+                        font-size: 26rpx;
+                        font-weight: bold;
+                        color: #2a3145;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        display: -moz-box;
+                        -webkit-line-clamp: 2;
+                        -moz-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        -moz-box-orient: vertical;
                     }
 
                     .action {
+                        padding: 0 16rpx 10rpx;
                         display: flex;
-                        align-items: center;
                         justify-content: space-between;
-                        margin-top: 10rpx;
+                        align-items: center;
 
                         .pricenum {
+                            color: var(--general);
+                            height: inherit;
                             flex: 1;
+
+                            :deep(.format-price) {
+                                .price-font {
+                                    font-size: 32rpx !important;
+                                    font-weight: bold;
+                                    color: #000;
+                                }
+                                .currency {
+                                    font-size: 22rpx !important;
+                                }
+                                .decimals {
+                                    font-size: 25rpx !important;
+                                }
+                            }
+                        }
+
+                        .buy_btn {
+                            color: var(--general);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            
+                            .buy_btn_icon {
+                                font-size: 42rpx;
+                            }
                         }
                     }
                 }

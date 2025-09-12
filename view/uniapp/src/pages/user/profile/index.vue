@@ -71,7 +71,7 @@
         <tig-fixed-placeholder >
             <view class="bottom-buttons">
                 <tig-button class="logout-btn" plain @click="onLogout">退出登录</tig-button>
-                <tig-button class="save-btn" @click="onSubmit">保存修改</tig-button>
+                <tig-button class="save-btn" style="border-color: #3544ba;" @click="onSubmit">保存修改</tig-button>
             </view>
         </tig-fixed-placeholder>
         <up-datetime-picker
@@ -173,7 +173,15 @@ const onSubmit = () => {
 };
 
 const onLogout = () => {
-    userStore.logout();
+    uni.showModal({
+        title: t("退出登录"),
+        content: t("确定要退出登录吗？"),
+        success: (res) => {
+            if (res.confirm) {
+                userStore.logout();
+            }
+        }
+    });
 };
 
 const edit = async () => {

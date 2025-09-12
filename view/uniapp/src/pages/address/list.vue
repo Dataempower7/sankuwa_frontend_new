@@ -35,7 +35,7 @@
             <view class="empty-content">
                 <image class="empty-image" src="/static/images/missing_page/missing_address.png" mode="aspectFit" />
                 <text class="empty-text">{{ $t("暂无收货地址") }}</text>
-                <text class="empty-desc">{{ $t("快速获取当前位置或手动添加收货地址") }}</text>
+                <text class="empty-desc">{{ $t("快速获取微信位置或手动添加收货地址") }}</text>
             </view>
         </view>
 
@@ -47,14 +47,15 @@
                 <template v-if="addressList.length === 0">
                     <tig-button class="import-address-btn" @click="handleImportAddress">
                         <view class="btn-content">
+                            <text class="iconfont-h5 icon-weizhi location-icon"></text>
                             <text>{{ $t("一键导入地址") }}</text>
                         </view>
                     </tig-button>
-                    <tig-button class="add-address-btn" @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
+                    <tig-button class="add-address-btn" style="border-color: #3544ba;"  @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
                 </template>
                 <!-- 有地址时只显示添加按钮 -->
                 <template v-else>
-                    <tig-button class="add-address-btn" @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
+                    <tig-button class="add-address-btn" style="border-color: #3544ba;" @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
                 </template>
             </view>
         </tig-fixed-placeholder>
@@ -69,7 +70,7 @@ import type { AddressFilterResult } from "@/types/user/address";
 import { reactive, ref } from "vue";
 import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { mobileConceal, currRoute } from "@/utils";
-import { getCurrentLocation, formatLocationToAddress } from "@/utils/location";
+import { importAddressOneClick } from "@/utils/location";
 import { useList } from "@/hooks";
 import { useI18n } from "vue-i18n";
 
@@ -151,102 +152,65 @@ const handleAdd = () => {
 };
 
 const handleImportAddress = async () => {
-    // 首先请求定位权限
-    try {
-        const authResult = await uni.authorize({
-            scope: 'scope.userLocation'
-        });
-
-        if (!authResult) {
-            // 权限被拒绝，显示说明
-            uni.showModal({
-                title: t('需要定位权限'),
-                content: t('为了获取您的精确位置，需要开启定位权限。您可以在设置中手动开启，或选择手动添加地址。'),
-                showCancel: true,
-                cancelText: t('手动添加'),
-                confirmText: t('去设置'),
-                success: (res) => {
-                    if (res.confirm) {
-                        uni.openSetting();
-                    } else {
-                        uni.navigateTo({
-                            url: "/pages/address/editRegion?import=true"
-                        });
-                    }
-                }
-            });
-            return;
-        }
-    } catch (error) {
-        console.log('权限请求失败，继续尝试定位:', error);
-    }
-
     uni.showLoading({
-        title: t('正在精确定位...')
+        title: t('获取地址信息...'),
+        mask: true
     });
-
+    
     try {
-        const locationResult = await getCurrentLocation();
-
-        if (locationResult.success) {
-            const addressData = formatLocationToAddress(locationResult);
-
-            // 将地址信息编码后传递给编辑页面
-            const addressInfo = encodeURIComponent(JSON.stringify({
-                regions: addressData.regions,
-                detail: addressData.detail,
-                fullAddress: addressData.fullAddress,
-                type: locationResult.type,
-                accuracy: locationResult.accuracy
-            }));
-
-            uni.hideLoading();
-
-            // 根据定位类型显示不同的成功提示
-            let successMsg = t('位置获取成功');
-            if (locationResult.type === 'gps') {
-                successMsg = t('GPS定位成功，位置精确');
-            } else if (locationResult.type === 'gps_basic') {
-                successMsg = t('GPS定位成功');
+        const result = await importAddressOneClick();
+        uni.hideLoading();
+        
+        if (result.success) {
+            let addressInfo;
+            
+            if (result.type === 'wechat_address') {
+                // 微信地址簿的数据
+                const regions = [result.provinceName, result.cityName, result.countyName].filter(Boolean);
+                addressInfo = encodeURIComponent(JSON.stringify({
+                    regions,
+                    detail: result.detailInfo || '',
+                    fullAddress: `${regions.join('')}${result.detailInfo || ''}`,
+                    type: 'wechat_address',
+                    consignee: result.userName,
+                    mobile: result.telNumber
+                }));
+            } else {
+                // 定位获取的地址数据
+                const regions = [result.provinceName, result.cityName, result.countyName].filter(Boolean);
+                addressInfo = encodeURIComponent(JSON.stringify({
+                    regions,
+                    detail: result.detailInfo || result.fullAddress || '',
+                    fullAddress: result.fullAddress || result.detailInfo || '',
+                    type: 'location_address'
+                }));
             }
-
-            uni.showToast({
-                title: successMsg,
-                icon: 'success',
-                duration: 1500
+            
+            uni.navigateTo({ 
+                url: `/pages/address/editRegion?import=true&location=${addressInfo}` 
             });
-
-            setTimeout(() => {
-                uni.navigateTo({
-                    url: `/pages/address/editRegion?import=true&location=${addressInfo}`
-                });
-            }, 1500);
         } else {
-            uni.hideLoading();
-
-            // 定位失败，提供选择
+            // 导入失败，跳转到手动添加
             uni.showModal({
-                title: t('定位失败'),
-                content: t('无法获取精确位置。可能原因：\n1. GPS信号弱\n2. 定位权限未开启\n3. 网络连接问题\n\n您可以选择手动添加地址'),
-                showCancel: true,
-                cancelText: t('取消'),
-                confirmText: t('手动添加'),
-                success: (res) => {
-                    if (res.confirm) {
-                        uni.navigateTo({
-                            url: "/pages/address/editRegion?import=true"
-                        });
-                    }
+                title: t('导入失败'),
+                content: t(result.message || '无法获取地址信息，请手动输入'),
+                showCancel: false,
+                success: () => {
+                    uni.navigateTo({ url: "/pages/address/editRegion" });
                 }
             });
         }
     } catch (error) {
         uni.hideLoading();
-        uni.showToast({
-            title: t('定位服务异常'),
-            icon: 'none'
+        console.error('一键导入地址失败:', error);
+        uni.showModal({
+            title: t('导入失败'),
+            content: t('地址获取失败，请手动输入'),
+            showCancel: false,
+            success: () => {
+                uni.navigateTo({ url: "/pages/address/editRegion" });
+            }
         });
-        console.error('定位失败:', error);
     }
 };
 

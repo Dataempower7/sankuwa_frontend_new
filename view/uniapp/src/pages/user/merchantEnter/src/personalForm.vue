@@ -383,6 +383,18 @@ import { staticResource } from "@/utils";
 import { applyMerchant, getMerchantInfo } from "@/api/user/merchantEnter";
 import type { ApplyDetailItem } from "@/types/user/merchantEnter";
 import { useI18n } from "vue-i18n";
+import {
+    validatePersonName,
+    validateAddress,
+    validatePhone,
+    validateEmail,
+    validateBankCard,
+    validateBankName,
+    validateShopName,
+    validateServicePhone,
+    createValidator,
+    getDocumentValidator
+} from "@/utils/validators";
 
 const { t } = useI18n();
 
@@ -425,11 +437,9 @@ const firstFormRules = {
                 return false;
             },
             message: t("请上传证件正面照"),
-            // 触发器可以同时用blur和change
             trigger: ["change", "blur"]
         }
     ],
-
     backOfPhoto: [
         {
             validator: (rule: any, value: any, callback: any) => {
@@ -439,7 +449,6 @@ const firstFormRules = {
                 return false;
             },
             message: t("请上传证件反面照"),
-            // 触发器可以同时用blur和change
             trigger: ["change", "blur"]
         }
     ],
@@ -448,24 +457,51 @@ const firstFormRules = {
             return value > 0;
         },
         message: t("请选择证件类型"),
-        // 触发器可以同时用blur和change
         trigger: ["change", "blur"]
     },
-    corporateName: {
-        required: true,
-        message: t("请输入姓名!"),
-        trigger: ["blur", "change"]
-    },
-    documentNumber: {
-        required: true,
-        message: t("请输入证件号码!"),
-        trigger: ["blur", "change"]
-    },
-    residentialAddress: {
-        required: true,
-        message: t("请输入居住地址!"),
-        trigger: ["blur", "change"]
-    }
+    corporateName: [
+        {
+            required: true,
+            message: t("请输入姓名!"),
+            trigger: ["blur", "change"]
+        },
+        createValidator(validatePersonName, t("请输入有效的姓名（2-20个字符，支持中英文）"))
+    ],
+    documentNumber: [
+        {
+            required: true,
+            message: t("请输入证件号码!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) {
+                    return true; // 空值由required处理
+                }
+                const validator = getDocumentValidator(firstForm.documentType);
+                const v = String(value).trim();
+                if (!validator(v)) {
+                    if (firstForm.documentType === 1) {
+                        callback(t("请输入有效的18位身份证号码"));
+                    } else {
+                        callback(t("请输入有效的证件号码"));
+                    }
+                    return false;
+                }
+                return true;
+            },
+            message: t("请输入有效的证件号码"),
+            trigger: ["blur", "change"]
+        }
+    ],
+    residentialAddress: [
+        {
+            required: true,
+            message: t("请输入居住地址!"),
+            trigger: ["blur", "change"]
+        },
+        createValidator(validateAddress, t("请输入有效的居住地址（5-200个字符）"))
+    ]
 };
 const firstForm = reactive({
     type: 1,
@@ -525,56 +561,186 @@ const getValidity = (e: any) => {
 /*      secondForm           */
 const secondFormRef = ref();
 const secondFormRules = {
-    "merchantData.contactName": {
-        required: true,
-        message: t("请输入姓名!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.contactPhone": {
-        required: true,
-        message: t("请输入手机号码!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.contactEmail": {
-        required: true,
-        message: t("请输入常用邮箱!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.merchantName": {
-        required: true,
-        message: t("请输入商户名称!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.customerServicePhone": {
-        required: true,
-        message: t("请输入客服电话!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.bankDeposit": {
-        required: true,
-        message: t("请输入开户银行!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.bankBranch": {
-        required: true,
-        message: t("请输入开户支行!"),
-        trigger: ["blur", "change"]
-    },
-    "merchantData.bankCard": {
-        required: true,
-        message: t("请输入银行卡号!"),
-        trigger: ["blur", "change"]
-    },
-    "shopData.shopTitle": {
-        required: true,
-        message: t("请输入店铺名称!"),
-        trigger: ["blur", "change"]
-    },
-    "shopData.contactMobile": {
-        required: true,
-        message: t("请输入联系电话!"),
-        trigger: ["blur", "change"]
-    },
+    "merchantData.contactName": [
+        {
+            required: true,
+            message: t("请输入姓名!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validatePersonName(value)) {
+                    callback(t("请输入有效的姓名（2-20个字符，支持中英文）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.contactPhone": [
+        {
+            required: true,
+            message: t("请输入手机号码!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validatePhone(value)) {
+                    callback(t("请输入有效的手机号码"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.contactEmail": [
+        {
+            required: true,
+            message: t("请输入常用邮箱!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateEmail(value)) {
+                    callback(t("请输入有效的邮箱地址"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.merchantName": [
+        {
+            required: true,
+            message: t("请输入商户名称!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (value.length < 2 || value.length > 50) {
+                    callback(t("商户名称长度应为2-50个字符"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.customerServicePhone": [
+        {
+            required: true,
+            message: t("请输入客服电话!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateServicePhone(value)) {
+                    callback(t("请输入有效的客服电话（手机号、座机号或400电话）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.bankDeposit": [
+        {
+            required: true,
+            message: t("请输入开户银行!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateBankName(value)) {
+                    callback(t("请输入正确的银行名称"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.bankBranch": [
+        {
+            required: true,
+            message: t("请输入开户支行!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (value.length < 2 || value.length > 100) {
+                    callback(t("支行名称长度应为2-100个字符"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "merchantData.bankCard": [
+        {
+            required: true,
+            message: t("请输入银行卡号!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateBankCard(value)) {
+                    callback(t("请输入有效的银行卡号（16-19位数字）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "shopData.shopTitle": [
+        {
+            required: true,
+            message: t("请输入店铺名称!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateShopName(value)) {
+                    callback(t("店铺名称不符合规范（2-50个字符，不能包含敏感词汇）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
+    "shopData.contactMobile": [
+        {
+            required: true,
+            message: t("请输入联系电话!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateServicePhone(value)) {
+                    callback(t("请输入有效的联系电话（手机号、座机号或400电话）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ],
     "merchantData.businessAddress": [
         {
             required: true,
@@ -588,15 +754,27 @@ const secondFormRules = {
                 return true;
             },
             message: t("请选择经营地址"),
-            // 触发器可以同时用blur和change
             trigger: ["change", "blur"]
         }
     ],
-    "merchantData.detailedAddress": {
-        required: true,
-        message: t("请输入详细地址!"),
-        trigger: ["blur", "change"]
-    }
+    "merchantData.detailedAddress": [
+        {
+            required: true,
+            message: t("请输入详细地址!"),
+            trigger: ["blur", "change"]
+        },
+        {
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value) return true;
+                if (!validateAddress(value)) {
+                    callback(t("请输入有效的详细地址（5-200个字符）"));
+                    return false;
+                }
+                return true;
+            },
+            trigger: ["blur", "change"]
+        }
+    ]
 };
 const secondForm = reactive({
     merchantData: {
@@ -858,7 +1036,8 @@ const handlReapply = () => {
     padding: 25rpx 15rpx;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 36rpx;
     height: 100%;
     font-size: 28rpx;
 

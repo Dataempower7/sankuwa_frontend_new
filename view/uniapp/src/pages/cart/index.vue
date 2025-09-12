@@ -1,9 +1,8 @@
 <template>
     <tig-layout @login-success="loginSuccess">
-        <template v-if="!showLogin">
-            <tig-navbar :show-left="false" title="购物车" />
-            <view v-if="!isLoad" class="cart-box shoppingCart">
-                <template v-if="cartList.length > 0">
+        <tig-navbar :show-left="false" title="购物车" />
+        <view v-if="!isLoad" class="cart-box shoppingCart">
+            <template v-if="cartList.length > 0">
                     <view class="top-text"> 
                         <view class="fl">
                             {{ $t("已选商品") }}
@@ -282,15 +281,11 @@
                     </view>
                 </template>
 
-                <template v-if="cartList.length === 0 && !isLoad">
-                    <cartEmpty />
-                </template>
-                <recommend @callback="getCartList" />
-            </view>
-        </template>
-        <template v-else>
-            <toLogin />
-        </template>
+            <template v-if="cartList.length === 0 && !isLoad">
+                <cartEmpty :isLoggedIn="!showLogin" />
+            </template>
+            <recommend @callback="getCartList" />
+        </view>
 
         <discountInfo v-model="showDiscountInfo" :total="total" />
         <detail v-model="showDetail" :detail="currentDetail" />
@@ -303,7 +298,6 @@ import activityCard from "@/components/masonry/activityCard.vue";
 import discountInfo from "@/components/product/discountInfo.vue";
 import recommend from "@/components/recommend/index.vue";
 import detail from "./src/detail.vue";
-import toLogin from "./src/toLogin.vue";
 import cartEmpty from "./src/cartEmpty.vue";
 import { onShow } from "@dcloudio/uni-app";
 import { useConfigStore } from "@/store/config";
@@ -419,6 +413,7 @@ const getCartList = async () => {
         updateCheckbox();
     } catch (error: any) {
         console.error(error);
+        // 如果是401错误（未登录），保持showLogin为true，让购物车空页面显示登录按钮
         if (error.code === 401) {
             showLogin.value = true;
         }

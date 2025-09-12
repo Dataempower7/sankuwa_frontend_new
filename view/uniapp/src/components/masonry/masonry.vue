@@ -326,7 +326,7 @@ const handleClose = () => {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-gap: 14rpx;
+    grid-gap: 20rpx;
     .masonry-item {
         width: 100%;
         overflow: hidden;
@@ -342,22 +342,29 @@ const handleClose = () => {
 
 .item-li {
     width: 100%;
-    margin-bottom: 15rpx;
+    margin-bottom: 20rpx;
     background: #fff;
-    border-radius: 12rpx;
+    border-radius: 33rpx;
     overflow: hidden;
     padding-bottom: 10rpx;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+    border: 1rpx solid #f0f0f0;
 }
 .item-li .photo {
-    padding: 20rpx;
+    border-radius: 22rpx;
+    overflow: hidden;
+    margin: 12rpx;
+    margin-bottom: 8rpx;
     text-align: center;
     position: relative;
 }
 .item-li .photo image {
     width: 100%;
+    border-radius: 22rpx;
 }
 .item-li .info {
     background: #ffffff;
+    padding: 0;
 }
 
 .item-li .info .detail {

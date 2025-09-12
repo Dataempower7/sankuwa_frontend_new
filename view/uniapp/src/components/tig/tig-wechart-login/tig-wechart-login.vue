@@ -4,7 +4,6 @@
             <view class="wechart-login-content">
                 <view class="popup-logo">
                     <image class="logo-image" src="/static/images/common/logo.png" mode="aspectFit" />
-                    <text class="logo-text">SANKUWA</text>
                 </view>
                 <view class="wechart-login-box">
                     <!-- #ifdef MP-WEIXIN -->
@@ -250,7 +249,7 @@ onShow(() => {
     height: auto;
     box-sizing: border-box;
     padding: 0;
-    background: #fff;
+    background: #ffffff;
     border-radius: 24rpx 24rpx 0 0;
     
     .popup-logo {
