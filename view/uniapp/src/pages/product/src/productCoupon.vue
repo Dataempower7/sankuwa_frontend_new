@@ -1,3 +1,4 @@
+<!-- 优惠券弹窗 -->
 <template>
     <tig-popup v-model:show="showCoupon" :z-index="999" :show-close="false" background-color="#fff">
         <view class="coupon-content">

@@ -2,6 +2,8 @@
     <view class="product-card-row product-detail-area">
         <view class="tab-box flex align-center justify-around">
             <view class="tab" :class="{ active: tabIndex == 0 }" @click="tabIndex = 0">{{ $t("商品介绍") }}</view>
+            <!-- 分割线 -->
+            <view class="divider-line-vertical"></view>
             <view class="tab" :class="{ active: tabIndex == 1 }" @click="tabIndex = 1">{{ $t("售后服务") }}</view>
         </view>
         <view v-if="tabIndex == 0" class="default">
@@ -9,7 +11,13 @@
                 <template v-if="isBuy === 1 && paidContent">
                     <template v-for="(item, index) in paidContent" :key="index">
                         <view v-if="item.type == 'pic'" class="desc-pic-item">
-                            <image lazy-load :src="imageFormat(item?.pic || '')" class="slide-image" mode="widthFix" />
+                            <image 
+                                lazy-load 
+                                :src="imageFormat(item?.pic || '')" 
+                                class="slide-image" 
+                                mode="widthFix" 
+                                @click="previewImage(imageFormat(item?.pic || ''), paidContent.filter(i => i.type === 'pic').map(i => imageFormat(i.pic)))"
+                            />
                         </view>
                         <rich-text v-if="item.type == 'text'" class="desc-text-item" :nodes="formatRichText(item.html)" />
                     </template>
@@ -21,7 +29,13 @@
 
             <template v-for="(item, index) in descArr" :key="index">
                 <view v-if="item.type == 'pic'" class="desc-pic-item">
-                    <image lazy-load :src="imageFormat(item?.pic || '')" class="slide-image" mode="widthFix" />
+                    <image 
+                        lazy-load 
+                        :src="imageFormat(item?.pic || '')" 
+                        class="slide-image" 
+                        mode="widthFix" 
+                        @click="previewImage(imageFormat(item?.pic || ''), descArr.filter(i => i.type === 'pic').map(i => imageFormat(i.pic)))"
+                    />
                 </view>
                 <rich-text v-if="item.type == 'text'" class="desc-text-item" :nodes="formatRichText(item.html)" />
             </template>
@@ -38,7 +52,6 @@ import { imageFormat } from "@/utils/format";
 import { isPro, staticResource, formatRichText } from "@/utils";
 import { ref } from "vue";
 import type { PropType } from "vue";
-import { watchEffect } from "vue";
 const props = defineProps({
     descArr: {
         type: Array as PropType<Array<any>>,
@@ -62,13 +75,21 @@ const props = defineProps({
     }
 });
 const tabIndex = ref(0);
+
+// 图片预览功能
+const previewImage = (current: string, urls: string[]) => {
+    uni.previewImage({
+        current,
+        urls
+    });
+};
 </script>
 
 <style lang="scss" scoped>
 .product-card-row {
     background-color: #fff;
     padding: 20rpx;
-    border-radius: 20rpx;
+    border-radius: 25rpx;
     margin: 20rpx 0;
     .cart-item {
         font-size: 26rpx;
@@ -105,12 +126,21 @@ const tabIndex = ref(0);
 
     .tab-box {
         padding: 10rpx 0 20rpx 0;
-        margin-bottom: 20rpx;
-        font-size: 24rpx;
+        margin-bottom: 0;
+        font-size: 30rpx;
+        font-weight: 500;
 
         .active {
             color: var(--general);
         }
+    }
+    
+    // 垂直分割线样式
+    .divider-line-vertical {
+        width: 1rpx;
+        height: 30rpx;
+        background-color: #e5e5e5;
+        margin: 0 20rpx;
     }
 
     .default {
@@ -130,9 +160,21 @@ const tabIndex = ref(0);
         }
 
         .desc-pic-item {
+            margin: 30rpx 0; // 图片上下间隙
+            
             .slide-image {
                 display: block;
                 width: 100%;
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+                
+                &:hover {
+                    opacity: 0.8;
+                }
+                
+                &:active {
+                    opacity: 0.9;
+                }
             }
         }
     }

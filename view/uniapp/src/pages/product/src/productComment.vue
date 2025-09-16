@@ -1,13 +1,23 @@
+<!-- 商品评论 -->
 <template>
     <view class="product-comment-card">
         <view class="comment-title flex justify-between align-center">
             <view class="txt">
-                {{ $t("评价") }}<text>({{ comment.total ?? 0 }})</text>
+                {{ $t("商品评价") }}<text>({{ comment.total ?? 0 }})</text>
             </view>
-            <view class="more" @click="toPage(`/pages/product/comment?id=${productId}`)">
-                {{ $t("好评") }}<text>{{ comment.goodPercent ?? 0 }}%</text>
-                <uni-icons type="right" size="16" color="#bfbfbf" />
-            </view>
+            
+            <template v-if="comment.goodPercent">
+                <view class="more" @click="toPage(`/pages/product/comment?id=${productId}`)">
+                                 <image class="arrow-icon" src="/static/images/common/right.png"  style="width: 27rpx; height: 27rpx;"/>
+                            </view>
+            </template>
+
+            <template v-else>
+                <view class="more">
+                    {{ $t("暂无评论") }}
+                </view>
+            </template>
+          
         </view>
         <block v-if="commentList.length > 0">
             <view v-for="(item, index) in commentList.slice(0, 2)" :key="index" class="comment-item">
@@ -36,20 +46,20 @@
                 </view>
             </view>
         </block>
-        <block v-else>
-            <view class="no-data"> {{ $t("暂无评价") }}~ </view>
-        </block>
-
-        <view class="comment-btn-box flex align-center justify-around">
-            <view class="btn flex align-center" @click="toPage(`/pages/product/comment?id=${productId}`)">
-                <uni-icons type="chat" size="20" color="#333" />
-                <text>{{ $t("全部评价") }}({{ comment.total ?? 0 }})</text>
-            </view>
+      
+         <block v-if="commentList.length > 0">
+            <view class="comment-btn-box flex align-center justify-around">
+                <view class="btn flex align-center" @click="toPage(`/pages/product/comment?id=${productId}`)">
+                    <uni-icons type="chat" size="20" color="#333" />
+                    <text>{{ $t("全部评价") }}({{ comment.total ?? 0 }})</text>
+                </view>
             <view class="btn flex align-center" @click="toPage(`/pages/product/consult?id=${productId}`)">
                 <uni-icons type="chatboxes" size="20" color="#333" />
                 <text>{{ $t("购买咨询") }}({{ consultationTotal ?? 0 }})</text>
             </view>
         </view>
+         </block>
+      
     </view>
 </template>
 
@@ -134,13 +144,13 @@ onLoad((option) => {
 .product-comment-card {
     background-color: #fff;
     padding: 20rpx;
-    border-radius: 20rpx;
+    border-radius: 25rpx;
     margin: 20rpx 0;
     .comment-title {
-        padding-bottom: 20rpx;
-        border-bottom: 1rpx solid #eee;
+        padding-bottom: 5rpx;
+      //  border-bottom: 1rpx solid #eee;
         .txt {
-            font-size: 26rpx;
+            font-size: 28rpx;
             font-weight: bold;
             text {
                 margin-left: 5rpx;
@@ -149,10 +159,8 @@ onLoad((option) => {
             }
         }
         .more {
-            font-size: 26rpx;
-            text {
-                color: var(--general);
-            }
+            font-size: 27rpx;
+            color: #C1C2C4;
         }
     }
     .comment-item {

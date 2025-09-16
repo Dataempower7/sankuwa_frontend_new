@@ -34,25 +34,35 @@
             </template>
             <view class="title-top-panle">
                 <view class="title-top-panle-collect" @click="addCollect">
-                    <view class="iconfont-h5 icon-shoucang1" :class="{ 'icon-yishoucang': isCollect }">
-                        <text />
+                    <view class="icon-container">
+                        <image 
+                            class="icon-img" 
+                            :src="isCollect ? '/static/images/product/collected.png' : '/static/images/product/collection.png'" 
+                        />
                     </view>
-                    <view class="title-panle-collect-text">{{ $t("收藏") }}</view>
                 </view>
                 <view class="title-top-panle-collect" @click.stop="handleShare">
-                    <view class="iconfont-h5 icon-fenxiang" />
-                    <view class="title-panle-collect-text">{{ $t("分享") }}</view>
+                    <view class="icon-container">
+                        <image class="icon-img" src="/static/images/product/share.png" />
+                    </view>
                 </view>
             </view>
         </view>
+
+        <!-- 优惠券 -->
         <template v-if="promotionList.length > 0">
             <view class="activity-box" @click="handleCoupon">
-                <view class="flex">
-                    <template v-for="item in promotionList.length > 2 ? promotionList.slice(0, 2) : promotionList" :key="item.promotionId">
-                        <activityCard :activity-info="item" card-type="detail" />
-                    </template>
+                <view class="coupon-left">
+                    <image class="coupon-icon" src="/static/images/product/coupon.png" />
+                    <view class="coupon-content">
+                        <template v-for="item in promotionList.length > 2 ? promotionList.slice(0, 2) : promotionList" :key="item.promotionId">
+                            <activityCard :activity-info="item" card-type="detail" />
+                        </template>
+                    </view>
                 </view>
-                <view class="activity-btn"> {{ $t("领券") }}<text class="iconfont-h5 icon-youjiantou" /> </view>
+                <view class="activity-btn">
+                    <image class="arrow-icon" src="/static/images/common/right.png"  />
+                </view>
             </view>
         </template>
         <view v-if="!isSeckill && !isDiscount" class="title-info-bottom line2">
@@ -186,7 +196,7 @@ watch(
 .product-title-info {
     background-color: #fff;
     padding: 15rpx 0 15rpx 15rpx;
-    border-radius: 20rpx;
+    border-radius: 25rpx;
     margin-top: 20rpx;
 
     .title-info-top {
@@ -221,16 +231,17 @@ watch(
                 align-items: center;
                 justify-content: center;
                 position: relative;
-                top: -5rpx;
-                margin-right: 15rpx;
-                .icon-shoucang1,
-                .icon-yishoucang,
-                .icon-fenxiang {
-                    font-size: 35rpx;
+                margin-right: 30rpx;
+                .icon-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     margin-bottom: 5rpx;
-                }
-                .icon-yishoucang {
-                    color: #fe9600;
+                    
+                    .icon-img {
+                        width: 45rpx;
+                        height: 45rpx;
+                    }
                 }
 
                 .title-panle-collect-text {
@@ -271,16 +282,51 @@ watch(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12rpx 0 15rpx;
-    .activity-btn {
-        font-size: 24rpx;
-        color: var(--main-bg);
+   padding: 20rpx 12px 20rpx 5rpx;
+    margin: 10rpx 0;
+    
+    .coupon-left {
         display: flex;
         align-items: center;
-        padding-right: 6rpx;
+        background-color: #FFECEE;
+        border-radius: 12rpx;
+        padding: 6rpx 8rpx 8rpx 14rpx;
+        
+        .coupon-icon {
+            width: 27rpx;
+            height: 27rpx;
+            margin-right: 7rpx;
+        }
+        
+        .coupon-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+    }
+    
+    .activity-btn {
+        font-size: 24rpx;
+        color: #ff4444;
+        display: flex;
+        align-items: center;
+        padding-left: 20rpx;
+        
+        .coupon-text {
+            color: #ff4444;
+            font-size: 24rpx;
+            margin-right: 10rpx;
+        }
+        
+        .arrow-icon {
+          width: 27rpx; 
+          height: 27rpx;
+        }
+        
         .icon-youjiantou {
             font-size: 36rpx;
             margin-left: -8rpx;
+            color: #ff4444;
         }
     }
 }

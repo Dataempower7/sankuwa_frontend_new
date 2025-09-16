@@ -55,6 +55,11 @@
                             {{ productName }}
                         </view>
                     </view>
+                    <view class="stock-info">
+                        {{ $t("库存") }}：<text v-if="productStock > 50" style="color: #5A62AE">{{ $t("充足") }}</text>
+                        <text v-else-if="productStock === 0" style="color: red">{{ $t("缺货") }}</text>
+                        <text v-else style="color: #FF6B35">{{ $t("仅剩") }}{{ productStock }}件</text>
+                    </view>
                 </view>
                 <view class="popup-close" @click="closePopup">
                     <uni-icons type="closeempty" size="24" style="color: #c8c9cc" />
@@ -107,11 +112,11 @@
                             </template>
                             <template v-else>
                                 <tig-number-box v-model="productNumber" :min="1" :max="productStock" @overlimit="handleOverlimit" />
-                                <view class="stock"
+                                <!-- <view class="stock"
                                     >{{ $t("库存") }}：<text v-if="productStock > 50" style="color: var(--general)">{{ $t("充足") }}</text>
                                     <text v-else-if="productStock === 0" style="color: var(--general)">{{ $t("缺货") }}</text>
                                     <text v-else style="color: var(--general)">{{ $t("仅剩") }}{{ productStock }}件</text>
-                                </view>
+                                </view> -->
                             </template>
                         </view>
                     </view>
@@ -235,29 +240,37 @@
                     </template>
                     <template v-else>
                         <template v-if="productType === 1">
-                            <view class="add_cart">
-                                <buy
-                                    :id="Number(modelValue)"
-                                    :sku-id="currentSku.skuId"
-                                    :disabled="productStock == 0"
-                                    :extra-attr-ids="filterParams.extraAttrIds"
-                                    :number="productNumber"
-                                    @callback="addCard"
-                                >
-                                    <view class="btn cart" :class="productStock === 0 ? 'disabled-div' : ''">{{ $t("加入购物车") }}</view>
-                                </buy>
-                                <buy
-                                    :id="Number(modelValue)"
-                                    :sku-id="currentSku.skuId"
-                                    :disabled="productStock == 0"
-                                    :extra-attr-ids="filterParams.extraAttrIds"
-                                    :number="productNumber"
-                                    :is-quick="true"
-                                    @callback="closePopup"
-                                >
-                                    <view class="btn buy-right" :class="productStock === 0 ? 'disabled-div' : ''">{{ $t("立即购买") }}</view>
-                                </buy>
-                            </view>
+                            <!-- 只显示立即购买 -->
+                            <template v-if="buyOnly">
+                                <view class="custom-single-btn">
+                                    <view 
+                                        class="custom-btn custom-single-buy-btn" 
+                                        :class="productStock === 0 ? 'disabled' : ''"
+                                        @click="handleBuyNow"
+                                    >
+                                        {{ $t("立即购买") }}
+                                    </view>
+                                </view>
+                            </template>
+                            <!-- 显示两个按钮 -->
+                            <template v-else>
+                                <view class="custom-buttons">
+                                    <view 
+                                        class="custom-btn custom-cart-btn" 
+                                        :class="productStock === 0 ? 'disabled' : ''"
+                                        @click="handleAddToCart"
+                                    >
+                                        {{ $t("加入购物车") }}
+                                    </view>
+                                    <view 
+                                        class="custom-btn custom-buy-btn" 
+                                        :class="productStock === 0 ? 'disabled' : ''"
+                                        @click="handleBuyNow"
+                                    >
+                                        {{ $t("立即购买") }}
+                                    </view>
+                                </view>
+                            </template>
                         </template>
                         <template v-else>
                             <view class="exchange-btn">
@@ -285,11 +298,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from "vue";
 import type { SkuList, SkuPromotion, ProductAmountItem } from "@/types/product/product";
-import { getProductDetail, getProductSkuDetail, getProductAmount, getBatchProductAvailability } from "@/api/product/product";
-import { getExchangeDetail } from "@/api/exchange/exchange";
+import { getProductDetail, getProductSkuDetail, getProductAmount, getBatchProductAvailability, addToCart } from "@/api/product/product";
+import { getExchangeDetail, addExchangeToCart } from "@/api/exchange/exchange";
+import { getCart } from "@/api/cart/cart";
+import type { CartResponse } from "@/types/cart/cart";
 import buy from "@/components/product/buy.vue";
 import { staticResource, isB2B } from "@/utils";
 import { useI18n } from "vue-i18n";
+import { useConfigStore } from "@/store/config";
 
 const props = defineProps({
     modelValue: {
@@ -303,6 +319,10 @@ const props = defineProps({
     type: {
         type: [String],
         default: ""
+    },
+    buyOnly: {
+        type: [Boolean],
+        default: false
     }
 });
 
@@ -344,6 +364,373 @@ const handleAttrClick = (index: number, id: number) => {
         checkedAttrs.value[index] = id;
     }
     loadSkuPrice();
+};
+
+// 防止重复点击的loading状态
+const isAddingToCart = ref(false);
+
+// 本地购物车缓存，用于避免并发问题
+const localCartCache = ref<{productId: number, skuId: number | null}[]>([]);
+
+// 清理本地缓存（在页面初始化或成功后一段时间后清理）
+const clearLocalCache = () => {
+    localCartCache.value = [];
+};
+
+// 自定义按钮点击事件
+const handleAddToCart = async () => {
+    if (productStock.value === 0) {
+        uni.showToast({ title: t("商品已售罄"), icon: "none", duration: 1500 });
+        return;
+    }
+    
+    // 防止重复点击
+    if (isAddingToCart.value) {
+        console.log('Already adding to cart, ignoring click');
+        return;
+    }
+    
+    isAddingToCart.value = true;
+    
+    try {
+        // 确俚SKU信息正确获取
+        let skuIdToCheck = null;
+        
+        console.log('Product info check:', {
+            productId: props.modelValue,
+            hasSpecs: specificationList.value.length > 0,
+            currentSku: currentSku.value,
+            skuListLength: skuList.value.length
+        });
+        
+        // 对于有规格的商品，确保已选择规格
+        if (specificationList.value.length > 0) {
+            if (!currentSku.value?.skuId) {
+                console.log('Specification required but not selected');
+                uni.showToast({ title: t("请选择商品规格"), icon: "none", duration: 1500 });
+                isAddingToCart.value = false;
+                return;
+            }
+            skuIdToCheck = currentSku.value.skuId;
+            console.log('Using selected SKU ID:', skuIdToCheck);
+        } else {
+            // 没有规格的商品，使用默认SKU或null
+            if (skuList.value.length > 0 && skuList.value[0].skuId) {
+                skuIdToCheck = skuList.value[0].skuId;
+                console.log('Using default SKU ID:', skuIdToCheck);
+            } else {
+                skuIdToCheck = null;
+                console.log('No SKU available, using null');
+            }
+        }
+        
+        // 先检查本地缓存（快速检查并发问题）
+        console.log('Local cache before check:', localCartCache.value);
+        const localDuplicate = localCartCache.value.some(item => {
+            const cacheSkuId = item.skuId === null ? 0 : item.skuId;
+            const checkSkuId = skuIdToCheck === null ? 0 : skuIdToCheck;
+            const isDuplicate = item.productId === props.modelValue && cacheSkuId === checkSkuId;
+            console.log(`Local cache comparison: cache(productId=${item.productId}, skuId=${item.skuId}) vs current(productId=${props.modelValue}, skuId=${skuIdToCheck}) = ${isDuplicate}`);
+            return isDuplicate;
+        });
+        
+        if (localDuplicate) {
+            console.log('Found duplicate in local cache, preventing duplicate request');
+            isAddingToCart.value = false;
+            uni.showToast({ 
+                title: t('请勿重复点击'), 
+                icon: "none", 
+                duration: 1500 
+            });
+            return;
+        }
+        
+        // 检查远程购物车中是否已存在相同的商品和SKU组合
+        console.log('Checking for duplicates - productId:', props.modelValue, 'skuId:', skuIdToCheck);
+        const isDuplicate = await checkDuplicateInCart(props.modelValue, skuIdToCheck);
+        console.log('Duplicate check result:', isDuplicate);
+        
+        if (isDuplicate) {
+            isAddingToCart.value = false; // 重置加载状态
+            uni.showModal({
+                title: t('提示'),
+                content: t('购物车中已有相同商品，是否前往购物车查看或继续添加？'),
+                showCancel: true,
+                cancelText: t('去购物车'),
+                confirmText: t('继续添加'),
+                success: (res) => {
+                    if (res.confirm) {
+                        // 用户选择继续添加，执行添加操作
+                        performAddToCart(skuIdToCheck);
+                    } else {
+                        // 用户选择去购物车
+                        closePopup();
+                        uni.navigateTo({ url: '/pages/cart/cartJump' });
+                    }
+                }
+            });
+            return;
+        }
+        
+        // 如果不重复，直接添加
+        await performAddToCart(skuIdToCheck);
+        
+    } catch (error: any) {
+        console.error('handleAddToCart error:', error);
+        uni.showToast({ title: error.message || '操作失败', icon: "none", duration: 1500 });
+    } finally {
+        isAddingToCart.value = false; // 确保始终重置加载状态
+    }
+};
+
+// 执行添加到购物车的实际操作
+const performAddToCart = async (skuId: number | null = null) => {
+    // 先在函数开始处定义finalSkuId，确保在所有作用域中可用
+    const finalSkuId = skuId !== null ? skuId : (currentSku.value?.skuId || null);
+    
+    try {
+        const configStore = useConfigStore();
+        const salesmanId = getSalemanId(props.modelValue);
+        let result: any = {};
+        
+        // 立即添加到本地缓存，防止并发问题
+        localCartCache.value.push({ productId: props.modelValue, skuId: finalSkuId });
+        
+        const filterParams: any = {
+            id: props.modelValue,
+            number: productNumber.value,
+            skuId: finalSkuId,
+            isQuick: 0 // 加入购物车不是快速购买
+        };
+        
+        console.log('performAddToCart - API params:', filterParams);
+        console.log('performAddToCart - currentSku details:', currentSku.value);
+        
+        // 对于有规格的商品，确保 skuId 不为 null
+        if (specificationList.value.length > 0 && !filterParams.skuId) {
+            uni.showToast({ title: t("请选择商品规格"), icon: "none", duration: 1500 });
+            return;
+        }
+        
+        if (checkedAttrs.value.length > 0) {
+            filterParams.extraAttrIds = checkedAttrs.value.filter((item) => !!item).join(",");
+        }
+        
+        switch (props.type) {
+            case "exchange":
+                result = await addExchangeToCart(filterParams);
+                break;
+            default:
+                filterParams.salesmanId = salesmanId > 0 ? salesmanId : undefined;
+                result = await addToCart(filterParams);
+        }
+        
+        // 触发加入购物车成功事件
+        addCard();
+        uni.showToast({ 
+            title: t("加入购物车成功"), 
+            icon: 'success',
+            duration: 1500 
+        });
+        
+        // 5秒后清理缓存，给后端时间处理
+        const cacheItem = { productId: props.modelValue, skuId: finalSkuId };
+        setTimeout(() => {
+            const index = localCartCache.value.findIndex(item => {
+                const cacheSkuId = item.skuId === null ? 0 : item.skuId;
+                const finalSkuIdNormalized = finalSkuId === null ? 0 : finalSkuId;
+                return item.productId === cacheItem.productId && cacheSkuId === finalSkuIdNormalized;
+            });
+            if (index > -1) {
+                console.log('Cleaning cache item:', localCartCache.value[index]);
+                localCartCache.value.splice(index, 1);
+            } else {
+                console.log('Cache item not found for cleanup:', cacheItem);
+            }
+        }, 5000);
+        
+    } catch (error: any) {
+        console.error('performAddToCart error:', error);
+        
+        // 出错时从本地缓存中移除
+        const index = localCartCache.value.findIndex(item => {
+            const cacheSkuId = item.skuId === null ? 0 : item.skuId;
+            const finalSkuIdNormalized = finalSkuId === null ? 0 : finalSkuId;
+            return item.productId === props.modelValue && cacheSkuId === finalSkuIdNormalized;
+        });
+        if (index > -1) {
+            console.log('Removing cache item due to error:', localCartCache.value[index]);
+            localCartCache.value.splice(index, 1);
+        } else {
+            console.log('Cache item not found for error removal, clearing all cache');
+            // 如果找不到对应的缓存项，为了安全起见，清空所有缓存
+            localCartCache.value = [];
+        }
+        
+        // 特殊处理重复记录错误
+        if (error.code === 1001 && error.message && error.message.includes('Expected one result')) {
+            uni.showModal({
+                title: t('提示'),
+                content: t('购物车中已有重复记录，请先去购物车页面清理后再试'),
+                showCancel: true,
+                cancelText: t('取消'),
+                confirmText: t('去购物车'),
+                success: (res) => {
+                    if (res.confirm) {
+                        closePopup();
+                        uni.navigateTo({ url: '/pages/cart/cartJump' });
+                    }
+                }
+            });
+        } else {
+            uni.showToast({ 
+                title: error.message || '加入购物车失败', 
+                icon: "none", 
+                duration: 2000 
+            });
+        }
+    }
+};
+
+const handleBuyNow = async () => {
+    if (productStock.value === 0) {
+        uni.showToast({ title: t("商品已售罄"), icon: "none", duration: 1500 });
+        return;
+    }
+    
+    
+    
+    try {
+        const configStore = useConfigStore();
+        
+        if (configStore.closeOrder === 1) {
+            uni.showToast({ title: t("商城已关闭下单"), icon: "none", duration: 1500 });
+            return;
+        }
+        
+        const salesmanId = getSalemanId(props.modelValue);
+        let result: any = {};
+        const filterParams: any = {
+            id: props.modelValue,
+            number: productNumber.value,
+            skuId: currentSku.value?.skuId || null,
+            isQuick: 1 // 立即购买是快速购买
+        };
+        
+        console.log('handleBuyNow - API params:', filterParams);
+        console.log('handleBuyNow - currentSku details:', currentSku.value);
+        
+        // 对于有规格的商品，确保 skuId 不为 null
+        if (specificationList.value.length > 0 && !filterParams.skuId) {
+            uni.showToast({ title: t("请选择商品规格"), icon: "none", duration: 1500 });
+            return;
+        }
+        
+        if (checkedAttrs.value.length > 0) {
+            filterParams.extraAttrIds = checkedAttrs.value.filter((item) => !!item).join(",");
+        }
+        
+        switch (props.type) {
+            case "exchange":
+                result = await addExchangeToCart(filterParams);
+                break;
+            default:
+                filterParams.salesmanId = salesmanId > 0 ? salesmanId : undefined;
+                result = await addToCart(filterParams);
+        }
+        
+        // 关闭弹窗
+        closePopup();
+        
+        // 跳转到订单确认页面
+        uni.navigateTo({ url: `/pages/order/check?flowType=${result.flowType}` });
+        
+    } catch (error: any) {
+        console.error('handleBuyNow error:', error);
+        
+        // 如果是重复记录错误，提供解决方案
+        if (error.code === 1001 && error.message.includes('Expected one result')) {
+            uni.showModal({
+                title: t('提示'),
+                content: t('购物车中已有相同商品，请先去购物车页面处理后再试，或选择加入购物车'),
+                showCancel: true,
+                cancelText: t('加入购物车'),
+                confirmText: t('去购物车'),
+                success: (res) => {
+                    if (res.confirm) {
+                        closePopup();
+                        uni.navigateTo({ url: '/pages/cart/cartJump' });
+                    } else {
+                        // 用户选择加入购物车，执行添加操作
+                        const skuIdForAdd = currentSku.value?.skuId || null;
+                        performAddToCart(skuIdForAdd);
+                    }
+                }
+            });
+        } else {
+            uni.showToast({ title: error.message, icon: "none", duration: 1500 });
+        }
+    }
+};
+
+// 检查购物车中是否已存在相同的商品和SKU组合
+const checkDuplicateInCart = async (productId: number, skuId: number | null): Promise<boolean> => {
+    try {
+        console.log('Fetching cart data for duplicate check...');
+        const cartResponse: CartResponse = await getCart();
+        
+        console.log('Cart response:', cartResponse);
+        
+        // 检查响应结构
+        if (!cartResponse || !cartResponse.data) {
+            console.log('No cart data available');
+            return false;
+        }
+        
+        const cartData = cartResponse.data;
+        
+        if (!cartData.cartList || !Array.isArray(cartData.cartList)) {
+            console.log('Cart list is empty or invalid');
+            return false;
+        }
+        
+        console.log(`Checking for duplicates: productId=${productId}, skuId=${skuId}`);
+        
+        // 检查所有购物车商店中的商品
+        for (const shop of cartData.cartList) {
+            if (!shop.carts || !Array.isArray(shop.carts)) {
+                continue;
+            }
+            
+            for (const cartItem of shop.carts) {
+                // 处理SKU ID的比較，保持与本地缓存检查一致的逻辑
+                const cartSkuId = cartItem.skuId === null ? 0 : cartItem.skuId;
+                const checkSkuId = skuId === null ? 0 : skuId;
+                
+                console.log(`Comparing: cart item (productId=${cartItem.productId}, skuId=${cartItem.skuId}->${cartSkuId}) vs checking (productId=${productId}, skuId=${skuId}->${checkSkuId})`);
+                
+                if (cartItem.productId === productId && cartSkuId === checkSkuId) {
+                    console.log('Duplicate found in remote cart!');
+                    return true;
+                }
+            }
+        }
+        
+        console.log('No duplicates found');
+        return false;
+    } catch (error) {
+        console.error('检查购物车重复项时出错:', error);
+        // 如果检查失败，为了安全起见，返回false允许继续添加
+        return false;
+    }
+};
+
+// 获取销售员ID
+const getSalemanId = (id: number) => {
+    const salesmanProducts = uni.getStorageSync("salesmanProducts") || [];
+    if (!salesmanProducts.length) return 0;
+    const salesman = salesmanProducts.find((item: any) => item.productId == id);
+    return Number(salesman?.salesmanId) || 0;
 };
 
 const __getProductDetail = async () => {
@@ -390,6 +777,10 @@ const reset = () => {
     currentSku.value = {} as SkuList;
     checkedAttrs.value = [];
     tabIndex.value = 0;
+    // 清理本地缓存，防止不同商品间的干扰
+    localCartCache.value = [];
+    // 重置加载状态
+    isAddingToCart.value = false;
 };
 
 const firstLoad = ref(false);
@@ -410,28 +801,46 @@ watch(
 );
 
 const setDefaultValue = () => {
-    if (specificationList.value.length > 0) {
+    if (specificationList.value.length > 0 && skuList.value.length > 0) {
         if (props.skuId > 0) {
+            // 如果有指定的skuId，设置为默认选中
             const skuItem = skuList.value.find((item: SkuList) => item.skuId === props.skuId);
             if (skuItem) {
-                const skuAttr = skuItem.skuValue.split("|");
-                skuAttr.forEach((item: string, index: number) => {
-                    checkedValue.value[index] = item;
+                const skuAttrs = skuItem.skuValue.split(":");
+                checkedValue.value = [...skuAttrs];
+                
+                // 更新界面选中状态
+                specificationList.value.forEach((item: any, index) => {
+                    item.attrList.forEach((subItem: any) => {
+                        subItem.checked = false;
+                        const attrValue = `${subItem.attrName}:${subItem.attrValue}`;
+                        if (skuAttrs[index] === attrValue) {
+                            subItem.checked = true;
+                            if (index === 0) {
+                                productImage.value = subItem.attrPic || productImage.value;
+                            }
+                        }
+                    });
                 });
+                
+                currentSku.value = skuItem;
+                console.log('setDefaultValue - set currentSku from props.skuId:', currentSku.value);
             }
-        }
-        if (checkedValue.value.length === 0) {
-            // 设置默认选中值
-            specificationList.value.forEach((item: any, index) => {
+        } else {
+            // 有规格但没有指定skuId，不自动选择，等待用户手动选择
+            specificationList.value.forEach((item: any) => {
                 item.attrList.forEach((subItem: any) => {
                     subItem.checked = false;
                 });
-                checkedValue.value[index] = item.attrList[0].attrName + ":" + item.attrList[0].attrValue;
-                item.attrList[0].checked = true;
             });
-            productImage.value = specificationList.value[0].attrList[0].attrPic;
+            checkedValue.value = [];
+            currentSku.value = {} as SkuList;
+            console.log('setDefaultValue - waiting for user to select specifications');
         }
-        updateValue();
+    } else if (skuList.value.length > 0) {
+        // 没有规格但有SKU的情况
+        currentSku.value = skuList.value[0];
+        console.log('setDefaultValue - no specs, set currentSku to first SKU:', currentSku.value);
     }
     loadSkuPrice();
 };
@@ -440,12 +849,34 @@ const handleChecked = (index: number, subIdx: number) => {
     if (index === 0) {
         productImage.value = checkedItem.attrPic;
     }
-    checkedValue.value[index] = checkedItem.attrName + ":" + checkedItem.attrValue;
+    
+    // 根据当前选择构建完整的SKU值
+    const newSkuParts: string[] = [];
+    
+    specificationList.value.forEach((spec: any, specIndex: number) => {
+        if (specIndex === index) {
+            // 当前点击的属性
+            newSkuParts.push(`${checkedItem.attrName}:${checkedItem.attrValue}`);
+        } else {
+            // 其他已选择的属性
+            const selectedItem = spec.attrList.find((item: any) => item.checked);
+            if (selectedItem) {
+                newSkuParts.push(`${selectedItem.attrName}:${selectedItem.attrValue}`);
+            } else {
+                // 如果没有选择，使用第一个
+                const firstItem = spec.attrList[0];
+                newSkuParts.push(`${firstItem.attrName}:${firstItem.attrValue}`);
+            }
+        }
+    });
+    
+    checkedValue.value = newSkuParts;
     updateValue();
     loadSkuPrice();
 };
 
 const updateValue = () => {
+    
     specificationList.value.forEach((item: any, index: number) => {
         const checkedItem = checkedValue.value[index];
         item.attrList.forEach((value: any) => {
@@ -463,7 +894,9 @@ const updateValue = () => {
         });
     });
 
-    const selectedItem: any = skuList.value.find((item: any) => item.skuValue == checkedValue.value.join("|"));
+    const searchKey = checkedValue.value.join(":");
+    const selectedItem: any = skuList.value.find((item: any) => item.skuValue == searchKey);
+    
     if (selectedItem) {
         currentSku.value = selectedItem;
     }
@@ -806,8 +1239,9 @@ defineExpose({
                     margin-left: 0;
                 }
                 &.checked {
-                    color: var(--general);
-                    background-color: var(--vice-bg);
+                    color: #5F679A;
+                    background-color: #EDEEFF;
+                    border: 2rpx solid #5F679A;
                 }
             }
         }
@@ -815,7 +1249,8 @@ defineExpose({
 }
 
 .specification {
-    height: v-bind(height);
+    //height: v-bind(height);
+    height: 500px;
     padding-bottom: v-bind(paddingBottom);
     box-sizing: border-box;
 }
@@ -835,6 +1270,7 @@ defineExpose({
             margin-left: 20rpx;
             padding-top: 20rpx;
             width: calc(100% - 180rpx);
+            position: relative;
 
             .ticket {
                 background-color: var(--tag-bg);
@@ -868,6 +1304,15 @@ defineExpose({
                 font-size: 24rpx;
             }
         }
+        
+        .stock-info {
+            position: absolute;
+            top: 180rpx;
+            left: 212rpx;
+            right: 0;
+            font-size: 24rpx;
+            color: #666666;
+        }
     }
 }
 
@@ -880,10 +1325,10 @@ defineExpose({
         flex-direction: column;
         gap: 20rpx;
         .tit {
-            color: #999;
+            color: #1d1d1d;
             height: 33rpx;
             line-height: 32rpx;
-            font-size: 24rpx;
+            font-size: 27rpx;
         }
         .sku-tag {
             display: flex;
@@ -917,12 +1362,13 @@ defineExpose({
                 }
             }
             .checked {
-                color: var(--general);
-                background-color: var(--vice-bg);
+                color: #5F679A;
+                background-color: #EDEEFF;
+                border: 2rpx solid #5F679A;
             }
             .disabled {
                 border: 1px dashed #eee;
-                color: #c8c9cc;
+                color: #000000;
                 cursor: not-allowed;
                 background-color: #f7f8fa;
             }
@@ -935,10 +1381,10 @@ defineExpose({
         align-items: center;
         justify-content: space-between;
         .tit {
-            color: #999;
+            color: #1d1d1d;
             height: 33rpx;
             line-height: 32rpx;
-            font-size: 24rpx;
+            font-size: 27rpx;
         }
 
         .sku-num {
@@ -1030,24 +1476,84 @@ defineExpose({
         height: 80rpx;
         justify-content: center;
         .btn {
-            width: 47vw;
-            height: 80rpx;
-            line-height: 80rpx;
+            flex: 1;
             text-align: center;
+            line-height: 80rpx;
+            height: 80rpx;
             color: #fff;
-            font-size: 30rpx;
-            font-weight: 500;
+            font-size: 24rpx;
         }
         .cart {
             background: var(--vice-bg);
             border-radius: 100rpx 0 0 100rpx;
             color: var(--vice-text);
         }
-        .buy-right {
+        .buy {
             background: var(--general);
             border-radius: 0 100rpx 100rpx 0;
             color: var(--main-text);
         }
+    }
+    .custom-buttons {
+        width: 100%;
+        display: flex;
+        height: 80rpx;
+        justify-content: center;
+        gap: 20rpx;
+        padding: 0 20rpx;
+    }
+    
+    .custom-single-btn {
+        width: 100%;
+        padding: 0 10rpx;
+    }
+    
+    .custom-btn {
+        height: 80rpx;
+        line-height: 80rpx;
+        text-align: center;
+        font-size: 30rpx;
+        font-weight: 500;
+        border-radius: 40rpx;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &.disabled {
+            background-color: #ddd;
+            color: #aaa;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    }
+    
+    .custom-cart-btn {
+        flex: 1;
+        background: #FFFFFF;
+        border: 2rpx solid #000000;
+        color: #000000;
+        
+        &:active {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+    }
+    
+    .custom-buy-btn,
+    .custom-single-buy-btn {
+        flex: 1;
+        background: #3544BA;
+        border: 2rpx solid #3544BA;
+        color: #FFFFFF;
+        
+        &:active {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+    }
+    
+    .custom-single-buy-btn {
+        width: 100%;
+        flex: none;
     }
 }
 

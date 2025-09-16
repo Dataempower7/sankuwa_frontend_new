@@ -4,10 +4,10 @@
             <view class="order-menu badgecolor">
                 <up-tabs
                     v-model:current="currentIndex"
-                    line-color="var(--general)"
+                    line-color="#3444BA"
                     :list="menuTypeList"
-                    :active-style="{ padding: '0 10rpx' }"
-                    :inactive-style="{ padding: '0 10rpx' }"
+                    :active-style="{ padding: '0 14rpx' }"
+                    :inactive-style="{ padding: '0 14rpx' }"
                     :scrollable="true"
                     key-name="value"
                     @change="changeMenu"
@@ -1255,21 +1255,22 @@ onUnmounted(() => {
                         white-space: nowrap;
                         text-overflow: ellipsis;
                         padding-bottom: 10rpx;
-                        font-size: 28rpx;
+                        font-size: 27rpx;
+                        margin-top: -5rpx;
                     }
 
                     .product-item-price {
                         display: flex;
-                        padding-top: 5rpx;
+                        padding-top: 10rpx;
                         .product-item-pricenum {
                             font-size: 30rpx;
                         }
 
                         .product-item-quantity {
-                            font-size: 28rpx;
+                            font-size: 26rpx;
                             color: #999;
                             padding-left: 23rpx;
-                            margin-top: 1.3px;
+                            margin-top: 3.3px;
                         }
                     }
                 }
@@ -1671,5 +1672,14 @@ onUnmounted(() => {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+}
+
+.sku-card{
+    display: inline-block;
+    background-color: #ffffff;
+    font-size: 23rpx;
+    color: #969799;
+    margin: 8rpx 0 ;
+    padding: 0rpx 0rpx;
 }
 </style>

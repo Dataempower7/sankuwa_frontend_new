@@ -1062,11 +1062,11 @@ const checkOutBarStyle = computed(() => {
     }
     .sku-card {
         display: inline-block;
-        background-color: #f7f8fa;
-        font-size: 22rpx;
-        padding: 8rpx 12rpx;
-        border-radius: 5rpx;
-        color: #969799;
+        background-color: #ffffff;
+        font-size: 24rpx;
+        padding: 6rpx 0rpx;
+     //   border-radius: 5rpx;
+        color: #717171;
         margin: 0;
 
         .sku-item {
@@ -1286,7 +1286,7 @@ const checkOutBarStyle = computed(() => {
     text-align: left;
     color: #000000;
     font-size: 27rpx;
-    margin-left: 60px;
+    margin-left: 95px;
 
     .txt {
         font-weight: normal;

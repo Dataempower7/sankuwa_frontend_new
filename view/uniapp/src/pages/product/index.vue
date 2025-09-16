@@ -37,18 +37,18 @@
                     <view class="product-card-row">
                         <view class="cart-item flex align-center justify-between" @click="showSpecification">
                             <view class="flex align-center">
-                                <view class="title"> {{ $t("规格") }} </view>
+                                <view class="title"> {{ $t("已选") }} </view>
                                 <view class="label">
                                     <template v-if="isB2B() && attrList.spe?.length > 0">
                                         <template v-for="item in attrList.spe" :key="item">
                                             <text>{{ item.attrList.length + $t("种") + $t(item.attrName) }}</text>
                                         </template>
                                     </template>
-                                    <template v-else> {{ $t(skuStr) }} {{ $t(productNumber) }} {{ $t("件") }}</template>
+                                    <template v-else>  {{ $t(productNumber) }}{{ $t("件") }} {{ $t(skuStr) }} </template>
                                 </view>
                             </view>
                             <view>
-                                <image class="icon-image" :src="staticResource('common/more.png')" />
+                              <image class="arrow-icon" src="/static/images/common/right.png" style="width: 27rpx; height: 27rpx;"/>
                             </view>
                         </view>
 
@@ -119,11 +119,11 @@
                         </template>
                     </view>
 
+                    <productComment class="evaluate-area" :product-id="product.productId" />
+
                     <template v-if="Object.keys(shopInfo).length > 0 && isMerchant()">
                         <productShopInfo :shop-info="shopInfo" @refresh-shop-detail="refreshShopDetail" />
                     </template>
-
-                    <productComment class="evaluate-area" :product-id="product.productId" />
 
                     <productContent
                         :is-buy="product.isBuy"
@@ -152,7 +152,7 @@
                                 <template v-else>
                                     <view class="label" @click="handleToHome">
                                         <view>
-                                            <image mode="widthFix" :src="staticResource('product/home.png')" class="img" />
+                                            <image mode="widthFix" src="/static/images/product/home.png" class="img" />
                                         </view>
                                         <view class="label-text">
                                             <text>{{ $t("首页") }}</text>
@@ -162,7 +162,7 @@
                                 <view v-if="showService" class="label">
                                     <service :phone="shopInfo.kefuPhone" :product-id="productId" :shop-id="shopInfo.shopId">
                                         <view>
-                                            <image mode="widthFix" :src="staticResource('product/service.png')" class="img" />
+                                            <image mode="widthFix" src="/static/images/product/server.png" class="img" />
                                         </view>
                                         <view class="label-text">
                                             <text>{{ $t("客服") }}</text>
@@ -172,7 +172,7 @@
                                 <view class="label cart-position" @click.stop="toPage('/pages/cart/cartJump')">
                                     <view>
                                         <uni-badge class="uni-badge-left-margin badgecolor" :text="cartCount" absolute="rightTop" size="small">
-                                            <image mode="widthFix" :src="staticResource('product/cart.png')" class="img" />
+                                            <image mode="widthFix"  src="/static/images/product/cart.png" class="img" />
                                         </uni-badge>
                                     </view>
                                     <view class="label-text">
@@ -186,15 +186,15 @@
                                 </template>
                                 <template v-else>
                                     <template v-if="type === 'exchange'">
-                                        <view class="other-products-btn" @click="showSpecification">{{ $t("立即兑换") }}</view>
+                                        <view class="other-products-btn" @click="showSpecification(true)">{{ $t("立即兑换") }}</view>
                                     </template>
                                     <template v-else>
                                         <template v-if="product.productType === 1">
-                                            <view class="btn cart" @click="showSpecification">{{ $t("加入购物车") }}</view>
-                                            <view class="btn buy" @click="showSpecification">{{ $t("立即购买") }} </view>
+                                            <view class="btn cart-new" @click="showSpecification(false)">{{ $t("加入购物车") }}</view>
+                                            <view class="btn buy-new" @click="showSpecification(true)">{{ $t("立即购买") }}</view>
                                         </template>
                                         <template v-else>
-                                            <view class="other-products-btn" @click="showSpecification">{{ $t("立即购买") }}</view>
+                                            <view class="other-products-btn" @click="showSpecification(true)">{{ $t("立即购买") }}</view>
                                         </template>
                                     </template>
                                 </template>
@@ -213,6 +213,7 @@
                     v-model="specificationId"
                     v-model:sku-id="skuId"
                     :type="type"
+                    :buy-only="buyOnly"
                     @load-end="getLoadStatus"
                     @add-card-succeed="getShowAnimation"
                     @send-value="getValue"
@@ -279,11 +280,13 @@ const animationPosition = ref({
 const layoutRef = ref();
 const type = ref("");
 const exchangeIntegral = ref(0);
+const buyOnly = ref(false);
 
 const showDrawer = () => {
     showAttrRef.value = true;
 };
-const showSpecification = () => {
+const showSpecification = (isBuyOnly = false) => {
+    buyOnly.value = isBuyOnly;
     if (specificationRef.value) {
         specificationRef.value.handleShowPopup();
     }
@@ -579,7 +582,7 @@ const showService = computed(() => {
 <style lang="scss" scoped>
 .badgecolor {
     :deep(.uni-badge--error) {
-        background-color: var(--general);
+        background-color:#3544BA;
     }
 }
 
@@ -805,6 +808,20 @@ const showService = computed(() => {
             background: var(--general);
             border-radius: 0 100rpx 100rpx 0;
             color: var(--main-text);
+        }
+        
+        // 新按钮样式 - 简单圆角
+        .cart-new {
+               background: #FFFFFF;
+                border-radius: 35rpx 0 0 35rpx;
+                color: var(--vice-text);
+                border: 1rpx solid black;
+        }
+        .buy-new {
+            background: #3544BA;
+            border-radius: 0 35rpx 35rpx 0;
+            color: var(--main-text);
+            border: 1rpx solid #3544BA;
         }
     }
 }

@@ -27,7 +27,7 @@
                                     </template>
                                 </view>
                             </template>
-                            <view class="right-price-box" :style="{ marginTop: 88 + 'rpx' }">
+                            <view class="right-price-box" :style="{ marginTop: 15 + 'px' }">
                                 <view class="store-card-item-content-right-price">
                                     <format-price
                                         :font-style="{ fontWeight: 'bold' }"
@@ -511,10 +511,11 @@ const handleAttribute = () => {
 
 .sku-card {
     display: inline-flex;
-    font-size: 22rpx;
-    border-radius: 5rpx;
-    color: #969799;
-    margin: 10rpx 0;
+    font-size: 24rpx;
+   // border-radius: 5rpx;
+    color: #717171;
+    margin: 10rpx -10px;
+    background-color: #ffffff;
 
     .sku-item {
         width: auto;

@@ -490,7 +490,7 @@ const edit = async () => {
                 .right-price {
                     display: flex;
                     font-size: 28rpx;
-                    padding-top: 78rpx;
+                    padding-top: 48rpx;
                     
                     .right-price-pricenum {
                         font-weight: bold;
@@ -500,6 +500,9 @@ const edit = async () => {
 
                     .right-price-quantity {
                         color: #999;
+                        margin-left: 15rpx;
+                        margin-top: 7rpx;
+                        font-size: 24rpx;
                     }
                 }
             }

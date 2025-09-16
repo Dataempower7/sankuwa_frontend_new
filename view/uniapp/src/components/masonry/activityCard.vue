@@ -70,7 +70,7 @@ const getActivityText = (type: number) => {
         padding-bottom: 2rpx;
 
         .ticket-type {
-            padding: 0 6rpx;
+            padding: 0 9rpx;
             // max-width: 50rpx;
             position: relative;
 
@@ -112,13 +112,54 @@ const getActivityText = (type: number) => {
         }
     }
     &.subbg {
-        margin: 10rpx;
-        margin-bottom: 0;
-        margin-left: 0;
+        margin: 0;
         padding: 0;
+        
         .activity {
-            background-color: var(--tag-bg);
-            color: var(--tag-text);
+            background-color: transparent;
+            color: #ff4444;
+            font-weight: bold;
+            border: none;
+            padding: 0 15rpx 0 0;
+            border-radius: 0;
+            font-size: 26rpx;
+        }
+        
+        .ticket {
+            background-color: transparent;
+            color: #ff4444;
+            font-weight: bold;
+            border-radius: 0;
+            
+            .ticket-type {
+                color: #ff4444;
+            }
+            
+            .ticket-content {
+                color: #ff4444;
+                font-weight: bold;
+            }
+            
+            .ticket-line {
+                background: linear-gradient(
+                    to bottom,
+                    #ff4444 20%,
+                    #ff4444 20%,
+                    #ff4444 20%,
+                    rgba(255, 255, 255, 0) 20%,
+                    rgba(255, 255, 255, 0) 35%,
+                    #ff4444 35%,
+                    #ff4444 35%,
+                    #ff4444 35%,
+                    #ff4444 60%,
+                    rgba(255, 255, 255, 0) 60%,
+                    rgba(255, 255, 255, 0) 55%,
+                    rgba(255, 255, 255, 0) 75%,
+                    #ff4444 75%,
+                    #ff4444 75%,
+                    #ff4444 100%
+                );
+            }
         }
     }
 }

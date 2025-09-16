@@ -2024,6 +2024,7 @@ onUnload(() => {
     gap: 10rpx;
 }
 
+
 .product-card-custom .sku-item {
     background: #f8f8f8;
     padding: 8rpx 16rpx;

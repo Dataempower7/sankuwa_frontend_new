@@ -182,7 +182,7 @@
             </uni-forms>
         </view>
 
-        <tig-fixed-placeholder background-color="#fff">
+        <tig-fixed-placeholder background-color="#fff" >
             <view class="btn-box">
                 <view
                     class="custom-btn cancel-btn"
@@ -446,7 +446,7 @@ const onSubmit = () => {
 <style lang="scss" scoped>
 .invoice-apply-page {
     background-color: #f5f5f5;
-    min-height: 100vh;
+    //max-height: 100vh;
     padding: 0 20rpx 160rpx 20rpx; // 移除顶部内边距，只保留左右和底部
 }
 
