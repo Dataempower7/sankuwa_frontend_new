@@ -53,7 +53,7 @@
         <template v-if="promotionList.length > 0">
             <view class="activity-box" @click="handleCoupon">
                 <view class="coupon-left">
-                    <image class="coupon-icon" src="/static/images/product/coupon.png" />
+                    <!-- <image class="coupon-icon" src="/static/images/product/coupon.png" /> -->
                     <view class="coupon-content">
                         <template v-for="item in promotionList.length > 2 ? promotionList.slice(0, 2) : promotionList" :key="item.promotionId">
                             <activityCard :activity-info="item" card-type="detail" />
@@ -288,8 +288,8 @@ watch(
     .coupon-left {
         display: flex;
         align-items: center;
-        background-color: #FFECEE;
-        border-radius: 12rpx;
+        // background-color: #FFECEE;
+        // border-radius: 12rpx;
         padding: 6rpx 8rpx 8rpx 14rpx;
         
         .coupon-icon {
@@ -302,6 +302,7 @@ watch(
             display: flex;
             align-items: center;
             flex: 1;
+                gap: 10rpx;
         }
     }
     

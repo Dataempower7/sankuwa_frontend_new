@@ -141,23 +141,8 @@
                 <view class="marketing-section">
                     <!-- 秒杀板块 -->
                     <view class="seckill-card" @click="goToSeckillList">
-                        <image class="seckill-bg" src="/static/images/home/Flash_kill_background@3x.png" mode="aspectFill" />
+                        <image class="seckill-bg" src="/static/images/home/home_seckill.png" mode="aspectFill" />
                         <view class="seckill-content">
-                            <view class="seckill-header">
-                                <view class="seckill-title-wrapper">
-                                    <text class="seckill-main-title">秒杀</text>
-                                 <!--    <text class="seckill-sub-title">{{ currentSeckillTime }}点场</text> -->
-                                </view>
-                                <view class="seckill-countdown">
-                                    <view class="countdown-item">{{ countdownTime.hours }}</view>
-                                    <text class="countdown-colon">:</text>
-                                    <view class="countdown-item">{{ countdownTime.minutes }}</view>
-                                    <text class="countdown-colon">:</text>
-                                    <view class="countdown-item">{{ countdownTime.seconds }}</view>
-                                    <image class="countdown-enter-icon" src="/static/images/home/enter@3x.png" mode="aspectFit" />
-                                </view>
-                            </view>
-                            
                             <view class="seckill-products">
                                 <view 
                                     v-for="(product, index) in seckillData.slice(0, 2)" 
@@ -179,16 +164,7 @@
                     <view class="right-section">
                         <!-- 限时折扣 -->
                         <view class="discount-card" @click="goToDiscountPage">
-                            <image class="discount-bg-image" src="/static/images/home/discount@3x.png" mode="aspectFill" />
-                            <view class="discount-overlay">
-                                <view class="discount-text-area">
-                                    <text class="discount-title">限时折扣</text>
-                                    <text class="discount-subtitle">限时速抢</text>
-                                </view>
-                                <view class="go-button">
-                                    <image class="go-icon" src="/static/images/home/go@3x.png" mode="aspectFit" />
-                                </view>
-                            </view>
+                            <image class="discount-bg-image" src="/static/images/home/home_discount.png" mode="aspectFill" />
                         </view>
                         
                         <!-- 优惠券和签到 -->
@@ -296,9 +272,9 @@
                                     <view class="product-title">{{ product.productName }}</view>
                                     <view class="product-price">
                                         <format-price
-                                            :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#000000' }"
-                                            :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#000000' }"
-                                            :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#000000' }"
+                                            :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#d1a671' }"   
                                             :price-data="product.productPrice"
                                         />
                                     </view>
@@ -1058,7 +1034,7 @@ const goToSeckillList = () => {
 // 跳转限时折扣页面
 const goToDiscountPage = () => {
     uni.navigateTo({
-        url: '/pages/activity/discount'
+        url: '/pages/discount/list'
     });
 };
 

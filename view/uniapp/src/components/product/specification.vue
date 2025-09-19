@@ -55,11 +55,11 @@
                             {{ productName }}
                         </view>
                     </view>
-                    <view class="stock-info">
+                    <!-- <view class="stock-info">
                         {{ $t("库存") }}：<text v-if="productStock > 50" style="color: #5A62AE">{{ $t("充足") }}</text>
                         <text v-else-if="productStock === 0" style="color: red">{{ $t("缺货") }}</text>
                         <text v-else style="color: #FF6B35">{{ $t("仅剩") }}{{ productStock }}件</text>
-                    </view>
+                    </view> -->
                 </view>
                 <view class="popup-close" @click="closePopup">
                     <uni-icons type="closeempty" size="24" style="color: #c8c9cc" />
@@ -112,11 +112,11 @@
                             </template>
                             <template v-else>
                                 <tig-number-box v-model="productNumber" :min="1" :max="productStock" @overlimit="handleOverlimit" />
-                                <!-- <view class="stock"
-                                    >{{ $t("库存") }}：<text v-if="productStock > 50" style="color: var(--general)">{{ $t("充足") }}</text>
-                                    <text v-else-if="productStock === 0" style="color: var(--general)">{{ $t("缺货") }}</text>
-                                    <text v-else style="color: var(--general)">{{ $t("仅剩") }}{{ productStock }}件</text>
-                                </view> -->
+                                <view class="stock"
+                                    >{{ $t("库存") }}：<text v-if="productStock > 50" style="color: #5A62AE">{{ $t("充足") }}</text>
+                                    <text v-else-if="productStock === 0" style="color: red">{{ $t("缺货") }}</text>
+                                    <text v-else style="color:#FF6B35">{{ $t("仅剩") }}{{ productStock }}件</text>
+                                </view>
                             </template>
                         </view>
                     </view>
@@ -1268,13 +1268,14 @@ defineExpose({
         }
         .info {
             margin-left: 20rpx;
-            padding-top: 20rpx;
+            padding-top: 5rpx;
             width: calc(100% - 180rpx);
             position: relative;
 
             .ticket {
-                background-color: var(--tag-bg);
-                color: var(--tag-text);
+                background: linear-gradient(130deg,#ff8853,#f52828);
+                color: white;
+                font-weight: 500;
                 border-radius: 5rpx;
                 white-space: nowrap;
                 width: fit-content;
@@ -1317,7 +1318,7 @@ defineExpose({
 }
 
 .product-sku-info {
-    padding: 20rpx 20rpx 0 20rpx;
+    padding: 20rpx 20rpx 0 20rpx;   
     box-sizing: border-box;
     .sku-item {
         margin-bottom: 30rpx;

@@ -1056,8 +1056,8 @@ const checkOutBarStyle = computed(() => {
 
 .goods-list-cart .cart_item {
     .sku-card-box {
-        height: 80rpx;
-        margin: 15rpx 0 8rpx;
+        height: 58rpx;
+        margin: 15rpx 0 0rpx;
         box-sizing: content-box;
     }
     .sku-card {
@@ -1286,7 +1286,7 @@ const checkOutBarStyle = computed(() => {
     text-align: left;
     color: #000000;
     font-size: 27rpx;
-    margin-left: 95px;
+    margin-left: 83px;
 
     .txt {
         font-weight: normal;
@@ -1303,7 +1303,7 @@ const checkOutBarStyle = computed(() => {
     font-size: 22rpx;
     display: flex;
     align-items: center;
-    margin-left: 10px;
+    margin-left: 4px;
 
     .discounts-btn {
         padding: 2rpx 15rpx;

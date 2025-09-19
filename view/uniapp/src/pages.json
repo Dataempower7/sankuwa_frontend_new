@@ -46,6 +46,12 @@
             "path": "pages/seckill/list"
         },
         {
+            "path": "pages/discount/list",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
             "path": "pages/404"
         },
         {

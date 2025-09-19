@@ -71,7 +71,8 @@
                                             <!-- <view class="exchange-btn">兑换</view> -->
                                         </template>
                                         <template v-else>
-                                            <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" />
+                                            <!-- <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" /> -->
+                                           <img src="/static/images/category/addProduct.png" style="width: 25px; height: 25px;"/>
                                         </template>
                                     </template>
                                 </view>
@@ -154,7 +155,8 @@
                                             <!-- <view class="exchange-btn">兑换</view> -->
                                         </template>
                                         <template v-else>
-                                            <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" />
+                                            <!-- <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" /> -->
+                                                <img src="/static/images/category/addProduct.png" style="width: 25px; height: 25px;"/>
                                         </template>
                                     </template>
                                 </view>

@@ -159,9 +159,9 @@
                                     <view class="price-container">
                                         <view class="current-price">
                                             <format-price
-                                                :decimals-style="{ fontSize: '22rpx', fontWeight: 'bold', color: '#000' }"
-                                                :currency-style="{ fontSize: '22rpx', fontWeight: 'bold', color: '#000' }"
-                                                :font-style="{ fontSize: '32rpx', fontWeight: 'bold', color: '#000' }"
+                                                :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                                :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                                :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#d1a671' }"   
                                                 :price-data="product.productPrice"
                                             />
                                         </view>
@@ -953,7 +953,7 @@ onMounted(() => {
                     background: #ffffff;
                     
                     .product-title {
-                        font-size: 26rpx;
+                        font-size: 24rpx;
                         color: #2a3145;
                         margin-bottom: 10rpx;
                         height: 80rpx;
@@ -1005,8 +1005,8 @@ onMounted(() => {
                         justify-content: center;
                         
                         .cart-icon {
-                            width: 50rpx;
-                            height: 50rpx;
+                            width: 45rpx;
+                            height: 45rpx;
                             margin-top: -15rpx;
                         }
                     }
@@ -1052,7 +1052,7 @@ onMounted(() => {
                 }
                 
                 .product-info {
-                   padding: 5rpx 20rpx 0rpx;
+                   padding: 0rpx 20rpx 0rpx;
                     position: relative;
                     flex: 1;
                     display: flex;
@@ -1060,7 +1060,7 @@ onMounted(() => {
                     background: #ffffff;
                     
                     .product-title {
-                        font-size: 26rpx;
+                        font-size: 24rpx;
                         color: #2a3145;
                         margin-bottom: 10rpx;
                         height: 80rpx;
@@ -1112,8 +1112,8 @@ onMounted(() => {
                         justify-content: center;
                         
                         .cart-icon {
-                            width: 50rpx;
-                            height: 50rpx;
+                            width: 45rpx;
+                            height: 45rpx;
 
                         }
                     }

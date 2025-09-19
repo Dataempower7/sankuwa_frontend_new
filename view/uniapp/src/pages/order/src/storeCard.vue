@@ -514,7 +514,7 @@ const handleAttribute = () => {
     font-size: 24rpx;
    // border-radius: 5rpx;
     color: #717171;
-    margin: 10rpx -10px;
+    margin: 0rpx -10px;
     background-color: #ffffff;
 
     .sku-item {

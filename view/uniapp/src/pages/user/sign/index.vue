@@ -1,3 +1,4 @@
+<!-- 签到 -->
 <template>
     <tig-layout title="签到">
         <div class="qiandaoBox">
@@ -30,25 +31,42 @@
             </div>
         </div>
         <template v-if="signInfo.recommendGoods">
-            <div class="recgoodsBox">
-                <div class="title">
-                    <div class="bg">
-                        {{ $t("今日特卖 发现好货") }}
-                    </div>
+            <!-- 商品推荐区域 - 搜索页样式 -->
+            <view class="product-recommend-section">
+                <view class="recommend-header">
+                    <view class="recommend-title">{{ $t("推荐好物") }}</view>
                     <navigator url="/pages/search/result?intro=hot">
-                        <div class="moregoods">{{ $t("查看更多") }} <span class="iconfont icon-xiangyou" /></div>
+                        <view class="recommend-more">{{ $t("查看更多") }} <span class="iconfont icon-xiangyou" /></view>
                     </navigator>
-                </div>
-                <div class="wrapGoods">
-                    <view v-for="(item, index) in signInfo.recommendGoods" :key="index" class="item" @click="toProductPage(item)">
-                        <img class="rec-img" :alt="item.productName" :src="imageFormat(item.picThumb)" />
-                        <div class="info">
-                            <div class="name">{{ item.productName }}</div>
-                            <format-price :is-bottom="false" class="price" :price-data="item.productPrice" />
-                        </div>
+                </view>
+                <scroll-view class="product-scroll" scroll-x="true" show-scrollbar="false">
+                    <view class="product-list">
+                        <view 
+                            class="product-item" 
+                            v-for="(item, index) in signInfo.recommendGoods" 
+                            :key="index" 
+                            @click="toProductPage(item)"
+                        >
+                            <view class="product-image-wrapper">
+                                <image 
+                                    lazy-load 
+                                    :src="imageFormat(item.picThumb)" 
+                                    mode="aspectFill" 
+                                    class="product-image" 
+                                    :alt="item.productName"
+                                />
+                            </view>
+                            <view class="product-info">
+                                <text class="product-name">{{ item.productName }}</text>
+                                <view class="product-price">
+                                    <text class="price-symbol">¥</text>
+                                    <text class="price-value">{{ item.productPrice || '0.00' }}</text>
+                                </view>
+                            </view>
+                        </view>
                     </view>
-                </div>
-            </div>
+                </scroll-view>
+            </view>
         </template>
     </tig-layout>
 </template>
@@ -247,72 +265,128 @@ onLoad(() => {
     }
 }
 
-.recgoodsBox {
-    margin: 0 10px;
-    background: #fff;
-    border-radius: 9px;
+/* 商品推荐区域样式 - 与搜索页保持一致 */
+.product-recommend-section {
+    margin: 20rpx 5rpx 5rpx 5rpx;
+    padding: 30rpx;
+    position: relative;
+    z-index: 1;
+}
 
-    .title {
-        display: flex;
-        flex-wrap: nowrap;
-        height: 50px;
-        line-height: 50px;
-        justify-content: space-between;
+.recommend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30rpx;
+}
 
-        .bg {
-            width: 200px;
-            height: 50px;
-            background-image: v-bind(hotBg);
-            background-repeat: no-repeat;
-            background-size: 100% 100%;
-            padding-left: 100rpx;
-            font-weight: bold;
-            line-height: 55px;
-        }
-
-        .moregoods {
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-            color: #999;
-            padding-top: 5px;
-            padding-right: 10px;
-        }
+.recommend-title {
+    font-size: 28rpx;
+    color: #333;
+    font-weight: 600;
+    position: relative;
+    top: -10rpx;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        left: -16rpx;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8rpx;
+        height: 24rpx;
+        border-radius: 4rpx;
     }
+}
 
-    .wrapGoods {
-        padding: 10px;
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        column-gap: 5px;
-        row-gap: 10px;
+.recommend-more {
+    display: flex;
+    align-items: center;
+    font-size: 26rpx;
+    color: #999;
+    
+    .iconfont {
+        font-size: 20rpx;
+        margin-left: 8rpx;
+    }
+}
 
-        .item {
-            display: flex;
-            flex-direction: column;
-            text-align: center;
+.product-scroll {
+    white-space: nowrap;
+}
 
-            img {
+.product-list {
+    display: inline-flex;
+    gap: 24rpx;
+    padding: 10rpx 0;
+    
+    .product-item {
+        display: inline-flex;
+        flex-direction: column;
+        width: 240rpx;
+        transition: transform 0.2s ease;
+        
+        &:active {
+            transform: scale(0.98);
+            
+            .product-image-wrapper {
+                box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.18), 
+                            0 6rpx 16rpx rgba(0, 0, 0, 0.12),
+                            0 3rpx 8rpx rgba(0, 0, 0, 0.08);
+                transform: translateY(-2rpx);
+            }
+        }
+    
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280rpx;
+            background-color: #fff;
+            overflow: hidden;
+            box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12), 
+                        0 4rpx 12rpx rgba(0, 0, 0, 0.08),
+                        0 2rpx 6rpx rgba(0, 0, 0, 0.06);
+            margin-bottom: 16rpx;
+            transition: all 0.3s ease;
+            border-radius: 25rpx;
+            
+            .product-image {
                 width: 100%;
-                height: auto;
-                border-radius: 9px;
-                border: 1px solid #efefef;
+                height: 100%;
+                object-fit: cover;
             }
-
-            .name {
-                padding: 0 15px;
-                height: 20px;
-                line-height: 20px;
-                overflow: hidden;
-                font-weight: 500;
+        }
+    
+        .product-info {
+            padding: 0;
+            text-align: left;
+            
+            .product-name {
+                font-size: 26rpx;
                 color: #333;
-                font-size: 12px;
-                margin-top: 4px;
+                font-weight: 500;
+                margin-bottom: 12rpx;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                line-height: 1.4;
             }
-
-            .price {
-                font-size: 12px;
-                color: #e45363;
+            
+            .product-price {
+                display: flex;
+                align-items: baseline;
+                color: #D1A671;
+                font-weight: 600;
+                
+                .price-symbol {
+                    font-size: 21rpx;
+                    margin-right: 4rpx;
+                }
+                
+                .price-value {
+                    font-size: 28rpx;
+                }
             }
         }
     }

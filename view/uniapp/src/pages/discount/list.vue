@@ -1,5 +1,5 @@
 <template>
-    <view class="seckill-page">
+    <view class="discount-page">
         <!-- 自定义导航栏 -->
         <view class="custom-navbar">
             <view class="navbar-content">
@@ -7,13 +7,13 @@
                     <image class="back-icon" src="/static/images/common/trolley_icon_back@3x.png" mode="aspectFit" />
                 </view>
                 <view class="navbar-title">
-                    {{ $t("限时秒杀") }}
+                    {{ $t("限时折扣") }}
                 </view>
                 <view class="placeholder"></view>
             </view>
         </view>
         
-        <view class="qianggou-list">
+        <view class="discount-list">
             <!-- 筛选条件 -->
             <view class="filter-container">
                 <view class="tab-box flex align-center justify-between">
@@ -33,70 +33,92 @@
                         </view>
                     </template>
                     
-                <view class="item flex" id="filter-btn" @click.stop="showFilterDrawer">
-                    <text>{{ $t("筛选") }}</text>
-                    <image class="filter-icon" src="/static/images/common/right.png" mode="aspectFit" />
-                </view>
+                    <view class="item flex" id="filter-btn" @click.stop="showFilterDrawer">
+                        <text>{{ $t("筛选") }}</text>
+                        <image class="filter-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                    </view>
                 </view>
             </view>
+            
             <!-- 空状态页面 -->
-            <view v-if="!isLoading && seckillProductList.length === 0" class="empty-seckill-container">
+            <view v-if="!isLoading && discountProductList.length === 0" class="empty-discount-container">
                 <view class="empty-content">
                     <image class="empty-image" src="/static/images/missing_page/missing_address.png" mode="aspectFit" />
-                    <text class="empty-text">{{ $t("暂无秒杀商品") }}</text>
-                    <text class="empty-desc">{{ $t("敬请期待") }}</text>
+                    <text class="empty-text">{{ $t("暂无折扣商品") }}</text>
+                    <text class="empty-desc">{{ $t("请稍后再来看看") }}</text>
                 </view>
             </view>
             
             <!-- 商品列表 -->
-            <view v-for="(item, index) in seckillProductList" :key="index" class="qianggou-item" @click="toDetail(item)">
-                <view class="qianggou-img-box">
-                    <image class="qianggou-img" :src="imageFormat(item.picThumb || '')" mode="aspectFill" />
-                    <view v-if="item.seckillStock === 0" class="qianggou-out">
-                        <view class="qianggou-out-txt">{{ $t("已抢完") }}</view>
+            <view v-for="(item, index) in discountProductList" :key="index" class="discount-item" @click="toDetail(item)">
+                <view class="discount-img-box">
+                    <image class="discount-img" :src="imageFormat(item.picThumb || '')" mode="aspectFill" />
+                    <view v-if="item.discountStock === 0" class="discount-out">
+                        <view class="discount-out-txt">{{ $t("已售完") }}</view>
                     </view>
                 </view>
-                <view class="qianggou-info">
-                    <view class="qianggou-tit line2">
+                <view class="discount-info">
+                    <view class="discount-tit line2">
                         {{ item.productName }}
                     </view>
                     <view class="line1 pro-txt-small">
-                        <text class="line1">{{ $t("限时秒杀 抢先提醒") }}</text>
+                        <text class="line1">{{ $t("限时折扣 优惠多多") }}</text>
                     </view>
-                    <view class="qianggou-money-box">
-                        <view class="qianggou-num">
-                            <view class="num"
-                                ><format-price
-                                    :decimals-style="{
-                                        fontSize: '25rpx',
-                                        fontWeight: 'bold',
-                                        color:'red'
-                                    }"
-                                    :currency-style="{
-                                        fontSize: '23rpx',
-                                        fontWeight: 'bold',
-                                         color:'red'
-                                    }"
-                                    :price-data="item.seckillPrice"
-                            /></view>
-                            <view class="del"
-                                ><format-price :font-style="{ 'text-decoration': 'line-through' }" :is-bottom="false" :price-data="item.marketPrice"
-                            /></view>
+                    <view class="discount-money-box">
+                        <view class="discount-num">
+                            <!-- 原价和折扣标签一行 -->
+                            <view class="original-price-row">
+                                <view class="original-price">
+                                    <format-price 
+                                    :font-style="{ 'text-decoration': 'line-through' }" 
+                                    :is-bottom="false" 
+                                    :price-data="item.productPrice"
+                                     />
+                                </view>
+                                <view v-if="item.discountPercent" class="discount-label">
+                                    <text class="discount-percent">{{ item.discountPercent }}折</text>
+                                </view>
+                            </view>
+                            <!-- 折扣价一行，左边加上"超值价"标签 -->
+                            <view class="discount-price-row">
+                                <text class="super-value-label">超值价</text>
+                                <view class="discount-price">
+                                    <format-price
+                                        :decimals-style="{
+                                            fontSize: '25rpx',
+                                            fontWeight: 'bold',
+                                            color:'red'
+                                        }"
+                                        :currency-style="{
+                                            fontSize: '23rpx',
+                                            fontWeight: 'bold',
+                                            color:'red'
+                                        }"
+                                        :font-style="{ 
+                                            fontSize: '28rpx', 
+                                            fontWeight: 'bold',
+                                             color: 'red' 
+                                            }"  
+                                        :price-data="item.discountPrice"
+                                    
+                                    />
+                                </view>
+                            </view>
                         </view>
-                        <view class="qianggou-btn" :class="{ flex: item.seckillStock === 0, 'align-center': item.seckillStock > 0 }">
-                            <view v-if="item.seckillStock === 0" class="btn-txt"> {{ $t("已抢完") }} </view>
+                        <view class="discount-btn" :class="{ flex: item.discountStock === 0, 'align-center': item.discountStock > 0 }">
+                            <view v-if="item.discountStock === 0" class="btn-txt"> {{ $t("已售完") }} </view>
                             <view v-else class="btn-txt">
-                                <view class="txt">{{ $t("马上抢") }}</view>
+                                <view class="txt">{{ $t("立即抢购") }}</view>
                                 <view class="progress-box flex align-center">
                                     <view class="progress-bar">
                                         <view
                                             class="progress"
                                             :style="{
-                                                width: seckillPercentage(item.seckillSales, item.seckillStock)
+                                                width: discountPercentage(item.discountSales, item.discountStock)
                                             }"
                                         />
                                     </view>
-                                    <view class="progress-txt">{{ seckillPercentage(item.seckillSales, item.seckillStock) }}</view>
+                                    <view class="progress-txt">{{ discountPercentage(item.discountSales, item.discountStock) }}</view>
                                 </view>
                             </view>
                         </view>
@@ -104,7 +126,7 @@
                 </view>
             </view>
         </view>
-        <loading-box v-model="isLoadMore" color="#fff" :page="filterParams.page" :length="seckillProductList.length" />
+        <loading-box v-model="isLoadMore" color="#fff" :page="filterParams.page" :length="discountProductList.length" />
         
         <!-- 筛选下拉菜单 -->
         <view
@@ -149,40 +171,43 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, nextTick } from "vue";
 import { imageFormat } from "@/utils/format";
-import { getSeckill } from "@/api/seckill/seckill";
-import type { SeckillFilterState } from "@/types/seckill/seckill";
+import { getDiscount } from "@/api/discount/discount";
+import type { DiscountFilterState } from "@/types/discount/discount";
 import { staticResource } from "@/utils";
 import { useList } from "@/hooks";
+
+// 使用折扣相关的参数名，但暂时复用秒杀的接口和类型
 const filterParams = reactive({
-    //初始化用于查询的参数
+    // 初始化用于查询的参数
     page: 1,
     size: 20
 });
+
 const {
     getList,
     isLoadMore,
     isLoading,
-    data: seckillProductList
-} = useList<SeckillFilterState>(getSeckill, {
+    data: discountProductList
+} = useList<DiscountFilterState>(getDiscount, {
     params: filterParams,
     path: {
         dataKey: "records"
     },
     immediate: true,
-    manageData: (data: SeckillFilterState[]) => {
-        // 保存原始数据用于前端排序
-        originalSeckillList.value = [...data];
+    manageData: (data: DiscountFilterState[]) => {
+        // 后端已经正确计算折扣价格，前端只需要保存数据
+        originalDiscountList.value = [...data];
     }
 });
 
-const toDetail = (data: SeckillFilterState) => {
+const toDetail = (data: DiscountFilterState) => {
     let url = `/pages/product/index?id=${data.productId}${data.skuId > 0 ? `&skuId=${data.skuId}` : ""}`;
     uni.navigateTo({
         url
     });
 };
 
-const seckillPercentage = (sales: number, stock: number) => {
+const discountPercentage = (sales: number, stock: number) => {
     return Math.round((sales / (stock + sales)) * 100) + "%";
 };
 
@@ -214,10 +239,10 @@ const filterConditions = ref({
 
 // 下拉菜单状态
 const showDropdown = ref(false);
-const dropdownPosition = ref({ top: 0, left: 272.34375 });
+const dropdownPosition = ref({ top: 0, left: 0 });
 
 // 原始未排序的商品列表
-const originalSeckillList = ref<SeckillFilterState[]>([]);
+const originalDiscountList = ref<DiscountFilterState[]>([]);
 
 // 筛选条件切换 - 使用前端排序
 const onChangeTab = (item: any) => {
@@ -239,7 +264,7 @@ const sortProductList = (sortType: string, order: string) => {
 };
 
 // 监听原始数据变化，自动应用当前筛选和排序
-watch(originalSeckillList, (newData) => {
+watch(originalDiscountList, (newData) => {
     if (newData.length > 0) {
         applyFilter();
     }
@@ -295,10 +320,10 @@ const toggleFilter = (filterType: 'isBest' | 'isHot' | 'isNew') => {
     filterConditions.value[filterType] = filterConditions.value[filterType] === 0 ? 1 : 0;
     applyFilter();
     
-    // uni.showToast({
-    //     title: `${getFilterName(filterType)}: ${filterConditions.value[filterType] === 1 ? '开启' : '关闭'}`,
-    //     icon: 'none'
-    // });
+    uni.showToast({
+        title: `${getFilterName(filterType)}: ${filterConditions.value[filterType] === 1 ? '开启' : '关闭'}`,
+        icon: 'none'
+    });
 };
 
 // 获取筛选条件名称
@@ -328,7 +353,7 @@ const resetFilter = () => {
 
 // 应用筛选条件
 const applyFilter = () => {
-    let filteredList = [...originalSeckillList.value];
+    let filteredList = [...originalDiscountList.value];
     
     // 根据筛选条件过滤商品
     if (filterConditions.value.isBest === 1) {
@@ -340,6 +365,7 @@ const applyFilter = () => {
     if (filterConditions.value.isNew === 1) {
         filteredList = filteredList.filter(item => item.isNew === 1);
     }
+
     
     // 更新原始数据以应用当前排序
     const currentTab = tabList.value.find(tab => tab.value === tabIndex.value);
@@ -350,30 +376,35 @@ const applyFilter = () => {
         switch (currentTab.value) {
             case "price":
                 sortedList.sort((a, b) => {
-                    const priceA = parseFloat(a.seckillPrice);
-                    const priceB = parseFloat(b.seckillPrice);
+                    // 使用折扣价进行排序，如果没有则使用原价
+                    const priceA = parseFloat(a.discountPrice || a.productPrice || a.marketPrice || '0');
+                    const priceB = parseFloat(b.discountPrice || b.productPrice || b.marketPrice || '0');
                     return currentTab.order === "asc" ? priceA - priceB : priceB - priceA;
                 });
                 break;
         }
         
-        seckillProductList.value = sortedList;
+        discountProductList.value = sortedList;
     } else {
-        seckillProductList.value = filteredList;
+        discountProductList.value = filteredList;
     }
 };
 </script>
+
 <style>
 page {
-    background: linear-gradient(to right, #fd146b 0%, #f52828 100%);
+    background: linear-gradient(to right, #ff6b35 0%, #ff8c42 100%);
 }
+
 </style>
+
 <style scoped lang="scss">
-.seckill-page {
-    min-height: 120vh;
-    background: url('/static/images/seckill/Flash kill background.png') no-repeat top center;
+.discount-page {
+    min-height: 100vh;
+    background: url('/static/images/discount/discount_background.png') no-repeat top center;
     background-size: 100% auto;
-    padding-top: 65px;
+    padding-top: 40px;
+    background-color: #F6F6F6;
 }
 
 .custom-navbar {
@@ -391,7 +422,7 @@ page {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 49px 30rpx;
+        padding: 48px 30rpx;
         
         .back-btn {
             width: 60rpx;
@@ -420,18 +451,17 @@ page {
     }
 }
 
-.qianggou-list {
-    margin: calc(88rpx + var(--status-bar-height, 44rpx) + 200rpx) 25rpx 0 25rpx;
-    background-color: #fff;
+.discount-list {
+    margin: calc(88rpx + var(--status-bar-height, 44rpx) + 200rpx) 30rpx 0 30rpx;
+    background-color: #f6f6f6;
     border-radius: 30rpx;
-    box-shadow: 0 -4rpx 16rpx rgba(0,0,0,.08);
+    box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.15);
     min-height: 60vh;
-    padding: 0 10rpx 10rpx;
+    padding: 0 20rpx 20rpx 20rpx;
     
     // 筛选条件样式（在商品列表内部）
     .filter-container {
-        background-color: #fff;
-        padding: 5px 0rpx;
+        padding: 0 20rpx;
         position: sticky;
         top: calc(88rpx + var(--status-bar-height, 44rpx));
         z-index: 999;
@@ -453,7 +483,7 @@ page {
                     font-weight: bold;
                 }
                 
-                .price-ico-box {
+                 .price-ico-box {
                         margin-left: 12rpx;
                         gap: 4rpx;
                     .price-icon {
@@ -472,161 +502,219 @@ page {
         }
     }
     
-    // 商品列表内容区域
-    padding: 0 20rpx 20rpx 20rpx;
-    
     // 商品项目样式
-    .qianggou-item {
-       margin-bottom: 15rpx;
-    background-color: #fff;
-    border-radius: 20rpx;
-    padding: 20rpx 5rpx 10rpx 0rpx;
-    display: flex;
-    align-items: center;
+    .discount-item {
+        margin-bottom: 15rpx;
+        background-color: #fff;
+        border-radius: 20rpx;
+        padding: 20rpx;
+        display: flex;
+        align-items: center;
 
-    .qianggou-img-box {
-        width: 200rpx;
-        height: 200rpx;
-        position: relative;
+        .discount-img-box {
+            width: 200rpx;
+            height: 200rpx;
+            position: relative;
 
-        .qianggou-img,
-        .qianggou-out {
-            width: 100%;
-            height: 100%;
-            border-radius: 25rpx;
-        }
-
-        .qianggou-out {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.5);
-
-            .qianggou-out-txt {
-                width: 150rpx;
-                height: 150rpx;
-                line-height: 150rpx;
-                background-color: rgba(0, 0, 0, 0.5);
-                color: #ffffff;
-                font-size: 32rpx;
-                text-align: center;
-                font-weight: bold;
-                border-radius: 100rpx;
+            .discount-img,
+            .discount-out {
+                width: 100%;
+                height: 100%;
+                border-radius: 25rpx;
             }
-        }
-    }
 
-    .qianggou-info {
-        margin-left: 20rpx;
-        flex: 1;
-        width: calc(100% - 200rpx);
-
-        .qianggou-tit {
-            color: #333333;
-            font-size: 27rpx;
-            margin-bottom: 10rpx;
-            font-family:
-                PingFangSC,
-                PingFang SC;
-            font-weight: 600;
-            width: 100%;
-        }
-
-        .pro-txt-small {
-            font-size: 25rpx;
-            color: #666666;
-            margin-bottom: 10rpx;
-            width: 100%;
-
-            .attr-tag {
-                width: 25rpx;
-                height: 25rpx;
-                margin-right: 8rpx;
-                margin-top: 3rpx;
-            }
-            .text {
-                width: 400rpx;
-            }
-        }
-
-        .qianggou-money-box {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            height: 80rpx;
-
-            .qianggou-num {
+            .discount-out {
+                position: absolute;
+                top: 0;
+                left: 0;
                 display: flex;
-                align-items: flex-end;
-                .num {
-                    color: red;
+                justify-content: center;
+                align-items: center;
+                background-color: rgba(255, 255, 255, 0.5);
+
+                .discount-out-txt {
+                    width: 150rpx;
+                    height: 150rpx;
+                    line-height: 150rpx;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    color: #ffffff;
+                    font-size: 32rpx;
+                    text-align: center;
                     font-weight: bold;
-                    font-size: 36rpx;
-                    display: flex;
-                    align-items: center;
+                    border-radius: 100rpx;
                 }
-                .del {
-                    display: flex;
-                    margin-left: 15rpx;
-                    font-size: 21rpx;
-                    color: #999;
+            }
+            
+            // 折扣标签
+            .discount-tag {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: #FFCF33;
+                border-radius: 0 15rpx 0 20rpx;
+                padding: 8rpx 12rpx;
+                
+                .discount-percent {
+                    color: #1e1e1e;
+                    font-size: 24rpx;
+                    font-weight: 500;
+                }
+            }
+        }
+
+        .discount-info {
+            margin-left: 20rpx;
+            flex: 1;
+            width: calc(100% - 200rpx);
+
+            .discount-tit {
+                color: #333333;
+                font-size: 27rpx;
+                margin-bottom: 10rpx;
+                font-family:
+                    PingFangSC,
+                    PingFang SC;
+                font-weight: 600;
+                width: 100%;
+                -webkit-line-clamp: 1;
+            }
+
+            .pro-txt-small {
+                font-size: 25rpx;
+                color: #666666;
+                margin-bottom: 10rpx;
+                width: 100%;
+
+                .attr-tag {
+                    width: 25rpx;
+                    height: 25rpx;
+                    margin-right: 8rpx;
+                    margin-top: 3rpx;
+                }
+                .text {
+                    width: 400rpx;
                 }
             }
 
-            .qianggou-btn {
-                width: 190rpx;
-                height: 75rpx;
-                background: linear-gradient(130deg, #ff8853 0%, #f52828 100%);
-                border-radius: 38rpx;
-                line-height: 60rpx;
-                text-align: center;
+            .discount-money-box {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                height: 115rpx;
 
-                .btn-txt {
-                    width: 100%;
-                    color: #fff;
-                    position: relative;
+                .discount-num {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    
+                    // 原价和折扣标签一行
+                    .original-price-row {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 8rpx;
+                        
+                        .original-price {
+                            font-size: 24rpx;
+                            color: #999;
+                        }
+                        
+                        .discount-label {
+                            margin-left: 10rpx;
+                            background: #FFCF33;
+                            border-radius: 25rpx;
+                            padding: 4rpx 8rpx;
+                            
+                            .discount-percent {
+                                color: #1e1e1e;
+                                font-size: 20rpx;
+                                font-weight: 500;
+                            }
+                        }
+                    }
+                    
+                    // 折扣价和超值价标签一行
+                    .discount-price-row {
+                        display: flex;
+                        align-items: center;
+                        
+                        .super-value-label {
+                            color: #2563eb;
+                            font-size: 22rpx;
+                            font-weight: 500;
+                            margin-right: 4rpx;
+                            padding: 4rpx 8rpx;
+                        }
+                        
+                        .discount-price {
+                            display: flex;
+                            align-items: center;
+                             color: red;
+                        }
+                    }
+                    
+                    // 兼容原有样式（万一还有其他地方用到）
+                    .num {
+                        color: red;
+                        font-weight: bold;
+                        font-size: 36rpx;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .del {
+                        display: flex;
+                        margin-left: 15rpx;
+                        font-size: 21rpx;
+                        color: red;
+                    }
                 }
 
-                .progress-box {
-                    position: absolute;
-                    bottom: -30rpx;
-                    left: 50%;
-                    margin-left: -60rpx;
-                    .progress-bar {
-                        width: 80rpx; /* 进度条容器的总宽度 */
-                        height: 8rpx; /* 进度条的高度 */
-                        background-color: #fcaa9e; /* 进度条背景色 */
-                        border-radius: 4rpx; /* 进度条容器的圆角 */
-                        box-shadow: inset 0 1rpx 3rpx rgba(0, 0, 0, 0.2); /* 可选：为进度条添加内阴影效果 */
-                    }
-                    .progress-txt {
-                        font-size: 20rpx;
-                        margin-left: 5rpx;
+                .discount-btn {
+                    width: 170rpx;
+                    height: 80rpx;
+                    background: #3645BA;
+                    border-radius: 38rpx;
+                    line-height: 60rpx;
+                    text-align: center;
+
+                    .btn-txt {
+                        width: 100%;
+                        color: #fff;
+                        position: relative;
                     }
 
-                    .progress {
-                        height: 8rpx; /* 进度条的高度 */
-                        background-color: #fff; /* 进度条的颜色 */
-                        border-radius: 4rpx; /* 进度部分的圆角 */
-                        transition: width 0.4s ease; /* 进度变化时的过渡动画效果 */
+                    .progress-box {
+                        position: absolute;
+                        bottom: -30rpx;
+                        left: 50%;
+                        margin-left: -60rpx;
+                        .progress-bar {
+                            width: 80rpx;
+                            height: 8rpx;
+                            background-color: #fcaa9e;
+                            border-radius: 4rpx;
+                            box-shadow: inset 0 1rpx 3rpx rgba(0, 0, 0, 0.2);
+                        }
+                        .progress-txt {
+                            font-size: 20rpx;
+                            margin-left: 5rpx;
+                        }
+
+                        .progress {
+                            height: 8rpx;
+                            background-color: #fff;
+                            border-radius: 4rpx;
+                            transition: width 0.4s ease;
+                        }
                     }
                 }
-            }
 
-            .btn-out {
-                background: rgba(178, 178, 178, 1);
+                .btn-out {
+                    background: rgba(178, 178, 178, 1);
+                }
             }
         }
     }
-    
-    // qianggou-item 结束
-    }
-    
-// qianggou-list 结束
 }
 
 /* 筛选下拉菜单样式 */
@@ -720,7 +808,7 @@ page {
 }
 
 /* 空状态页面样式 */
-.empty-seckill-container {
+.empty-discount-container {
     display: flex;
     justify-content: center;
     align-items: center;

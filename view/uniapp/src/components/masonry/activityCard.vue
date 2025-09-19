@@ -3,7 +3,9 @@
         <view v-if="activityInfo.type != 2" class="activity">{{ $t(getActivityText(activityInfo.type)) }}</view>
         <view v-if="activityInfo.type == 2" class="ticket">
             <view class="ticket-type"
-                >{{ $t("券") }}
+            
+                ><image src="/static/images/product/coupon.png"  style="    width: 14px;   height: 13px;  position: relative;top: 2px;"/>
+                 {{ $t("券") }}
                 <text class="ticket-line" />
             </view>
             <view class="ticket-content">{{ activityInfo.data.promotionDesc }}</view>
@@ -55,17 +57,19 @@ const getActivityText = (type: number) => {
 
     .activity {
         max-width: 250rpx;
-        background-color: var(--general);
-        color: var(--main-text);
         padding: 0 8rpx;
         border-radius: 5rpx;
         padding-bottom: 2rpx;
         margin-right: 10rpx;
+        background: linear-gradient(130deg,#ff8853,#f52828);
+        color: #ffffff;
+        font-weight: 500;
     }
     .ticket {
         display: flex;
-        background-color: var(--tag-bg);
-        color: var(--tag-text);
+        background: linear-gradient(130deg,#ff8853,#f52828);
+        color: #ffffff;
+        font-weight: 500;
         border-radius: 5rpx;
         padding-bottom: 2rpx;
 
@@ -116,27 +120,27 @@ const getActivityText = (type: number) => {
         padding: 0;
         
         .activity {
-            background-color: transparent;
-            color: #ff4444;
-            font-weight: bold;
+            background: linear-gradient(130deg,#ff8853,#f52828);
+            color: #ffffff;
+            font-weight: 500;
             border: none;
-            padding: 0 15rpx 0 0;
-            border-radius: 0;
+            padding: 0 6rpx 0 0;
+            border-radius: 5rpx;
             font-size: 26rpx;
         }
         
         .ticket {
-            background-color: transparent;
-            color: #ff4444;
-            font-weight: bold;
-            border-radius: 0;
+            background: linear-gradient(130deg,#ff8853,#f52828);
+            color: #ffffff;
+            font-weight: 500;
+            border-radius: 5rpx;
             
             .ticket-type {
-                color: #ff4444;
+                color: #ffffff;
             }
             
             .ticket-content {
-                color: #ff4444;
+                color: #ffffff;
                 font-weight: bold;
             }
             
