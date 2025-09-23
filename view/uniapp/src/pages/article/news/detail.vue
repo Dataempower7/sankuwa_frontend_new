@@ -10,8 +10,8 @@
                 <view class="v-html" v-html="formArticleState.content" />
             </view>
             <view v-else class="empty-state">
-                <view class="empty-image" style="width: 300rpx; height: 300rpx;">
-                    <img src="/static/images/missing_page/missing_address.png" />
+                <view class="empty-image">
+                    <img  src="/static/images/missing_page/missing_address.png" style="width: 300rpx; height: 300rpx" />
                 </view>
                 <view class="empty-text" style="margin-top: -40rpx;">
                     <text>暂无文章</text>

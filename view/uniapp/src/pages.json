@@ -460,6 +460,13 @@
                     "path": "order/info"
                 },
                 {
+                    "path": "order/shoppingInfo",
+                    "style": {
+                        "navigationStyle": "custom",
+                        "navigationBarTitleText": "物流追踪"
+                    }
+                },
+                {
                     "path": "profile/index"
                 },
                 {

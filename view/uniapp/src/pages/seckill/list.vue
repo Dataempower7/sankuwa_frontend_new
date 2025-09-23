@@ -67,6 +67,11 @@
                         <view class="qianggou-num">
                             <view class="num"
                                 ><format-price
+                                    :font-style="{
+                                        fontSize: '36rpx',
+                                        fontWeight: 'bold',
+                                        color: 'red'
+                                    }"
                                     :decimals-style="{
                                         fontSize: '25rpx',
                                         fontWeight: 'bold',
@@ -80,7 +85,22 @@
                                     :price-data="item.seckillPrice"
                             /></view>
                             <view class="del"
-                                ><format-price :font-style="{ 'text-decoration': 'line-through' }" :is-bottom="false" :price-data="item.marketPrice"
+                                ><format-price 
+                                    :font-style="{ 
+                                        'text-decoration': 'line-through',
+                                        fontSize: '18rpx',
+                                        color: '#999'
+                                    }" 
+                                    :currency-style="{
+                                        fontSize: '16rpx',
+                                        color: '#999'
+                                    }"
+                                    :decimals-style="{
+                                        fontSize: '16rpx',
+                                        color: '#999'
+                                    }"
+                                    :is-bottom="false" 
+                                    :price-data="item.marketPrice"
                             /></view>
                         </view>
                         <view class="qianggou-btn" :class="{ flex: item.seckillStock === 0, 'align-center': item.seckillStock > 0 }">
@@ -572,8 +592,7 @@ page {
                 .del {
                     display: flex;
                     margin-left: 15rpx;
-                    font-size: 21rpx;
-                    color: #999;
+                    font-size: 18rpx;
                 }
             }
 

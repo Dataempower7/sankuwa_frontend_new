@@ -17,7 +17,7 @@
                                         <format-price :show-text="false" :is-bottom="false" :price-data="item.price" />
                                     </view>
                                     <template v-if="item.skuData && item.skuData.length > 0">
-                                        <view class="sku-card">
+                                        <view class="sku-card" style="    display: inline-block;  font-size: 23rpx;  color: #969799;   margin: 10rpx 0; background: white; padding: 0rpx 0rpx;" >
                                             <view v-for="(skuItem, skuIndex) in item.skuData" :key="skuIndex" class="sku-item line1">{{ skuItem.value }}</view>
                                         </view>
                                     </template>
@@ -112,7 +112,7 @@
                                     </view>
                                 </view>
                                 <view class="comment-cell">
-                                    <tig-button class="tig-button" @click="onSubmit(item)">{{ $t("提交评论") }}</tig-button>
+                                    <tig-button class="tig-button" style="  margin-top: 50rpx;  color: white;   background-color: #3544BA;   border-color: #3544BA;   border-width: 1px;   border-style: solid;   font-weight: 500;" @click="onSubmit(item)">{{ $t("提交评论") }}</tig-button>
                                 </view>
                             </view>
                         </view>
@@ -314,7 +314,7 @@ onUnload(() => {
                         width: 130rpx;
                     }
                     .tips {
-                        color: var(--general);
+                        color: red;
                     }
                     .label-list {
                         .label-item,
@@ -325,11 +325,11 @@ onUnload(() => {
                             padding: 8rpx 15rpx;
                             margin-right: 15rpx;
                             margin-bottom: 15rpx;
-                            border-radius: 5rpx;
+                            border-radius: 15rpx;
                         }
                         .active {
-                            background-color: var(--general);
-                            color: #fff;
+                            background-color: #ECEFFF;
+                            color: #6369D3;
                         }
                         .label-edit-input {
                             width: 100vw;

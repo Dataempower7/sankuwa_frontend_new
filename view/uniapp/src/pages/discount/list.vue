@@ -70,7 +70,19 @@
                             <view class="original-price-row">
                                 <view class="original-price">
                                     <format-price 
-                                    :font-style="{ 'text-decoration': 'line-through' }" 
+                                    :font-style="{ 
+                                        'text-decoration': 'line-through',
+                                        fontSize: '18rpx',
+                                        color: '#999'
+                                    }" 
+                                    :currency-style="{
+                                        fontSize: '16rpx',
+                                        color: '#999'
+                                    }"
+                                    :decimals-style="{
+                                        fontSize: '16rpx',
+                                        color: '#999'
+                                    }"
                                     :is-bottom="false" 
                                     :price-data="item.productPrice"
                                      />
@@ -84,6 +96,11 @@
                                 <text class="super-value-label">超值价</text>
                                 <view class="discount-price">
                                     <format-price
+                                        :font-style="{ 
+                                            fontSize: '28rpx', 
+                                            fontWeight: 'bold',
+                                             color: 'red' 
+                                            }"  
                                         :decimals-style="{
                                             fontSize: '25rpx',
                                             fontWeight: 'bold',
@@ -94,11 +111,6 @@
                                             fontWeight: 'bold',
                                             color:'red'
                                         }"
-                                        :font-style="{ 
-                                            fontSize: '28rpx', 
-                                            fontWeight: 'bold',
-                                             color: 'red' 
-                                            }"  
                                         :price-data="item.discountPrice"
                                     
                                     />
@@ -615,7 +627,7 @@ page {
                         margin-bottom: 8rpx;
                         
                         .original-price {
-                            font-size: 24rpx;
+                            font-size: 18rpx;
                             color: #999;
                         }
                         

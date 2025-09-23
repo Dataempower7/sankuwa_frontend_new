@@ -98,6 +98,20 @@
                     <uni-steps active-color="var(--general)" :options="orderInfo.stepStatus.steps" :active="orderInfo.stepStatus.current" />
                 </view> -->
 
+                <!-- 物流信息模块 - 仅在待收货或已完成状态显示 -->
+                <template v-if="(orderInfo.orderStatus === 2 || orderInfo.orderStatus === 5) && logisticsCompany">
+                    <view class="logistics-module-custom">
+                        <view class="logistics-status-custom" @click="handleLogisticsDetail(orderInfo.orderId)">
+                            <view class="logistics-info-custom">
+                                <text class="logistics-status-text">已发货</text>
+                                <text class="logistics-separator">|</text>
+                                <text class="logistics-message">{{ getLatestLogisticsMessage() }}</text>
+                            </view>
+                            <img src="/static/images/common/right.png" style="width: 25rpx; height: 25rpx;"></img>
+                        </view>
+                    </view>
+                </template>
+
                 <!-- 地址信息模块  -->
                 <template >
                     <view class="address-module-custom">
@@ -269,8 +283,8 @@
 
                             <view class="expressage-box">
                                 <view class="expressage-info">
-                                    <view class="">{{ orderInfo.logisticsName }}</view>
-                                    <view class="">{{ orderInfo.trackingNo }}</view>
+                                    <view class="company-name">{{ logisticsCompany || orderInfo.logisticsName }}</view>
+                                    <view class="tracking-number">{{ orderInfo.trackingNo }}</view>
                                 </view>
                                 <view class="copy-btn" @click="handleCopy(orderInfo.trackingNo)">{{ $t("复制") }}</view>
                             </view>
@@ -849,19 +863,56 @@ const __getOrder = async () => {
 };
 
 const shippingInfo = ref<ShippingInfoTrace[]>([]);
+const logisticsCompany = ref<string>("");
 const emptyText = ref<string>("");
 const __getShippingInfo = async () => {
     try {
         const result = await getShippingInfo({ id: id.value });
-        if (result) {
-            if (Array.isArray(result)) {
-                shippingInfo.value = result;
+        console.log('物流查询结果:', result);
+        
+        if (result && result.success === 'true') {
+            // 处理物流轨迹数据
+            if (result.traces && Array.isArray(result.traces)) {
+                // 按时间倒序排列，最新消息在前面
+                const sortedTraces = result.traces.sort((a: any, b: any) => {
+                    return new Date(b.acceptTime).getTime() - new Date(a.acceptTime).getTime();
+                });
+                
+                shippingInfo.value = sortedTraces.map((trace: any) => ({
+                    acceptTime: trace.acceptTime,
+                    acceptStation: trace.acceptStation,
+                    action: trace.action
+                }));
             } else {
-                shippingInfo.value = result.traces ?? ([] as ShippingInfoTrace[]);
+                shippingInfo.value = [];
             }
+            
+            // 设置物流公司名称
+            const companyNameMap: Record<string, string> = {
+                'ZTO': '中通快递',
+                'YTO': '圆通速递',
+                'STO': '申通快递',
+                'SF': '顺丰速递',
+                'EMS': '中国邮政',
+                'JD': '京东快递',
+                'HTKY': '百世汇通',
+                'UC': '优速快递',
+                'DBL': '德邦物流',
+                'YZPY': '邮政包裹'
+            };
+            logisticsCompany.value = companyNameMap[result.shipperCode] || result.shipperCode || orderInfo.value.logisticsName || '';
+            
+            emptyText.value = shippingInfo.value.length === 0 ? '暂无物流信息' : '';
+        } else {
+            shippingInfo.value = [];
+            logisticsCompany.value = orderInfo.value.logisticsName || '';
+            emptyText.value = '查询物流信息失败，请稍后再试';
         }
     } catch (error) {
-        console.error(error);
+        console.error('物流查询异常:', error);
+        shippingInfo.value = [];
+        logisticsCompany.value = orderInfo.value.logisticsName || '';
+        emptyText.value = '网络异常，请稍后再试';
     } finally {
         uni.hideLoading();
     }
@@ -949,6 +1000,22 @@ const handleCopy = (data: any) => {
             title: t("复制成功"),
             icon: "none"
         });
+    });
+};
+
+// 获取最新物流消息
+const getLatestLogisticsMessage = () => {
+    if (shippingInfo.value && shippingInfo.value.length > 0) {
+        // 返回最新的物流消息（数组第一个元素）
+        return shippingInfo.value[0].acceptStation || '包裹正在等待揽收';
+    }
+    return '包裹正在等待揽收';
+};
+
+// 点击跳转到物流详情页面
+const handleLogisticsDetail = (orderId: number) => {
+    uni.navigateTo({
+        url: `/pages/user/order/shoppingInfo?id=${orderId}`
     });
 };
 
@@ -1137,9 +1204,9 @@ onUnload(() => {
 .extraskudata-box {
     display: flex;
     .extraskudata {
-        background-color: #f7f8fa;
-        padding: 10rpx 15rpx;
-        border-radius: 10rpx;
+        background-color: #ffffff;
+        // padding: 10rpx 15rpx;
+        // border-radius: 10rpx;
         margin-top: 5rpx;
         color: #969799;
         display: flex;
@@ -1538,6 +1605,71 @@ onUnload(() => {
     font-size: 28rpx;
     color: #666;
     line-height: 1.4;
+}
+
+/* 物流模块样式 */
+.logistics-module-custom {
+    background: #fff;
+    border-radius: 18rpx;
+    margin: 0 20rpx 20rpx 20rpx;
+    border-left: 4rpx solid #3544BA;
+}
+
+/* 物流状态信息样式 */
+.logistics-status-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20rpx 15rpx;
+    box-sizing: border-box;
+    
+    .logistics-info-custom {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0; /* 重要：允许flex子元素缩小 */
+        overflow: hidden;
+        
+        .logistics-status-text {
+            font-size: 24rpx;
+            font-weight: 600;
+            color: #3544BA;
+            margin-right: 10rpx;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .logistics-separator {
+            font-size: 24rpx;
+            color: #a2a2a2;
+            margin-right: 5rpx;
+            flex-shrink: 0;
+        }
+        
+        .logistics-message {
+            font-size: 24rpx;
+            color: #666;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+            text-align: left;
+        }
+    }
+    
+    .logistics-arrow {
+        font-size: 24rpx;
+        color: #999;
+        margin-left: 8rpx;
+        flex-shrink: 0;
+    }
+    
+    &:active {
+        background-color: #f0f2ff;
+        transform: scale(0.98);
+        transition: all 0.2s;
+    }
 }
 
     .address-content {
@@ -2015,20 +2147,26 @@ onUnload(() => {
     color: #333;
     font-weight: 500;
     line-height: 1.4;
-    margin-bottom: 15rpx;
+   // margin-bottom: 15rpx;
 }
 
 .product-card-custom .sku-card {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10rpx;
+  //  flex-wrap: wrap;
+}
+
+.sku-card{
+    font-size: 23rpx;
+    color: #969799;
+    margin: 10rpx 0;
+    background-color: #ffffff;
+    padding: 0rpx 0rpx;
+    
 }
 
 
 .product-card-custom .sku-item {
-    background: #f8f8f8;
-    padding: 8rpx 16rpx;
-    border-radius: 8rpx;
+    padding: 6rpx 0rpx ;
     font-size: 24rpx;
     color: #666;
 }
@@ -2037,7 +2175,6 @@ onUnload(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: -25rpx;
 }
 
 .product-card-custom .product-card-item-price {
@@ -2047,7 +2184,7 @@ onUnload(() => {
 }
 
 .product-card-custom .product-card-item-quantity {
-    font-size: 28rpx;
+    font-size: 24rpx;
     color: #999;
 }
 

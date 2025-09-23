@@ -4,11 +4,11 @@
             <view class="line1 b2b-text">{{ $t(b2bText) }}</view>
         </template>
         <template v-else>
-            <view v-if="props.currencyFormat" :style="hasContent(currencyStyle) ? currencyStyle : fontStyle" class="num util"  style="font-size: 15px; color: #d1a671;    font-weight: bold;">
+            <view v-if="props.currencyFormat" :style="hasContent(currencyStyle) ? currencyStyle : fontStyle" class="num util">
                 {{ currency }}
             </view>
-            <view class="num integer" style="font-size: 18px; color: #d1a671;     font-weight: bold; " :style="fontStyle">{{ price.integer }}</view>
-            <view v-if="showDecimals" class="num decimal"   style="font-size: 15px; color: #d1a671;     font-weight: bold;" :style="hasContent(decimalsStyle) ? decimalsStyle : fontStyle">{{ price.decimals }}</view>
+            <view class="num integer" :style="fontStyle">{{ price.integer }}</view>
+            <view v-if="showDecimals" class="num decimal" :style="hasContent(decimalsStyle) ? decimalsStyle : fontStyle">{{ price.decimals }}</view>
         </template>
     </view>
 </template>

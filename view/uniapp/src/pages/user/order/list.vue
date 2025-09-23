@@ -208,15 +208,15 @@
                             </view>
                         </template>
 
-                        <!-- 待评价订单的特殊底部样式：只有确认收货后且没有售后完成的订单才显示 -->
-                        <template v-else-if="item.payStatus === 2 && item.orderStatus === 5 && item.shippingStatus === 2">
+                        <!-- 待评价订单的特殊底部样式：只有确认收货后且没有售后完成且需要评价的订单才显示 -->
+                        <template v-else-if="item.payStatus === 2 && item.orderStatus === 5 && item.shippingStatus === 2 && item.availableActions.toComment">
                             <view class="order-pay-footer">
                                 <!-- 商品统计和总价 -->
                                 <view class="pay-summary">
                                     <text class="summary-text">共{{ getTotalQuantity(item.items) }}件商品</text>
                                     <view class="summary-price">
                                         <text style="font-size: 28rpx; color: #666;">实付款：</text>
-                                        <text class="price-amount">¥{{ formatPrices(item.totalAmount || 0) }}</text>
+                                        <text class="price-amount">￥{{ formatPrices(item.totalAmount || 0) }}</text>
                                     </view>
                                 </view>
 
@@ -239,11 +239,11 @@
                                         </view>
                                         <view
                                             class="comment-btn"
-                                            style="padding: 16rpx 32rpx; border: 1rpx solid #808080; border-radius: 50rpx; background-color: #fff;"
+                                            style="padding: 16rpx 32rpx; border: 1rpx solid #3544ba; border-radius: 50rpx; background-color: #3544ba;"
                                             @tap="handleEvaluate(item.orderId)"
                                             @click="handleEvaluate(item.orderId)"
                                         >
-                                            <text class="comment-btn-text" style="font-size: 28rpx; color: #1c1c1c;">去评论</text>
+                                            <text class="comment-btn-text" style="font-size: 28rpx; color: #ffffff;">去评论</text>
                                         </view>
                                     </view>
                                 </view>
@@ -436,7 +436,7 @@
                                     >
                                         {{ $t("再次购买") }}
                                     </tig-button>
-                                    <!-- 只有在没有售后完成的情况下才显示去评价按钮 -->
+                                    <!-- 只有在没有售后完成的情况下且需要评价的订单才显示去评价按钮 -->
                                     <tig-button
                                         v-if="item.availableActions.toComment && !item.isAfterSaleCompleted"
                                         color="#333"
@@ -740,9 +740,9 @@ const handleApplyInvoice = (orderId: number) => {
 };
 
 // 处理物流详情
-const handleLogisticsDetail = (orderId: number) => {
+const handleLogisticsDetail = (id: number) => {
     uni.navigateTo({
-        url: `/pages/user/order/logistics?orderId=${orderId}`
+        url: `/pages/user/order/shoppingInfo?id=${id}`
     });
 };
 

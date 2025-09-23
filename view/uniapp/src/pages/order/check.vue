@@ -254,7 +254,8 @@
 
 <script lang="ts" setup>
 import { computed, onUnmounted, reactive, ref, nextTick } from "vue";
-import { getOrderCheckData, updateOrderCheckData, orderSubmit, updateCouponData, getShippingType } from "@/api/order/check";
+import { getOrderCheckData, updateOrderCheckData, orderSubmit, getPaymentType, getShippingType } from "@/api/order/check";
+import { creatPay, checkPayStatus } from "@/api/order/pay";
 import type { CartList, Total, ShippingTypeItem } from "@/types/order/check";
 // import { getPaymentType } from "@/api/order/check"; // 微信小程序只用微信支付
 // import type { PaymentTypeItem } from "@/types/order/check"; // 微信小程序只用微信支付
@@ -668,15 +669,14 @@ const submitOrder = async () => {
     try {
         const result = await orderSubmit(formState);
         if (result.returnType === 2) {
+            // 免支付订单，直接跳转到支付状态页面
             redirect({
                 url: `/pages/order/payStatus?id=${result.orderId}`,
                 mode: "redirectTo"
             });
         } else {
-            redirect({
-                url: `/pages/order/pay?orderId=${result.orderId}`,
-                mode: "redirectTo"
-            });
+            // 需要支付的订单，直接调用支付接口
+            await handleDirectPay(result.orderId);
         }
     } catch (error: any) {
         console.error(error);
@@ -701,6 +701,137 @@ const submitOrder = async () => {
     } finally {
         submitLoading.value = false;
     }
+};
+
+/**
+ * 直接调用支付接口
+ */
+const handleDirectPay = async (orderId: number) => {
+    try {
+        // 创建支付订单
+        const payResult = await createPayOrder(orderId);
+        
+        if (payResult) {
+            // 调用微信小程序支付
+            if (configStore.XClientType === "miniProgram") {
+                await miniProgramPay(payResult.payInfo, orderId);
+            }
+            // 其他平台的支付处理可以在这里添加
+            else {
+                // 非小程序环境，跳转到支付页面
+                redirect({
+                    url: `/pages/order/pay?orderId=${orderId}`,
+                    mode: "redirectTo"
+                });
+            }
+        }
+    } catch (error: any) {
+        uni.showToast({
+            title: error.message || '支付订单失败',
+            icon: "none",
+            duration: 2000
+        });
+        // 创建支付订单失败，跳转到订单列表页面的待支付状态
+        setTimeout(() => {
+            redirect({
+                url: "/pages/user/order/list?status=0", // status=0 表示待支付状态
+                mode: "redirectTo"
+            });
+        }, 2000);
+    }
+};
+
+/**
+ * 创建支付订单
+ */
+const createPayOrder = async (orderId: number) => {
+    // #ifdef MP-WEIXIN
+    return new Promise((resolve, reject) => {
+        wx.login({
+            success: async (res: any) => {
+                try {
+                    const result = await creatPay({
+                        id: orderId,
+                        type: 'wechat', // 微信小程序默认使用微信支付
+                        code: res.code
+                    });
+                    resolve(result);
+                } catch (err) {
+                    reject(err);
+                }
+            },
+            fail: (err: any) => {
+                reject(err);
+            }
+        });
+    });
+    // #endif
+    
+    // #ifdef APP-PLUS || H5 || MP-QQ || MP-TOUTIAO || MP-BAIDU || MP-ALIPAY
+    return await creatPay({
+        id: orderId,
+        type: 'wechat' // 根据实际支付类型调整
+    });
+    // #endif
+};
+
+/**
+ * 微信小程序支付
+ */
+const miniProgramPay = async (payInfo: any, orderId: number) => {
+    return new Promise((resolve, reject) => {
+        wx.requestPayment({
+            timeStamp: String(payInfo.timeStamp),
+            nonceStr: payInfo.nonceStr,
+            package: payInfo.package,
+            signType: payInfo.signType,
+            paySign: payInfo.paySign,
+            success: () => {
+                uni.showToast({
+                    title: '支付成功',
+                    duration: 1500
+                });
+                setTimeout(() => {
+                    redirect({
+                        url: `/pages/order/payStatus?id=${orderId}`,
+                        mode: "redirectTo"
+                    });
+                }, 1500);
+                resolve(true);
+            },
+            fail: (error: any) => {
+                console.error('微信支付失败:', error);
+                
+                // 根据支付失败的具体原因给出不同的提示
+                let errorMessage = '支付失败';
+                let shouldRedirect = true;
+                
+                if (error.errMsg) {
+                    if (error.errMsg.includes('cancel')) {
+                        errorMessage = '支付已取消，请在订单列表中重新支付';
+                    } else if (error.errMsg.includes('fail')) {
+                        errorMessage = '支付失败，请在订单列表中重新支付';
+                    }
+                }
+                
+                uni.showToast({
+                    title: errorMessage,
+                    duration: 2000,
+                    icon: "none"
+                });
+                
+                // 支付失败后跳转到订单列表页面的待支付状态
+                setTimeout(() => {
+                    redirect({
+                        url: "/pages/user/order/list?status=0", // status=0 表示待支付状态
+                        mode: "redirectTo"
+                    });
+                }, 2000);
+                
+                reject(error);
+            }
+        });
+    });
 };
 
 const couponInfoRef = ref();

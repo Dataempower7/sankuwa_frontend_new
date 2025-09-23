@@ -122,16 +122,17 @@
                         <view class="notice-text-wrapper">
                             <view 
                                 class="notice-text-slider" 
-                                :style="{ transform: `translateY(-${currentNoticeIndex * 100}%)` }"
+                                :style="{ transform: `translateY(-${currentNoticeIndex * 70}rpx)` }"
                             >
-                                <text 
+                                <view 
                                     v-for="(notice, index) in noticeMessages" 
                                     :key="index"
                                     class="notice-text-item"
                                     @click="goToNoticeDetail(notice)"
                                 >
-                                    {{ notice.text }}
-                                </text>
+                                    <view class="notice-text">{{ notice.text }}</view>
+                                    <image class="notice-arrow" src="/static/images/common/right.png" mode="aspectFit" @click.stop="goToNoticeDetail(notice)" />
+                                </view>
                             </view>
                         </view>
                     </view>
@@ -142,7 +143,7 @@
                     <!-- 秒杀板块 -->
                     <view class="seckill-card" @click="goToSeckillList">
                         <image class="seckill-bg" src="/static/images/home/home_seckill.png" mode="aspectFill" />
-                        <view class="seckill-content">
+                        <!-- <view class="seckill-content">
                             <view class="seckill-products">
                                 <view 
                                     v-for="(product, index) in seckillData.slice(0, 2)" 
@@ -157,7 +158,7 @@
                                     </view>
                                 </view>
                             </view>
-                        </view>
+                        </view> -->
                     </view>
                     
                     <!-- 右侧板块 -->
@@ -394,13 +395,7 @@ const refreshLoading = ref(false);
 const currentPage = ref(1);
 
 // 公告消息数据
-const noticeMessages = ref([
-    { id: 1, text: "SANKUWA 恭候您的尊贵莅临，愿您在此邂逅心仪臻品", articleId: 1 },
-    { id: 2, text: "新品上架：2025春季新品正式发布，限时特惠进行中", articleId: 2 },
-    { id: 3, text: "会员福利：注册即送100元优惠券，更多惊喜等您发现", articleId: 3 },
-    { id: 4, text: "品质保证：所有商品均为正品，支持7天无理由退换", articleId: 4 },
-    { id: 5, text: "客服热线：400-888-8888，专业团队为您提供贴心服务", articleId: 5 }
-]);
+const noticeMessages = ref<any[]>([]);
 const currentNoticeIndex = ref(0);
 const noticeTimer = ref<ReturnType<typeof setInterval> | null>(null);
 
@@ -420,20 +415,59 @@ const initRecommendProducts = () => {
     commodityList.value = [];
 };
 
-// 获取本站公告数据
+// 获取消息公告数据
 const getNoticeData = async () => {
     try {
+        // 重置索引
+        currentNoticeIndex.value = 0;
+        
         const result = await getArticleList({
             page: 1,
-            size: 1,
-            categorySn: "本站公告" // 文章分类为本站公告
+            size: 10, // 获取多条公告用于轮播
+            articleCategoryId: 10 // 传入指定的分类ID
         });
         
-        if (result && (result as any).data && (result as any).data.records && (result as any).data.records.length > 0) {
-            noticeData.value = (result as any).data.records[0]; // 获取最新的一条公告
+        // 尝试多种数据结构可能性
+        let records = null;
+        if (result && (result as any).data && (result as any).data.records) {
+            records = (result as any).data.records;
+        } else if (result && (result as any).records) {
+            records = (result as any).records;
+        } else if (result && Array.isArray(result)) {
+            records = result;
         }
+        
+        if (records && Array.isArray(records) && records.length > 0) {
+            // 将获取的公告数据格式化为轮播数据
+            const formattedMessages = records.map((item: any) => ({
+                id: item.articleId || item.id,
+                text: item.articleTitle || item.title,
+                articleId: item.articleId || item.id
+            }));
+            
+            // 确保数据正确赋值
+            noticeMessages.value = formattedMessages;
+            
+            // 保留第一条作为主要公告数据
+            noticeData.value = records[0];
+        } else {
+            // 如果没有获取到数据，使用默认公告
+            noticeMessages.value = [
+                { id: 1, text: "SANKUWA 恭候您的尊贵莅临，愿您在此邂逅心仪臻品", articleId: 1 }
+            ];
+        }
+        
+        // 数据加载完成后重新启动轮播
+        startNoticeRotation();
     } catch (error) {
         console.error("获取公告数据失败:", error);
+        // 出错时使用默认公告
+        noticeMessages.value = [
+            { id: 1, text: "SANKUWA 恭候您的尊贵莅临，愿您在此邂逅心仪臻品", articleId: 1 }
+        ];
+        
+        // 出错时也启动轮播
+        startNoticeRotation();
     }
 };
 
@@ -698,8 +732,17 @@ const goToNoticeDetail = (notice?: any) => {
     const targetNotice = notice || noticeData.value;
     if (targetNotice && targetNotice.articleId) {
         uni.navigateTo({
-            url: `/pages/article/detail?id=${targetNotice.articleId}`
+            url: `/pages/article/news/detail?id=${targetNotice.articleId}`,
+            fail: (error) => {
+                console.error('跳转文章详情页失败:', error);
+                uni.showToast({
+                    title: '页面跳转失败',
+                    icon: 'none'
+                });
+            }
         });
+    } else {
+        console.warn('无效的公告数据，无法跳转:', targetNotice);
     }
 };
 
@@ -709,9 +752,15 @@ const startNoticeRotation = () => {
         clearInterval(noticeTimer.value);
     }
     
-    noticeTimer.value = setInterval(() => {
-        currentNoticeIndex.value = (currentNoticeIndex.value + 1) % noticeMessages.value.length;
-    }, 5000); // 5秒切换一次
+    // 只有当公告数据大于1条时才开始轮播
+    if (noticeMessages.value.length > 1) {
+        noticeTimer.value = setInterval(() => {
+            const oldIndex = currentNoticeIndex.value;
+            currentNoticeIndex.value = (currentNoticeIndex.value + 1) % noticeMessages.value.length;
+        }, 5000); // 5秒切换一次
+    } else {
+        console.log('公告数量不足，不启动轮播');
+    }
 };
 
 // 停止公告轮播
@@ -722,13 +771,6 @@ const stopNoticeRotation = () => {
     }
 };
 
-// 返回顶部
-const backToTop = () => {
-    uni.pageScrollTo({
-        scrollTop: 0,
-        duration: 300
-    });
-};
 
 // 侧边栏相关方法
 const toggleSidebar = () => {
@@ -1063,9 +1105,6 @@ onLoad(async (options: any) => {
     // 获取秒杀数据并启动倒计时
     await getSeckillData();
     startCountdown();
-    
-    // 启动公告轮播
-    startNoticeRotation();
 
     // 加载默认商品数据（推荐好物）
     await loadTabProducts();
@@ -1102,7 +1141,10 @@ onShow(() => {
     uni.hideTabBar();
     
     // 页面显示时恢复公告轮播和倒计时
-    startNoticeRotation();
+    // 只有当已有公告数据时才启动轮播，避免重复启动
+    if (noticeMessages.value.length > 0) {
+        startNoticeRotation();
+    }
     startCountdown();
 });
 
@@ -1167,9 +1209,9 @@ page {
 }
 
 /* 激活状态时隐藏相邻分隔符 */
-.index-page .nav-tab-item.active .nav-tab-divider {
+/* .index-page .nav-tab-item.active .nav-tab-divider {
     opacity: 0 !important;
-}
+} */
 
 /* 商品展示区域 - 全局样式 */
 .index-page .product-display-container {
@@ -1558,6 +1600,8 @@ page {
         background-color: #fff;
         border-radius: 35rpx;
         padding: 0 30rpx;
+        width: 100%;
+        box-sizing: border-box;
         
         .notice-icon {
             width: 32rpx;
@@ -1568,27 +1612,46 @@ page {
         
         .notice-text-wrapper {
             flex: 1;
-            height: 100%;
+            height: 70rpx;
             overflow: hidden;
             position: relative;
+            min-width: 0; // 确保flex子项可以收缩
             
             .notice-text-slider {
                 transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 will-change: transform;
+                width: 100%;
                 
                 .notice-text-item {
-                    display: block;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
                     height: 70rpx;
-                    line-height: 70rpx;
-                    font-size: 26rpx;
-                    color: #666;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
                     cursor: pointer;
+                    width: 100%;
+                    box-sizing: border-box;
                     
                     &:active {
                         opacity: 0.7;
+                    }
+                    
+                    .notice-text {
+                        flex: 1;
+                        font-size: 26rpx;
+                        color: #666;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        line-height: 70rpx;
+                        min-width: 0;
+                    }
+                    
+                    .notice-arrow {
+                        width: 24rpx;
+                        height: 24rpx;
+                        margin-left: 15rpx;
+                        flex-shrink: 0;
+                        opacity: 0.6;
                     }
                 }
             }
@@ -2086,8 +2149,19 @@ page {
 }
 
 .empty-container {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 80rpx 0;
+    min-height: 400rpx;
+}
+
+.empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .loading-text {
