@@ -248,7 +248,7 @@ const hasMore = ref(true);
 const selectedFirstCategoryId = ref(0); // 选中的一级分类
 const selectedSecondCategoryId = ref(0); // 选中的二级分类  
 const selectedThirdCategoryId = ref(0); // 选中的三级分类
-const selectedSort = ref('comprehensive');
+const selectedSort = ref('');
 const sortOrder = ref('desc');
 const listViewMode = ref('double'); // 列表显示模式：'single' 单列，'double' 双列
 
@@ -262,7 +262,7 @@ const defaultCategoryIcon = staticResource('common/empty-img-bg3.png');
 
 // 排序选项
 const sortOptions = [
-    { label: '综合', value: 'comprehensive' },
+    { label: '综合', value: '' },
     { label: '热销', value: 'isHot' },
     { label: '新品', value: 'isNew' },
     { label: '价格', value: 'price' }
@@ -273,7 +273,7 @@ const params = reactive({
     categoryId: 0, // 最终的分类ID（可能是一级、二级或三级）
     page: 1,
     size: 20,
-    sort: 'comprehensive',
+    sort: '',
     order: 'desc',
     sortField: '', // 添加后端期望的排序字段
     sortOrder: 'desc', // 添加后端期望的排序顺序
@@ -391,7 +391,6 @@ const loadProducts = async () => {
     
     loading.value = true;
     try {
-        console.log('发送到后端的参数:', JSON.stringify(params, null, 2));
         const result = await getCateProduct(params);
         
         if (params.page === 1) {

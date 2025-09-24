@@ -80,10 +80,10 @@
         <view class="custom-navbar">
             <view class="navbar-content">
                 <view class="nav-left" @click="toggleSidebar">
-                    <image class="nav-icon" src="/static/images/home/list@3x.png" mode="aspectFit" />
+                    <!-- <image class="nav-icon" src="/static/images/home/list@3x.png" mode="aspectFit" /> -->
                 </view>
-                <view class="nav-center">
-                    <text class="logo-text">SANKUWA</text>
+                <view class="nav-center" @click="toggleSidebar">
+                     <image class="logo-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758687963AJS969IKrvfTozW23Q.jpeg" mode="aspectFit" />
                 </view>
             </view>
         </view>
@@ -105,10 +105,10 @@
                 </view>
 
                 <!-- 广告轮播图 -->
-                <view class="banner-container">
+                <view v-if="topAdvertisements.length > 0" class="banner-container">
                     <swiper class="banner-swiper" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="1000" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff">
-                        <swiper-item v-for="(banner, index) in bannerList" :key="index">
-                            <image class="banner-image" :src="banner.picUrl" mode="aspectFill" @click="bannerClick(banner)" />
+                        <swiper-item v-for="(advertisement, index) in topAdvertisements" :key="advertisement.id || index">
+                            <image class="banner-image" :src="advertisement.imageUrl" mode="aspectFill" @click="advertisementClick(advertisement)" />
                         </swiper-item>
                     </swiper>
                 </view>
@@ -142,7 +142,7 @@
                 <view class="marketing-section">
                     <!-- 秒杀板块 -->
                     <view class="seckill-card" @click="goToSeckillList">
-                        <image class="seckill-bg" src="/static/images/home/home_seckill.png" mode="aspectFill" />
+                        <image class="seckill-bg" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694676IvkC0QflsmbZYSMbc1.jpeg" mode="aspectFill" />
                         <!-- <view class="seckill-content">
                             <view class="seckill-products">
                                 <view 
@@ -165,17 +165,13 @@
                     <view class="right-section">
                         <!-- 限时折扣 -->
                         <view class="discount-card" @click="goToDiscountPage">
-                            <image class="discount-bg-image" src="/static/images/home/home_discount.png" mode="aspectFill" />
+                            <image class="discount-bg-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694676EQbyc9PSiFBLGt4IVq.jpeg" mode="aspectFill" />
                         </view>
                         
                         <!-- 优惠券和签到 -->
                         <view class="bonus-container">
                             <view class="bonus-card coupon-card" @click="goToCouponPage">
-                                <image class="bonus-bg-image" src="/static/images/home/coupons@3x.png" mode="aspectFill" />
-                                <view class="bonus-overlay">
-                                    <view class="bonus-tag">精选好券</view>
-                                    <view class="bonus-main-text">领券</view>
-                                </view>
+                                <image class="bonus-bg-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758695555TwB1JMBGXumu0S7XZA.jpeg" mode="aspectFill" />
                             </view>
                             
                             <view class="bonus-card checkin-card" @click="goToCheckinPage">
@@ -303,7 +299,7 @@
                 <!-- 平台简介 - 放在推荐内容后面  -->
                 <view class="platform-intro">
                     <view class="intro-image-wrapper">
-                        <image class="intro-image" style="margin-left: 25rpx; width: 95%; margin-top: -15rpx;" src="/static/images/home/introduction@3x.png" mode="widthFix" />
+                        <image class="intro-image" style="margin-left: 25rpx; width: 95%; margin-top: -15rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/175869589419bZDy6bxVcDSCrKao.jpeg" mode="widthFix" />
                     </view>
                 </view>
                 
@@ -318,13 +314,13 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { onLoad, onReachBottom, onShow, onShareAppMessage, onShareTimeline, onUnload, onPageScroll } from "@dcloudio/uni-app";
-import { getIndex, getSplashAd, getCateProduct, getHomeSeckill } from "@/api/home/home";
+import { getIndex, getSplashAd, getCateProduct, getHomeSeckill, getTopAdvertisement } from "@/api/home/home";
 import { getArticleList } from "@/api/article/article";
 import { getCategoryAll } from "@/api/productCate/productCate";
 import SplashAd from "@/components/modules/SplashAd/index.vue";
 import masonry from "@/components/masonry/masonry.vue";
 import previewTip from "./src/previewTip.vue";
-import type { GetProductFilterResult, SeckillListResponse } from "@/types/home/home";
+import type { GetProductFilterResult, SeckillListResponse, TopAdvertisementItem, TopAdvertisementRawItem } from "@/types/home/home";
 import type { ArticleFilterState } from "@/types/article/article";
 import type { SeckillFilterState } from "@/types/seckill/seckill";
 import type { filterSeleted } from "@/types/productCate/productCate";
@@ -361,10 +357,10 @@ const bottomLoading = ref(true);
 const commodityList = ref<GetProductFilterResult[]>([]);
 
 // 新增的UI数据
-const bannerList = ref<any[]>([]);
 const noticeData = ref<ArticleFilterState | null>(null);
 const navList = ref<filterSeleted[]>([]);
 const seckillData = ref<SeckillFilterState[]>([]);
+const topAdvertisements = ref<TopAdvertisementItem[]>([]);
 
 // 将导航数据按每页8个进行分组
 const navPages = computed(() => {
@@ -484,6 +480,45 @@ const getSeckillData = async () => {
     }
 };
 
+// 获取顶部广告数据（用于轮播图）
+const getTopAdvertisementData = async () => {
+    try {
+        const result = await getTopAdvertisement();
+        
+        let rawData: TopAdvertisementRawItem[] = [];
+        
+        // 判断数据结构
+        if (result && (result as any).data && Array.isArray((result as any).data)) {
+            // 如果返回的是包装过的数据结构
+            rawData = (result as any).data as TopAdvertisementRawItem[];
+        } else if (result && Array.isArray(result)) {
+            // 如果直接返回数组
+            rawData = result as TopAdvertisementRawItem[];
+        }
+        
+        // 将原始数据转换为组件需要的格式
+        if (rawData.length > 0) {
+            const ads: TopAdvertisementItem[] = rawData.map((item: TopAdvertisementRawItem) => ({
+                id: item.picId,
+                title: item.picName || `广告 ${item.picId}`,
+                imageUrl: item.picUrl,
+                linkUrl: undefined, // API 没有返回链接信息，可以根据需要后续扩展
+                sortOrder: item.picId,
+                isActive: true // 假设所有返回的广告都是激活的
+            }));
+            
+            topAdvertisements.value = ads;
+        } else {
+            console.log('未获取到有效的广告数据');
+            topAdvertisements.value = [];
+        }
+    } catch (error) {
+        console.error("获取顶部广告数据失败:", error);
+        // 设置空数组，轮播图不会显示
+        topAdvertisements.value = [];
+    }
+};
+
 // 获取分类导航数据
 const getCategoryNavData = async () => {
     try {
@@ -537,17 +572,14 @@ const getIndexData = async () => {
     try {
         const res = await getIndex();
         
-        // 处理轮播图数据
-        const bannerModule = res.moduleList.find((item: any) => item.type === 'banner');
-        if (bannerModule && bannerModule.module) {
-            bannerList.value = (bannerModule.module as any).bannerContent?.picList || [];
-        }
-        
         // 获取公告数据
         await getNoticeData();
         
         // 获取秒杀数据
         await getSeckillData();
+        
+        // 获取顶部广告数据（用于轮播图）
+        await getTopAdvertisementData();
         
         // 获取分类导航数据
         await getCategoryNavData();
@@ -590,11 +622,47 @@ const search = () => {
     });
 };
 
-// 轮播图点击
-const bannerClick = (banner: any) => {
-    if (banner.picLink) {
-        uni.navigateTo({
-            url: banner.picLink
+
+// 广告点击
+const advertisementClick = (ad: TopAdvertisementItem) => {
+    console.log('点击了广告:', ad);
+    
+    if (ad.linkUrl) {
+        // 如果是外部链接，可以使用 uni.navigateTo 或 其他处理方式
+        if (ad.linkUrl.startsWith('http')) {
+            // 外部链接，可以使用网页组件打开
+            uni.navigateTo({
+                url: `/pages/webview/index?url=${encodeURIComponent(ad.linkUrl)}&title=${encodeURIComponent(ad.title)}`
+            }).catch(() => {
+                // 如果没有 webview 页面，就复制链接
+                uni.setClipboardData({
+                    data: ad.linkUrl,
+                    success: () => {
+                        uni.showToast({
+                            title: '链接已复制',
+                            icon: 'success'
+                        });
+                    }
+                });
+            });
+        } else {
+            // 内部链接
+            uni.navigateTo({
+                url: ad.linkUrl
+            }).catch((error) => {
+                console.error('跳转失败:', error);
+                uni.showToast({
+                    title: '跳转失败',
+                    icon: 'none'
+                });
+            });
+        }
+    } else {
+        // 当前 API 没有返回链接信息，可以显示提示或者不做任何操作
+        uni.showToast({
+            title: ad.title,
+            icon: 'none',
+            duration: 1500
         });
     }
 };
@@ -1530,12 +1598,18 @@ page {
             // justify-content: center;
             // align-items: center;
             
-            .logo-text {
-                font-size: 38rpx;
-                font-weight: 500;
-                color: #333;
-                position: relative;
-                right: 15rpx;
+            // .logo-text {
+            //     font-size: 38rpx;
+            //     font-weight: 500;
+            //     color: #333;
+            //     position: relative;
+            //     right: 15rpx;
+            // }
+
+            .logo-image{
+                width: 40%;
+                margin-left: -45px;
+                margin-top: -10px;
             }
         }
     }

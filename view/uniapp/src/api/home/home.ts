@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { HomeResponse, GetCateProductFilterParams, GetCateProductResponse, SeckillListResponse, CouponResponse } from "@/types/home/home";
+import type { HomeResponse, GetCateProductFilterParams, GetCateProductResponse, SeckillListResponse, CouponResponse, TopAdvertisementResponse } from "@/types/home/home";
 import type { MobileCatNavFilterParams, MobileCatNavFilterResult } from "@/types/decorate/mobileCatNav.d";
 import type { getProductListFilterState } from "@/types/decorate/mobileProduct";
 
@@ -68,6 +68,14 @@ export const getMemberDecorate = () => {
 export const getSplashAd = () => {
     return request({
         url: "decorate/discrete/getOpenAdvertising",
+        method: "get"
+    });
+};
+
+// 获取首页广告
+export const getTopAdvertisement = () => {
+    return request<TopAdvertisementResponse>({
+        url: "home/home/getTopAdvertisement",
         method: "get"
     });
 };

@@ -61,7 +61,7 @@ page {
     flex-direction: column;
     height: 100%;
     // background-image: url(../../../static/images/user/vip_bg.png);
-    background-image: url(https://oss.tigshop.com/img/gallery/202502/1739845582HFfsl3dr4o7dvrmgL7.png);
+    background-image: url(https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758696224vjE4aO0r88kT2FsRmK.jpeg);
     background-repeat: no-repeat;
     background-size: 100% auto;
     .bottom_wapper {

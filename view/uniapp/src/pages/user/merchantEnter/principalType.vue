@@ -7,7 +7,7 @@
                     <view class="type-box" :class="{ active: type === 1 }" @click="type = 1">
                         <view class="type-content">
                             <view class="type-image">
-                                <image src="/static/images/merchanEnter/personal.png" mode="aspectFit" />
+                                <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705277LAfBxQvmTVRH9Ubjkn.jpeg" mode="aspectFit" />
                             </view>
                             <view class="type-text">个人</view>
                         </view>
@@ -18,7 +18,7 @@
                     <view class="type-box" :class="{ active: type === 2 }" @click="type = 2">
                         <view class="type-content">
                             <view class="type-image">
-                                <image src="/static/images/merchanEnter/business.png" mode="aspectFit" />
+                                <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/175870527799rpdZyaIM4RmkpxfS.jpeg" mode="aspectFit" />
                             </view>
                             <view class="type-text">企业</view>
                         </view>

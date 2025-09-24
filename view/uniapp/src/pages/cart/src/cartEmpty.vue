@@ -1,7 +1,7 @@
 <template>
     <view class="empty-cart-container">
         <view class="empty-content">
-            <image class="empty-image" src="/static/images/missing_page/missing_cart.png" mode="aspectFit" />
+            <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880oVdSpbtj6QmI2TImXU.jpeg" mode="aspectFit" />
 
             <template v-if="isLoggedIn">  
                 <text class="empty-text">{{ $t("购物车空空如也～") }}</text>

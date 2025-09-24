@@ -821,27 +821,27 @@ const formatOrderStatus = (status: string) => {
 // 空状态配置映射
 const emptyStateConfig = {
     all: {
-        image: "/static/images/missing_page/goods.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg",
         text: t("暂无订单"),
         desc: t("您还没有任何订单记录")
     },
     awaitPay: {
-        image: "/static/images/missing_page/payment.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880cdOrKjg0Od9bHE7LHW.jpeg",
         text: t("暂无待支付订单"),
         desc: t("您没有需要支付的订单")
     },
     awaitShipping: {
-        image: "/static/images/missing_page/goods.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880Mnz8Rv2y15GUvGFRJv.jpeg",
         text: t("暂无待发货订单"),
         desc: t("您没有等待发货的订单")
     },
     awaitReceived: {
-        image: "/static/images/missing_page/goods.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880Mnz8Rv2y15GUvGFRJv.jpeg",
         text: t("暂无待收货订单"),
         desc: t("您没有等待收货的订单")
     },
     awaitComment: {
-        image: "/static/images/missing_page/comments.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880z0mMO8S5n9KqitAkgK.jpeg",
         text: t("暂无待评价订单"),
         desc: t("您没有需要评价的订单")
     }
@@ -850,7 +850,7 @@ const emptyStateConfig = {
 // 获取空状态配置
 const getEmptyStateConfig = () => {
     return emptyStateConfig[currentType.value as keyof typeof emptyStateConfig] || {
-        image: "/static/images/missing_page/goods.png",
+        image: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg",
         text: t("暂无订单"),
         desc: t("快去购买心仪的商品吧")
     };

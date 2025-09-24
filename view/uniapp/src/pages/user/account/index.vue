@@ -1,7 +1,7 @@
 <template>
     <tig-layout title="资金管理">
         <view class="top-card">
-            <image class="card-bg" src="/static/images/common/balance.png" mode="aspectFill"></image>
+            <image class="card-bg" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694514sboAernA4qSfPNWnzz.jpeg" mode="aspectFill"></image>
             <view class="card-content">
                 <view class="balance-row"> {{ $t("可用余额") }} </view>
                 <view class="amount-row">

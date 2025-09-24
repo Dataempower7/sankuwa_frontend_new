@@ -7,7 +7,7 @@
             <view class="product-sku-box flex justify-between">
                 <view class="product-info">
                     <view class="product-info-img">
-                        <tig-image :src="productImage" />
+                        <tig-image :src="productImage" :preview="true" @click="handleImagePreview" />
                     </view>
                     <view class="info">
                         <view class="price">
@@ -339,6 +339,20 @@ const closePopup = () => {
 const handleShowPopup = () => {
     showPopup.value = true;
 };
+
+// 处理商品图片预览
+const handleImagePreview = () => {
+    if (productImage.value) {
+        uni.previewImage({
+            urls: [productImage.value],
+            current: productImage.value,
+            indicator: "default",
+            loop: false
+        });
+    }
+};
+
+
 const specificationList = ref<any[]>([]);
 const skuList = ref<SkuList[]>([]);
 const b2bSkuList = ref<SkuList[]>([]);
@@ -1265,6 +1279,21 @@ defineExpose({
             height: 180rpx;
             border-radius: 20rpx;
             overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            
+            // 添加点击反馈效果
+            &:active {
+                transform: scale(0.95);
+            }
+            
+            // 添加一个微妙的阴影效果，表示可点击
+            box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            
+            &:hover {
+                box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+            }
         }
         .info {
             margin-left: 20rpx;

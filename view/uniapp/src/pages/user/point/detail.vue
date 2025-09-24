@@ -1,7 +1,7 @@
 <template>
     <tig-layout title="积分明细">
         <view class="top-card">
-            <image class="card-bg" src="/static/images/common/integral.png" mode="aspectFill"></image>
+            <image class="card-bg" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694514XskqOAUYQnQbtMXnyj.jpeg" mode="aspectFill"></image>
             <view class="card-content">
                 <view class="balance-row"> {{ $t("我的积分") }} </view>
                 <view class="amount-row">

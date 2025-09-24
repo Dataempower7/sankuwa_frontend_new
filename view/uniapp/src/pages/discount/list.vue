@@ -43,7 +43,7 @@
             <!-- 空状态页面 -->
             <view v-if="!isLoading && discountProductList.length === 0" class="empty-discount-container">
                 <view class="empty-content">
-                    <image class="empty-image" src="/static/images/missing_page/missing_address.png" mode="aspectFit" />
+                    <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880KR1xldruCfkdYsFnqr.jpeg" mode="aspectFit" />
                     <text class="empty-text">{{ $t("暂无折扣商品") }}</text>
                     <text class="empty-desc">{{ $t("请稍后再来看看") }}</text>
                 </view>
@@ -413,7 +413,7 @@ page {
 <style scoped lang="scss">
 .discount-page {
     min-height: 100vh;
-    background: url('/static/images/discount/discount_background.png') no-repeat top center;
+    background: url('https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694676WAXVDOYEHDrCre8mb8.jpeg') no-repeat top center;
     background-size: 100% auto;
     padding-top: 40px;
     background-color: #F6F6F6;

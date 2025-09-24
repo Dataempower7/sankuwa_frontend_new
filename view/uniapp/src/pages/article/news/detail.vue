@@ -11,7 +11,7 @@
             </view>
             <view v-else class="empty-state">
                 <view class="empty-image">
-                    <img  src="/static/images/missing_page/missing_address.png" style="width: 300rpx; height: 300rpx" />
+                    <img  src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880KR1xldruCfkdYsFnqr.jpeg" style="width: 300rpx; height: 300rpx" />
                 </view>
                 <view class="empty-text" style="margin-top: -40rpx;">
                     <text>暂无文章</text>

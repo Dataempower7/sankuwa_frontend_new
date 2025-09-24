@@ -33,7 +33,7 @@
         <!-- 自定义缺失页面 -->
         <view v-if="!isLoadMore && !isLoading && addressList.length === 0" class="empty-address-container">
             <view class="empty-content">
-                <image class="empty-image" src="/static/images/missing_page/missing_address.png" mode="aspectFit" />
+                <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg" mode="aspectFit" />
                 <text class="empty-text">{{ $t("暂无收货地址") }}</text>
                 <text class="empty-desc">{{ $t("快速获取微信位置或手动添加收货地址") }}</text>
             </view>

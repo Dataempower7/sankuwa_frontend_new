@@ -82,8 +82,8 @@
             </view>
         </view>
         <view v-if="collectList.length === 0 && loadend === true" class="empty-collect-container">
-            <view class="empty-content">
-                <image class="empty-image" src="/static/images/missing_page/collectProduct.png" mode="aspectFit" />
+            <view class="empty-content"> 
+                <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880KR1xldruCfkdYsFnqr.jpeg" mode="aspectFit" />
                 <text class="empty-text">{{ $t("暂无收藏记录") }}</text>
                 <text class="empty-desc">{{ $t("收藏喜欢的商品，方便下次查看") }}</text>
             </view>

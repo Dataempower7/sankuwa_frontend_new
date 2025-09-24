@@ -41,7 +41,7 @@
             <!-- <empty-box v-if="collectionShopList.length == 0 && !loading && !loaded" text="暂无收藏记录！"></empty-box> -->
             <view v-if="collectionShopList.length === 0 && !loading && !loaded" class="empty-shop-container">
                 <view class="empty-content">
-                    <image class="empty-image" src="/static/images/missing_page/collectShop.png" mode="aspectFit" />
+                    <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880eQjtdumcN6A9yOB11i.jpeg" mode="aspectFit" />
                     <text class="empty-text">{{ $t("暂无收藏店铺") }}</text>
                     <text class="empty-desc">{{ $t("收藏喜欢的店铺，方便下次查看") }}</text>
                 </view>

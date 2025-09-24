@@ -8,7 +8,7 @@
                     <view class="profile-label">头像</view>
                     <view class="profile-value">
                         <tig-upload class="avatar-upload-wrapper" request-url="user/user/modifyAvatar" @change="handleAvatarChange">
-                            <image class="avatar-image" :src="imageFormat(form.avatar) || '/static/images/default-avatar.png'" mode="aspectFill" />
+                            <image class="avatar-image" :src="imageFormat(form.avatar) || 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758697604fT1jxhpvcaA5co3s0x.jpeg'" mode="aspectFill" />
                         </tig-upload>
                         <view class="iconfont icon-xiangyou profile-arrow" />
                     </view>

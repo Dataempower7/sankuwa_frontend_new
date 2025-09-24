@@ -42,7 +42,7 @@
             <!-- 空状态页面 -->
             <view v-if="!isLoading && seckillProductList.length === 0" class="empty-seckill-container">
                 <view class="empty-content">
-                    <image class="empty-image" src="/static/images/missing_page/missing_address.png" mode="aspectFit" />
+                    <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/17587058805bEdlfVAmtBsLCYcfz.jpeg" mode="aspectFit" />
                     <text class="empty-text">{{ $t("暂无秒杀商品") }}</text>
                     <text class="empty-desc">{{ $t("敬请期待") }}</text>
                 </view>
@@ -391,7 +391,7 @@ page {
 <style scoped lang="scss">
 .seckill-page {
     min-height: 120vh;
-    background: url('/static/images/seckill/Flash kill background.png') no-repeat top center;
+    background: url('https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/175869467673crlBuHp2RHBa1CsZ.jpeg') no-repeat top center;
     background-size: 100% auto;
     padding-top: 65px;
 }

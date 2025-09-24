@@ -53,7 +53,7 @@
         <template v-if="!loading && historyList.length == 0">
             <view class="empty-history-container">
                 <view class="empty-content">
-                    <image class="empty-image" src="/static/images/missing_page/browse.png" mode="aspectFit" />
+                    <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/17587058805bEdlfVAmtBsLCYcfz.jpeg" mode="aspectFit" />
                     <text class="empty-text">{{ $t("暂无浏览记录") }}</text>
                     <text class="empty-desc">{{ $t("浏览过的商品会在这里显示") }}</text>
                 </view>

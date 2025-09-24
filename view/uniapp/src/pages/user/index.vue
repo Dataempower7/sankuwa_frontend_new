@@ -3,7 +3,7 @@
         <view class="user">
             <!-- 用户信息头部 -->
             <view class="user-header">
-                <image src="@/static/images/member/Background.png"  class="bg-image" />
+                <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758696224vjE4aO0r88kT2FsRmK.jpeg"  class="bg-image" />
 
                 <!-- 个人中心标题和编辑图标 -->
                 <view class="header-nav">
@@ -40,27 +40,30 @@
 
                 <!-- 会员等级卡片 -->
                 <view class="member-card" @click="goPages('/pages/user/levelCenter/index')">
-                    <image :src="getMemberCardBg(member?.rankName)" class="card-bg" />
+                    <image :src="getMemberCardBg(currentMemberLevel)" class="card-bg" />
                     <view class="card-content">
                         <view class="member-level" @click.stop="goPages('/pages/user/levelCenter/index')">
                             <image :src="member?.rankLogo" class="crown-icon" />
-                            <text class="level-text">{{ member?.rankName ||  '登录立享会员权益' }}</text>
+                            <text class="level-text" :style="hasToken ? getRankNameStyle(currentMemberLevel) : { color: '#8B4513' }">{{ hasToken ? currentMemberLevel : '登录立享会员权益' }}</text>
                         </view>
-                        <view class="growth-value">{{member?.growthPoints || "-"}} 成长值</view>
+                        <view class="growth-value">
+                            {{member?.growthPoints || "-"}} 成长值
+                        </view>
+                        
 
                         <!-- 余额、优惠券、积分 -->
                         <view class="wallet-info" >
                             <view class="wallet-item" @click="goPages('/pages/user/account/index')">
-                                <view class="amount">{{ Number(member?.totalBalance || 0).toFixed(2) }}</view>
-                                <view class="label">余额</view>
+                                <view class="amount" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">{{ Number(member?.totalBalance || 0).toFixed(2) }}</view>
+                                <view class="label" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">余额</view>
                             </view>
                             <view class="wallet-item" @click="goPages('/pages/coupon/index?type=2')">
-                                <view class="amount">{{ member?.coupon || 0 }}</view>
-                                <view class="label">优惠券</view>
+                                <view class="amount" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">{{ member?.coupon || 0 }}</view>
+                                <view class="label" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">优惠券</view>
                             </view>
                             <view class="wallet-item" @click="goPages('/pages/user/point/detail')">
-                                <view class="amount">{{ member?.points || 0 }}</view>
-                                <view class="label">积分</view>
+                                <view class="amount" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">{{ member?.points || 0 }}</view>
+                                <view class="label" :style="hasToken ? getRankTextStyle(currentMemberLevel) : { color: '#8B4513' }">积分</view>
                             </view>
                         </view>
                     </view>
@@ -69,7 +72,7 @@
 
                 <!-- 透明模块 -->
                 <view class="transparent-module">
-                    <image src="@/static/images/member/transparent.png" class="transparent-module-image" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758698456WkjWfXKZd8ZUaugQfp.jpeg" class="transparent-module-image" />
                 </view>
 
 
@@ -213,16 +216,61 @@ const goPages = (url: string) => {
     });
 };
 
-// 根据会员等级名称获取对应的背景图片
-const getMemberCardBg = (rankName: string) => {
-    const rankBgMap: { [key: string]: string } = {
-        '黄金会员': '/static/images/member/golds.png',
-        '铂金会员': '/static/images/member/platinum.png',
-        '黑金会员': '/static/images/member/black_gold.png',
-        '钻石会员': '/static/images/member/diamond.png',
-        '至尊会员': '/static/images/member/supreme.png'
+// 会员等级配置（根据成长值区间和背景图片定义）
+const memberLevelConfig = [
+    { name: '黄金会员', minGrowth: 0, maxGrowth: 99, bgImage: 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/17586828917dIwqRbVebvgolp790.jpeg' },
+    { name: '铂金会员', minGrowth: 100, maxGrowth: 299, bgImage: 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758682890oGpbHG3nBjNolO2P84.jpeg' },
+    { name: '黑金会员', minGrowth: 300, maxGrowth: 499, bgImage: 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758682890mL1YNY9vedfigP6aRC.jpeg' },
+    { name: '钻石会员', minGrowth: 500, maxGrowth: 699, bgImage: 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758682890oGpbHG3nBjNolO2P84.jpeg' },
+    { name: '至尊会员', minGrowth: 700, maxGrowth: Infinity, bgImage: 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/17586828911EQZ1ObF5rGMxVsEz9.jpeg' }
+];
+
+// 根据成长值获取对应的会员等级名称（仅用于验证和备用）
+const getExpectedLevelByGrowth = (growthPoints: number): string => {
+    if (growthPoints === null || growthPoints === undefined || growthPoints < 0) {
+        return '黄金会员';
+    }
+    
+    const level = memberLevelConfig.find(config => 
+        growthPoints >= config.minGrowth && growthPoints <= config.maxGrowth
+    );
+    
+    return level ? level.name : '黄金会员';
+};
+
+// 根据等级名称获取对应的背景图片
+const getMemberCardBg = (rankName?: string): string => {
+    if (!rankName) {
+        return memberLevelConfig[0].bgImage; // 默认黄金会员背景
+    }
+    
+    const levelConfig = memberLevelConfig.find(config => config.name === rankName);
+    return levelConfig ? levelConfig.bgImage : memberLevelConfig[0].bgImage;
+};
+
+// 根据会员等级名称获取对应的文字颜色样式
+const getRankTextStyle = (rankName: string) => {
+    const rankStyleMap: { [key: string]: any } = {
+        '黄金会员': { color: '#91583E' },
+        '铂金会员': { color: '#2A426C' },
+        '黑金会员': { color: '#ffffff' },
+        '钻石会员': { color: '#2E236C' },
+        '至尊会员': { color: '#9D87F4' }
     };
-    return rankBgMap[rankName] || '/static/images/member/golds.png';
+    return rankStyleMap[rankName] || { color: '#8B4513' }; // 默认颜色
+};
+
+// 专门为至尊会员等级名称获取渐变样式
+const getRankNameStyle = (rankName: string) => {
+    if (rankName === '至尊会员') {
+        return {
+            background: 'linear-gradient(135deg, #CED2FC 0%, #9D87F4 100%)',
+            '-webkit-background-clip': 'text',
+            '-webkit-text-fill-color': 'transparent',
+            'background-clip': 'text'
+        };
+    }
+    return getRankTextStyle(rankName);
 };
 
 const resetUser = () => {
@@ -246,6 +294,33 @@ const loginSuccess = () => {
 
 const hasToken = computed(() => {
     return userStore.token || uni.getStorageSync("token");
+});
+
+// 智能获取当前用户的会员等级
+const currentMemberLevel = computed(() => {
+    const userData = member.value;
+    if (!userData) return '黄金会员';
+    
+    // 优先使用接口返回的 rankName
+    if (userData.rankName) {
+        // 如果同时有 growthPoints，验证一致性
+        if (userData.growthPoints !== null && userData.growthPoints !== undefined) {
+            const expectedLevel = getExpectedLevelByGrowth(userData.growthPoints);
+            // 如果不一致，在控制台给出警告，但仍使用接口返回的等级
+            if (userData.rankName !== expectedLevel) {
+                console.warn(`会员等级不一致: 接口返回“${userData.rankName}”, 成长值“${userData.growthPoints}”对应“${expectedLevel}”`);
+            }
+        }
+        return userData.rankName;
+    }
+    
+    // 如果没有 rankName 但有 growthPoints，根据成长值计算
+    if (userData.growthPoints !== null && userData.growthPoints !== undefined) {
+        return getExpectedLevelByGrowth(userData.growthPoints);
+    }
+    
+    // 都没有的情况下返回默认等级
+    return '黄金会员';
 });
 
 
@@ -336,7 +411,7 @@ page {
         top: 0;
         left: 0;
         width: 100%;
-        height: 67%;
+        height: 70%;
         z-index: 1;
     }
 
@@ -417,7 +492,7 @@ page {
                 .level-text {
                     font-size: 32rpx;
                     font-weight: bold;
-                    color: #8B4513;
+                    /* color 将由动态样式控制 */
                 }
             }
 
@@ -444,13 +519,13 @@ page {
                     .amount {
                         font-size: 40rpx;
                         font-weight: bold;
-                        color: #8B4513;
+                        /* color 将由动态样式控制 */
                         margin-bottom: 10rpx;
                     }
 
                     .label {
                         font-size: 24rpx;
-                        color: #8B4513;
+                        /* color 将由动态样式控制 */
                     }
                 }
             }
@@ -463,19 +538,18 @@ page {
         height: 80rpx;
         z-index: 2;
         margin-top: -35px;
-        border-radius: 20rpx;
+        border-radius: 25rpx;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(8rpx);
-        border: 1rpx solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+        
 
         .transparent-module-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-            mix-blend-mode: overlay;
+            // object-fit: cover;
+            // opacity: 0.9;
+            // mix-blend-mode: overlay;
         }
 
         /* 添加渐变叠加效果 */
@@ -540,8 +614,8 @@ page {
         /* 分割线 */
         .divider {
             height: 1rpx;
-            background: #f5f5f5;
-             margin: 0 70rpx;
+            background: #f1eded;
+            margin: 0px 85rpx 0px 40px;
         }
 
         /* 订单状态 */

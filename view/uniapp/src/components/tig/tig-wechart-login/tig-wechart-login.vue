@@ -3,7 +3,7 @@
         <template v-if="show">
             <view class="wechart-login-content">
                 <view class="popup-logo">
-                    <image class="logo-image" src="/static/images/common/logo.png" mode="aspectFit" />
+                    <image class="logo-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758687963AJS969IKrvfTozW23Q.jpeg" mode="aspectFit" />
                 </view>
                 <view class="wechart-login-box">
                     <!-- #ifdef MP-WEIXIN -->
@@ -253,16 +253,16 @@ onShow(() => {
     border-radius: 24rpx 24rpx 0 0;
     
     .popup-logo {
-        padding: 60rpx 0 40rpx;
+        padding: 0rpx 0 40rpx;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
         
         .logo-image {
-            width: 120rpx;
-            height: 120rpx;
-            margin-bottom: 20rpx;
+            width: 300rpx;
+            height: 300rpx;
+            margin-bottom: -75rpx;
         }
         
         .logo-text {

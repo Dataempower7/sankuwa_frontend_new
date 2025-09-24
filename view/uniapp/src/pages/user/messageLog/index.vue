@@ -41,7 +41,7 @@
                 </uni-swipe-action>
             </view>
             <view v-if="!isLoading && total === 0" class="empty-box">
-                <view class="pictrue"><image src="/static/images/missing_page/missing_address.png" /></view>
+                <view class="pictrue"><image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880KR1xldruCfkdYsFnqr.jpeg" /></view>
                 <view class="txt">{{ $t("暂无站内消息") }}</view>
             </view>
             <loading-box :model-value="!isLoading" :page="filterParams.page" :length="messageList.length" />

@@ -138,7 +138,7 @@
             </block>
             <view v-if="!loading && filteredCouponList && filteredCouponList.length === 0" class="empty-box">
                 <view class="pictrue">
-                    <image src="@/static/images/missing_page/coupons.png" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880bD5lWtN9QRlXqBFJpQ.jpeg" />
                 </view>
                 <view class="txt">{{ $t("暂无优惠券") }}</view>
             </view>

@@ -253,3 +253,32 @@ export interface CouponList {
     limitUserRank: null;
     shopId: number;
 }
+
+/* 顶部广告 */
+export interface TopAdvertisementResponse {
+    data: TopAdvertisementItem[];
+    code: number;
+    message: string;
+}
+
+// API 返回的原始数据结构
+export interface TopAdvertisementRawItem {
+    picId: number;
+    picUrl: string;
+    picThumb: string;
+    picName: string;
+    addTime: string;
+    galleryId: number;
+    picOwerId: number;
+    shopId: number | null;
+}
+
+// 处理后的广告数据结构
+export interface TopAdvertisementItem {
+    id: number;
+    title: string;
+    imageUrl: string;
+    linkUrl?: string;
+    sortOrder?: number;
+    isActive: boolean;
+}
