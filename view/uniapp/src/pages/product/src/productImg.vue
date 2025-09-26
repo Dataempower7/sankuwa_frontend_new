@@ -214,13 +214,15 @@ onMounted(() => {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.2);
         height: 40rpx;
-        padding: 0 40rpx 0 30rpx;
-        border-radius: 40rpx 0 0 40rpx;
-        right: 0;
-        bottom: 30rpx;
+        padding: 0 20rpx;
+        border-radius: 20rpx;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 20rpx;
         line-height: 40rpx;
         font-size: 20rpx;
         color: #fff;
+        text-align: center;
     }
 }
 

@@ -766,8 +766,8 @@ const showService = computed(() => {
             .other-products-btn {
                 flex: 1;
                 font-weight: bold;
-                color: var(--main-text);
-                background-color: var(--main-bg);
+                color: white;
+                background-color:#3544ba;
                 height: 70rpx;
                 border-radius: 100rpx;
                 display: flex;
@@ -797,7 +797,8 @@ const showService = computed(() => {
             line-height: 70rpx;
             height: 70rpx;
             color: #fff;
-            font-size: 24rpx;
+            font-size: 26rpx;
+             font-weight: 500;
         }
         .cart {
             background: var(--vice-bg);
@@ -815,13 +816,13 @@ const showService = computed(() => {
                background: #FFFFFF;
                 border-radius: 35rpx 0 0 35rpx;
                 color: var(--vice-text);
-                border: 1rpx solid black;
+                box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.25);
         }
         .buy-new {
             background: #3544BA;
             border-radius: 0 35rpx 35rpx 0;
             color: var(--main-text);
-            border: 1rpx solid #3544BA;
+            box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.25);
         }
     }
 }

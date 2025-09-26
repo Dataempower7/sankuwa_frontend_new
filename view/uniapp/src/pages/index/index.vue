@@ -12,19 +12,22 @@
             <view class="sidebar-content">
                 <!-- 用户信息模块 -->
                 <view class="user-section">
-                    <view class="user-info">
+                    <view class="user-info" @click="handleUserNameClick">
                         <image
                             class="user-avatar"
                             :src="userStore.token ? userStore.userInfo.avatar || '/static/images/common/avatar_empty.png' : '/static/images/common/avatar_empty.png'"
                             mode="aspectFill"
-                            @click="handleAvatarClick"
+                            @click.stop="handleAvatarClick"
                         />
-                        <view class="user-details" @click="handleUserNameClick">
+                        <view class="user-details">
                             <text class="user-name">{{ userStore.token ? (userStore.userInfo.nickname || userStore.userInfo.mobile) : $t('立刻登录') }}</text>
                             <text v-if="userStore.token" class="user-phone">{{  'Hi, 欢迎来到森酷玩' }}</text>
                         </view>
-                        <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                        <view class="arrow-area">
+                            <image class="arrow-icon" src="/static/images/common/right.png" mode="aspectFit" />
+                        </view>
                     </view>
+                    
                 </view>
 
                 <!-- 分类模块 -->
@@ -80,10 +83,10 @@
         <view class="custom-navbar">
             <view class="navbar-content">
                 <view class="nav-left" @click="toggleSidebar">
-                    <!-- <image class="nav-icon" src="/static/images/home/list@3x.png" mode="aspectFit" /> -->
+                  <image class="nav-icon" src="/static/images/home/list@3x.png" mode="aspectFit" /> 
                 </view>
-                <view class="nav-center" @click="toggleSidebar">
-                     <image class="logo-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758687963AJS969IKrvfTozW23Q.jpeg" mode="aspectFit" />
+                <view class="nav-center" >
+                     <image class="logo-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758687963AJS969IKrvfTozW23Q.jpeg" mode="aspectFit"  />
                 </view>
             </view>
         </view>
@@ -99,8 +102,8 @@
                 <!-- 搜索框 -->
                 <view class="search-container">
                     <view class="search-box" @click="search">
-                        <image class="search-icon" src="/static/images/home/search@3x.png" mode="aspectFit" />
-                        <text class="search-placeholder">{{ $t('点击搜索商品') }}</text>
+                        <image class="search-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
+                        <text class="search-placeholder" >{{ $t('点击搜索商品') }}</text>
                     </view>
                 </view>
 
@@ -175,11 +178,7 @@
                             </view>
                             
                             <view class="bonus-card checkin-card" @click="goToCheckinPage">
-                                <image class="bonus-bg-image" src="/static/images/home/calendar@3x.png" mode="aspectFill" />
-                                <view class="bonus-overlay">
-                                    <view class="bonus-tag">签到兑奖</view>
-                                    <view class="bonus-main-text">签到</view>
-                                </view>
+                                <image class="bonus-bg-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758763958ffkaR6ULCE5nK8ZBNh.jpeg" mode="aspectFill" />
                             </view>
                         </view>
                     </view>
@@ -382,7 +381,7 @@ const productTabs = ref([
     { name: '推荐好物', key: 'recommend', params: {} },
     { name: '新品推荐', key: 'new', params: { isNew: 1 } },
     { name: '热销产品', key: 'hot', params: { isHot: 1 } },
-    { name: 'SANKUWA', key: 'sankuwa', params: { categoryId: 768 } }
+    { name: 'SANKUWA', key: 'sankuwa', params: { categoryId: 891 } }
 ]);
 const activeTabIndex = ref(0);
 const productLoading = ref(false);
@@ -618,14 +617,19 @@ const onSplashClose = () => {
 // 搜索点击
 const search = () => {
     uni.navigateTo({
-        url: "/pages/search/index"
+        url: "/pages/search/index",
+        success: () => {
+            console.log('跳转搜索页面成功');
+        },
+        fail: (err) => {
+            console.error('跳转搜索页面失败', err);
+        }
     });
 };
 
 
 // 广告点击
 const advertisementClick = (ad: TopAdvertisementItem) => {
-    console.log('点击了广告:', ad);
     
     if (ad.linkUrl) {
         // 如果是外部链接，可以使用 uni.navigateTo 或 其他处理方式
@@ -943,9 +947,18 @@ const handleUserNameClick = () => {
         return;
     }
 
-    // 已登录时跳转到个人中心
+    // 已登录时跳转到个人资料页面
     uni.navigateTo({
-        url: '/pages/user/index'
+        url: '/pages/user/profile/index',
+        success: () => {
+        },
+        fail: (err) => {
+            console.error('跳转失败', err);
+            uni.showToast({
+                title: '页面跳转失败',
+                icon: 'none'
+            });
+        }
     });
     closeSidebar();
 };
@@ -1516,6 +1529,17 @@ page {
     color: #999;
 }
 
+.arrow-area {
+    display: flex;
+    align-items: center;
+    padding: 5rpx;
+    cursor: pointer;
+    
+    &:active {
+        opacity: 0.7;
+    }
+}
+
 .arrow-icon {
     width: 24rpx;
     height: 24rpx;
@@ -1607,8 +1631,9 @@ page {
             // }
 
             .logo-image{
-                width: 40%;
-                margin-left: -45px;
+                width: 300rpx;
+                height: 180rpx;
+                margin-left: -8px;
                 margin-top: -10px;
             }
         }
@@ -1632,17 +1657,29 @@ page {
         background-color: #fff;
         border-radius: 35rpx;
         padding: 0 30rpx;
+        cursor: pointer;
+        /* 确保整个区域都可点击 */
+        width: 100%;
+        box-sizing: border-box;
+        
+        &:active {
+            background-color: #f5f5f5;
+        }
         
         .search-icon {
             width: 32rpx;
             height: 32rpx;
             margin-right: 20rpx;
+            /* 确保图标不阻挡点击 */
+            pointer-events: none;
         }
         
         .search-placeholder {
             flex: 1;
             font-size: 28rpx;
             color: #999;
+            /* 确保文字不阻挡点击 */
+            pointer-events: none;
         }
     }
 }

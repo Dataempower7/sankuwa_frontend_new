@@ -347,8 +347,8 @@ const onCodeInput = (value: string) => {
 
 
 const showAgreement = () => {
-    uni.navigateTo({
-        url: "/pages/login/mallAgreement"
+    uni.redirectTo({
+        url: "/pages/login/mallAgreement?articleSn=fwxy"
     });
 };
 

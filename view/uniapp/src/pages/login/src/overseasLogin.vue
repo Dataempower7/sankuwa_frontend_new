@@ -141,7 +141,7 @@
                             <text>{{ $t("我已阅读并同意") }}</text>
                             <text class="special-color" @click.stop="handleLink('/pages/login/mallAgreement?articleSn=fwxy')"> 《{{ $t("服务协议") }}》 </text>
                             <text>{{ $t("和") }}</text>
-                            <text class="special-color" @click.stop="handleLink('/pages/login/mallAgreement?articleSn=ysxy')"> 《{{ $t("隐私协议") }}》 </text>
+                            <text class="special-color" @click.stop="handleLink('/pages/login/mallAgreement?articleSn=yszc')"> 《{{ $t("隐私协议") }}》 </text>
                         </view>
                     </view>
                 </view>
@@ -316,8 +316,11 @@ const updateUserOpenId = async () => {
 
 const handleLink = (url: string) => {
     if (!url) return;
+    // 如果是协议页面，使用redirectTo来关闭弹窗
+    const mode = url.includes('/pages/login/mallAgreement') ? 'redirectTo' : 'navigateTo';
     redirect({
-        url: url
+        url: url,
+        mode: mode
     });
 };
 

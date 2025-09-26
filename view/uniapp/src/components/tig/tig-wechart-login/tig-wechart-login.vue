@@ -82,7 +82,11 @@
                         <tig-checkbox v-model:checked="isChecked" :custom-style="{'transform': 'scale(0.8)'}"/>
                         <view class="rule-xieyi">
                             <text class="agreement-text" @click="isChecked = !isChecked">{{ $t("登录即为同意") }}</text>
-                            <text class="special-color" @click="showAgreement">{{ $t("《商城用户服务协议》") }}</text>
+                            <text class="special-color" @click="showAgreement('yszc')">{{ $t("《隐私政策》") }}</text>
+                            <text>{{ $t("、") }}</text>
+                            <text class="special-color" @click="showAgreement('fwxy')">{{ $t("《服务协议》") }}</text>
+                            <text>{{ $t("、") }}</text>
+                            <text class="special-color" @click="showAgreement('sqgy')">{{ $t("《社区公约》") }}</text>
                         </view>
                     </view>
 
@@ -123,9 +127,12 @@ const show = computed({
 const isChecked = ref(false);
 const loginLoading = ref(false);
 const showShake = ref(false);
-const showAgreement = () => {
+const showAgreement = (articleSn: string) => {
+    // 先关闭弹窗
+    userStore.setAuthType("");
+    // 然后跳转到协议页面
     uni.navigateTo({
-        url: "/pages/login/mallAgreement"
+        url: `/pages/login/mallAgreement?articleSn=${articleSn}`
     });
 };
 const mobileLogin = () => {

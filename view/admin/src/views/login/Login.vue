@@ -10,7 +10,7 @@
             <div class="login-box">
                 <h1 class="login-title">
                     <span class="login-title-welcome">欢迎登录</span
-                    ><span class="login-title-intro">{{ landingType ? "商城后台管理系统" : "商家后台管理系统" }}</span>
+                    ><span class="login-title-intro">{{ landingType ? "森酷玩商城后台管理系统" : "森酷玩商家后台管理系统" }}</span>
                 </h1>
                 <div class="login-tabs-warp">
                     <Transition mode="out-in" name="slide-fade">
@@ -255,11 +255,11 @@ onMounted(() => {
 }
 
 .login-page-left {
-    background: url("@/style/images/login-page-bg.png") center;
+    background: url("https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758784740QV9rL6si4I7FdVv0Tp.jpeg") center;
     background-size: cover;
     flex: 1.5;
     position: relative;
-    height: 100%;
+    height: 150px;
 }
 
 .login-page-right {

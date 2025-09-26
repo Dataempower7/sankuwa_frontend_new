@@ -35,3 +35,11 @@ export const getShopCategoryTree = (id?: number) => {
         method: "get"
     });
 };
+
+// 获取热门搜索关键词
+export const getHotKeywords = () => {
+    return request<string>({
+        url: "search/searchGuess/searchHotKeyword",
+        method: "get"
+    });
+};

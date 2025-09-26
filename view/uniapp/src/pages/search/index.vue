@@ -4,11 +4,11 @@
         <view class="custom-navbar">
             <view class="navbar-content">
                 <view class="back-btn" @click="handleBack">
-                    <text class="iconfont-h5 icon-zuojiantou" />
+                   <image style="    width: 50rpx;    height: 50rpx;" src="/static/images/common/trolley_icon_back@3x.png" mode="aspectFit" />
                 </view>
                 <view class="search-container">
                     <view class="search-box">
-                        <text class="iconfont-h5 icon-sousuo search-icon" />
+                        <image class="search-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
                         <input
                             v-model="keyWords"
                             :focus="true"
@@ -26,6 +26,21 @@
         </view>
 
         <view class="searchGood">
+            <!-- 热门搜索 -->
+            <view v-if="hotKeywords.length" class="search_init_box">
+                <view class="search_hot_box">
+                    <view class="title">
+                        {{ $t("热门搜索") }}
+                    </view>
+                    <view class="list acea-row">
+                        <template v-for="(item, index) in hotKeywords" :key="index">
+                            <view class="item line1" @click="handleSearch(item)">{{ item }}</view>
+                        </template>
+                    </view>
+                </view>
+            </view>     
+            
+            <!-- 历史搜索 -->
             <view v-if="searchHistory.length" class="search_init_box">
                 <view class="search_history_box">
                     <view class="title">
@@ -46,10 +61,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useI18n } from "vue-i18n";
 import { redirect } from "@/utils";
+import { getHotKeywords } from "@/api/search/search";
 
 const { t } = useI18n();
 
@@ -59,7 +75,22 @@ const keyWords = ref("");
 
 const searchHistory = ref<any[]>([]);
 
+const hotKeywords = ref<string[]>([]);
+
 const shopId = ref("");
+
+// 获取热门搜索关键词
+const loadHotKeywords = async () => {
+    try {
+        const result = await getHotKeywords();
+        if (result && typeof result === 'string') {
+            // 假设后端返回的是逗号分隔的字符串
+            hotKeywords.value = result.split(',').filter(item => item.trim()).slice(0, 10);
+        }
+    } catch (error) {
+        console.error('获取热门搜索失败:', error);
+    }
+};
 
 onLoad((options: any) => {
     if (options) {
@@ -71,6 +102,9 @@ onLoad((options: any) => {
     if (uni.getStorageSync("searchHistory")) {
         searchHistory.value = uni.getStorageSync("searchHistory");
     }
+    
+    // 加载热门搜索
+    loadHotKeywords();
 });
 const searchSubmit = () => {
     if (keyWords.value) {
@@ -170,6 +204,8 @@ page {
     .search-icon {
         font-size: 35rpx;
         color: #999;
+        width: 32rpx;
+        height: 32rpx;
     }
 
     input {
@@ -240,5 +276,10 @@ page {
         height: 40rpx;
         margin-top: 6rpx;
     }
+}
+
+/* 热门搜索样式 */
+.search_hot_box {
+    margin-bottom: 40rpx;
 }
 </style>

@@ -37,7 +37,7 @@
                     <view class="icon-container">
                         <image 
                             class="icon-img" 
-                            :src="isCollect ? '/static/images/product/collected.png' : '/static/images/product/collection.png'" 
+                            :src="isCollect ? 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778574ydrbAz3k2yeFUQ2ocC.jpeg' : 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778574ZVxAud1Q4FLWOU6E3o.jpeg'" 
                         />
                     </view>
                 </view>

@@ -37,33 +37,33 @@ const show = computed({
 
 const menuList = [
     {
-        icon: "common/home.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963kNYB20o26OCC5KInTk.jpeg",
         text: "首页",
         link: "/pages/index/index"
     },
     {
-        icon: "common/search.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg",
         text: "搜索",
         link: "/pages/search/index"
     },
     {
-        icon: "common/user.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963wCVz0wyR8JZUe3VVh8.jpeg",
         text: "个人中心",
         link: "/pages/user/index"
     },
     {
-        icon: "common/collection.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/17587789630cTs3IM0qNn0n7RUhT.jpeg",
         text: "商品收藏",
         link: "/pages/user/collectProduct/index"
     },
     {
-        icon: "common/history.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963L9nctOxKhQnbDF3X0l.jpeg",
         text: "查看足迹",
         link: "/pages/user/historyProduct/index"
     },
 
     {
-        icon: "common/message.svg",
+        icon: "https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963kNYB20o26OCC5KInTk.jpeg",
         text: "消息中心",
         link: "/pages/user/messageLog/index"
     }

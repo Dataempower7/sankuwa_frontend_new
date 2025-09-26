@@ -4,7 +4,7 @@
         <view class="search-header">
             <view class="search-container">
                 <view class="search-box" @click="toSearch">
-                    <text class="iconfont-h5 icon-sousuo search-icon" />
+                    <image style="width: 32rpx; height: 32rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
                     <text class="search-placeholder">{{ $t("点击搜索商品") }}</text>
                 </view>
                 <view class="location-icon">
@@ -39,6 +39,15 @@
             <view class="left-menu">
                 <scroll-view scroll-y class="menu-scroll">
                     <!-- <view class="menu-header">SANKUWA</view> -->
+                    <!-- 全部选项 -->
+                    <view 
+                        class="menu-item"
+                        :class="{ active: selectedSecondCategoryId === 0 }"
+                        @click="selectAllCategory"
+                    >
+                        {{ $t("全部") }}
+                    </view>
+                    <!-- 二级分类 -->
                     <view 
                         v-for="(category, index) in secondLevelCategories" 
                         :key="index"
@@ -79,7 +88,7 @@
 
                 <!-- 产品排序选项 -->
                 <view class="sort-options">
-                    <view class="sort-container">
+                    <view class="sort-container" :style="{ marginTop: selectedSecondCategoryId === 0 ? '-15rpx' : '-30rpx' }">
                         <view 
                             v-for="(option, index) in sortOptions" 
                             :key="index"
@@ -104,13 +113,13 @@
                         <view class="list-toggle-icon" @click="toggleListViewMode">
                             <image 
                                 v-if="listViewMode === 'double'" 
-                                src="/static/images/category/oneList.png" 
+                                src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758783658fZFJYCNLmWSRghsJF2.jpeg" 
                                 mode="aspectFit"
                                 class="toggle-icon"
                             />
                             <image 
                                 v-else 
-                                src="/static/images/category/twoList.png" 
+                                src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758783658KbLbzwoKjspOiiptQn.jpeg" 
                                 mode="aspectFit"
                                 class="toggle-icon"
                             />
@@ -263,8 +272,8 @@ const defaultCategoryIcon = staticResource('common/empty-img-bg3.png');
 // 排序选项
 const sortOptions = [
     { label: '综合', value: '' },
-    { label: '热销', value: 'isHot' },
-    { label: '新品', value: 'isNew' },
+    { label: '热销', value: 'isHot' , params: { isHot: 1 }},
+    { label: '新品', value: 'isNew' , params: { isNew: 1 }},
     { label: '价格', value: 'price' }
 ];
 
@@ -277,6 +286,8 @@ const params = reactive({
     order: 'desc',
     sortField: '', // 添加后端期望的排序字段
     sortOrder: 'desc', // 添加后端期望的排序顺序
+    isHot: undefined as number | undefined, // 热销筛选
+    isNew: undefined as number | undefined, // 新品筛选
 });
 
 // 计算属性
@@ -294,18 +305,17 @@ const toSearch = () => {
 // 选择一级分类
 const selectFirstCategory = async (category: filterSeleted) => {
     selectedFirstCategoryId.value = category.categoryId;
-    selectedSecondCategoryId.value = 0;
+    selectedSecondCategoryId.value = 0; // 默认选中"全部"
     selectedThirdCategoryId.value = 0;
     
     // 加载二级分类
     await loadSecondCategories(category.categoryId);
     
-    // 重置产品列表，使用当前有效的分类ID
-    if (selectedSecondCategoryId.value > 0) {
-        params.categoryId = selectedSecondCategoryId.value;
-    } else {
-        params.categoryId = category.categoryId;
-    }
+    // 清空三级分类
+    thirdLevelCategories.value = [];
+    
+    // 重置产品列表，使用一级分类ID（显示该分类下的所有商品）
+    params.categoryId = category.categoryId;
     resetProducts();
 };
 
@@ -318,6 +328,19 @@ const selectSecondCategory = async (category: filterSeleted) => {
     await loadThirdCategories(category.categoryId);
     // 重置产品列表，使用二级分类ID
     params.categoryId = category.categoryId;
+    resetProducts();
+};
+
+// 选择"全部"（显示一级分类下的所有商品）
+const selectAllCategory = () => {
+    selectedSecondCategoryId.value = 0;
+    selectedThirdCategoryId.value = 0;
+    
+    // 清空三级分类
+    thirdLevelCategories.value = [];
+    
+    // 使用当前选中的一级分类ID
+    params.categoryId = selectedFirstCategoryId.value;
     resetProducts();
 };
 
@@ -352,6 +375,17 @@ const selectSort = (sortValue: string) => {
     
     selectedSort.value = sortValue;
     
+    // 每次选择排序时都先清除热销和新品参数
+    params.isHot = undefined;
+    params.isNew = undefined;
+    
+    // 根据选择的排序类型设置对应的参数
+    if (sortValue === 'isHot') {
+        params.isHot = 1;  // 热销商品参数
+    } else if (sortValue === 'isNew') {
+        params.isNew = 1;  // 新品商品参数
+    }
+    
     // 设置排序参数
     params.sort = sortValue;
     params.order = sortOrder.value;
@@ -368,7 +402,9 @@ const selectSort = (sortValue: string) => {
         sort: params.sort, 
         order: params.order,
         sortField: params.sortField, 
-        sortOrder: params.sortOrder 
+        sortOrder: params.sortOrder,
+        ...(params.isHot !== undefined && { isHot: params.isHot }),
+        ...(params.isNew !== undefined && { isNew: params.isNew })
     });
     resetProducts();
 };
@@ -391,7 +427,14 @@ const loadProducts = async () => {
     
     loading.value = true;
     try {
-        const result = await getCateProduct(params);
+        // 清除undefined的参数，仅传递有值的参数
+        const cleanParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== undefined && value !== '')
+        );
+        
+        console.log('最终请求参数:', cleanParams);
+        
+        const result = await getCateProduct(cleanParams);
         
         if (params.page === 1) {
             productList.value = result.records || [];
@@ -423,20 +466,13 @@ const loadSecondCategories = async (firstCategoryId: number) => {
         if (firstCategory && firstCategory.children && firstCategory.children.length > 0) {
             secondLevelCategories.value = firstCategory.children;
             
-            // 默认选中第一个二级分类
-            const firstSecond = secondLevelCategories.value[0];
-            selectedSecondCategoryId.value = firstSecond.categoryId;
+            // 不再默认选中二级分类，保持 selectedSecondCategoryId.value = 0
+            // 这样"全部"选项会被选中，显示一级分类下的所有商品
             
-            // 加载三级分类并等待完成
-            await loadThirdCategories(firstSecond.categoryId);
-            
-            // 确保三级分类加载完成后再设置查询参数
-            params.categoryId = firstSecond.categoryId;
         } else {
             // 如果没有子分类，直接使用一级分类
             secondLevelCategories.value = [];
             thirdLevelCategories.value = [];
-            params.categoryId = firstCategoryId;
         }
     } catch (error) {
         console.error('加载二级分类失败:', error);
@@ -547,16 +583,14 @@ const initData = async () => {
         }
 
         selectedFirstCategoryId.value = targetCategory.categoryId;
+        selectedSecondCategoryId.value = 0; // 初始选中"全部"
+        selectedThirdCategoryId.value = 0;
 
         // 加载二级分类
         await loadSecondCategories(targetCategory.categoryId);
 
-        // 设置产品查询参数
-        if (selectedSecondCategoryId.value > 0) {
-            params.categoryId = selectedSecondCategoryId.value;
-        } else {
-            params.categoryId = targetCategory.categoryId;
-        }
+        // 设置产品查询参数，使用一级分类ID（显示该分类下的所有商品）
+        params.categoryId = targetCategory.categoryId;
 
         // 加载产品
         loadProducts();
@@ -611,11 +645,7 @@ onMounted(() => {
             align-items: center;
             padding: 0 30rpx;
             gap: 15rpx;
-            
-            .search-icon {
-                font-size: 32rpx;
-                color: #999;
-            }
+         
             
             .search-placeholder {
                 font-size: 28rpx;
@@ -800,14 +830,13 @@ onMounted(() => {
 }
 
 .sort-options {
-    padding: 20rpx 30rpx;
+    padding: 40rpx 30rpx 20rpx; // 增加顶部间距，给"全部"选项腾出空间
     flex-shrink: 0; // 防止被挤压
     
     .sort-container {
         display: flex;
         gap: 65rpx;
         margin-left: 15rpx;
-        margin-top: -15rpx;
         align-items: center;
         justify-content: flex-start;
         
@@ -840,7 +869,7 @@ onMounted(() => {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: -20rpx;
+            margin-left: -25rpx;
             
             .toggle-icon {
                 width: 40rpx;

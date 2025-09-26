@@ -1,7 +1,7 @@
 <template>
     <view class="success-box">
         <view class="content">
-            <image class="success-img" mode="heightFix" src="/static/images/home/Unknown-20@3x.png"/>
+            <image class="success-img" mode="heightFix" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758771456eH1YXx7mC4W0UEqcUt.jpeg"/>
             <view class="success-text">{{ $t("审核已通过") }}</view>
             <view v-if="initialUserInfo && initialUserInfo.initialPassword && initialUserInfo.mobile" class="tip">
                 {{

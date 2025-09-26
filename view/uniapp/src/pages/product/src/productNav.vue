@@ -1,8 +1,8 @@
 <template>
     <view class="product-nav">
         <view class="product-nav-container">
-            <view class="product-nav-left product-nav-icon" :style="{ opacity: iconOpacity }" @click="handleBack">
-                <text class="iconfont icon-houtui" :class="{ change: modelValue > contentThresholdValue }" />
+            <view class="product-nav-left product-nav-icon" @click="handleBack">
+                <text class="iconfont icon-houtui" />
             </view>
 
             <view class="product-nav-middle" :style="{ opacity: contentOpacity }">
@@ -15,8 +15,8 @@
                     >{{ $t(item.label) }}</view
                 >
             </view>
-            <view class="product-nav-right product-nav-icon" :style="{ opacity: iconOpacity }" @click="handelShowMenu">
-                <text class="iconfont-h5 icon-gengduo" :class="{ change: modelValue > contentThresholdValue }" />
+            <view class="product-nav-right product-nav-icon" @click="handelShowMenu">
+                <text class="iconfont-h5 icon-gengduo"  />
             </view>
         </view>
     </view>
@@ -128,7 +128,7 @@ const iconInfo = computed(() => {
         width: 100%;
 
         .product-nav-icon {
-            color: #fff;
+            color: #000;
             position: absolute;
             z-index: 20;
             padding-top: v-bind(paddingTop);
@@ -146,10 +146,7 @@ const iconInfo = computed(() => {
             .icon-houtui {
                 font-weight: bold;
                 font-size: 38rpx;
-
-                &.change {
-                    color: #333;
-                }
+                color: #000;
             }
         }
 
@@ -160,9 +157,7 @@ const iconInfo = computed(() => {
             // #endif
             .icon-gengduo {
                 font-size: 44rpx;
-                &.change {
-                    color: #333;
-                }
+                color: #000;
             }
         }
 

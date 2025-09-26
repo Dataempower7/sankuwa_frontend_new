@@ -1257,7 +1257,7 @@ const checkOutBarStyle = computed(() => {
     height: 100rpx;
     margin-left: 20rpx;
     text-align: center;
-    width: 220rpx;
+    width: 240rpx;
     border-radius: 50rpx;
     flex-shrink: 0;
 }
@@ -1286,7 +1286,7 @@ const checkOutBarStyle = computed(() => {
     text-align: left;
     color: #000000;
     font-size: 27rpx;
-    margin-left: 83px;
+    margin-left: 65px;
 
     .txt {
         font-weight: normal;
