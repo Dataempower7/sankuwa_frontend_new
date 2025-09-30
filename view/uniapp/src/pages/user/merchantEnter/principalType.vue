@@ -43,7 +43,7 @@
                         <view class="agreement" :class="{ 'agreement-shake': isShaking }">
                             <tig-checkbox v-model:checked="isChecked" />
                             <text class="agreement-text" @click="isChecked = !isChecked">{{ $t("我已阅读并同意") }}</text>
-                            <text class="agreement-link" @click="handleLink">《{{ $t("商户入驻协议") }}》</text>
+                            <text class="agreement-link" @click="handleLink">《{{ $t("森酷玩平台入驻协议") }}》</text>
                         </view>
                     </view>
                 </tig-fixed-placeholder>

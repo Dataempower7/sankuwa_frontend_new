@@ -306,10 +306,6 @@ const currentMemberLevel = computed(() => {
         // 如果同时有 growthPoints，验证一致性
         if (userData.growthPoints !== null && userData.growthPoints !== undefined) {
             const expectedLevel = getExpectedLevelByGrowth(userData.growthPoints);
-            // 如果不一致，在控制台给出警告，但仍使用接口返回的等级
-            if (userData.rankName !== expectedLevel) {
-                console.warn(`会员等级不一致: 接口返回“${userData.rankName}”, 成长值“${userData.growthPoints}”对应“${expectedLevel}”`);
-            }
         }
         return userData.rankName;
     }

@@ -71,16 +71,11 @@ export const validateHkMacaoPass = (pass: string): boolean => {
     return passRegex.test(pass);
 };
 
-// 银行卡号校验
+// 银行卡号校验 - 宽松版本（移除Luhn算法校验）
 export const validateBankCard = (cardNumber: string): boolean => {
-    // 银行卡号通常为16-19位数字
-    const bankCardRegex = /^\d{16,19}$/;
-    if (!bankCardRegex.test(cardNumber)) {
-        return false;
-    }
-    
-    // 使用Luhn算法校验银行卡号
-    return luhnCheck(cardNumber);
+    // 银行卡号通常为15-20位数字，支持更宽泛的范围
+    const bankCardRegex = /^\d{15,20}$/;
+    return bankCardRegex.test(cardNumber);
 };
 
 // Luhn算法校验
@@ -220,16 +215,27 @@ export const validateBusinessScope = (scope: string): boolean => {
     return scopeRegex.test(scope);
 };
 
-// 客服电话校验（支持座机和手机）
+// 客服电话校验（支持座机和手机）- 宽松版本
 export const validateServicePhone = (phone: string): boolean => {
-    // 手机号格式
-    const mobileRegex = /^1[3-9]\d{9}$/;
-    // 座机号格式（区号+号码）
-    const landlineRegex = /^0\d{2,3}-?\d{7,8}$/;
-    // 400电话格式
-    const serviceRegex = /^400-?\d{3}-?\d{4}$/;
+    // 手机号格式 - 支持1开头的11位数字
+    const mobileRegex = /^1\d{10}$/;
+    // 座机号格式 - 支持更多格式：区号+号码，可选分隔符
+    const landlineRegex = /^0\d{2,3}[-\s]?\d{7,8}$/;
+    // 400/800电话格式 - 支持更多客服电话格式
+    const serviceRegex = /^[48]00[-\s]?\d{3}[-\s]?\d{4}$/;
+    // 固定电话格式 - 支持不带区号的7-8位固定电话
+    const fixedPhoneRegex = /^\d{7,8}$/;
+    // 支持带分机号的电话格式
+    const extensionRegex = /^0\d{2,3}[-\s]?\d{7,8}[-\s]?\d{1,6}$/;
     
-    return mobileRegex.test(phone) || landlineRegex.test(phone) || serviceRegex.test(phone);
+    const mobileResult = mobileRegex.test(phone);
+    const landlineResult = landlineRegex.test(phone);
+    const serviceResult = serviceRegex.test(phone);
+    const fixedResult = fixedPhoneRegex.test(phone);
+    const extensionResult = extensionRegex.test(phone);
+    
+    const finalResult = mobileResult || landlineResult || serviceResult || fixedResult || extensionResult;
+    return finalResult;
 };
 
 // 创建 uniapp 表单校验器工厂函数

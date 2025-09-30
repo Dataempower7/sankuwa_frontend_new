@@ -872,8 +872,9 @@ const secondFormRules = {
         {
             validator: (rule: any, value: any, callback: any) => {
                 if (!value) return true;
-                if (!validateServicePhone(value)) {
-                    callback(t("请输入有效的客服电话（手机号、座机号或400电话）"));
+                const phoneValue = String(value).trim();
+                if (!validateServicePhone(phoneValue)) {
+                    callback(t("请输入有效的客服电话"));
                     return false;
                 }
                 return true;
@@ -926,8 +927,9 @@ const secondFormRules = {
         {
             validator: (rule: any, value: any, callback: any) => {
                 if (!value) return true;
-                if (!validateBankCard(value)) {
-                    callback(t("请输入有效的银行账号（16-19位数字）"));
+                const cardValue = String(value).trim();
+                if (!validateBankCard(cardValue)) {
+                    callback(t("请输入有效的银行账号（15-20位数字）"));
                     return false;
                 }
                 return true;
@@ -961,11 +963,18 @@ const secondFormRules = {
         },
         {
             validator: (rule: any, value: any, callback: any) => {
+                console.log('[DEBUG] 联系电话校验 - 原始值:', value, '类型:', typeof value);
                 if (!value) return true;
-                if (!validateServicePhone(value)) {
-                    callback(t("请输入有效的联系电话（手机号、座机号或400电话）"));
+                const phoneValue = String(value).trim();
+                console.log('[DEBUG] 联系电话校验 - 处理后值:', phoneValue, '长度:', phoneValue.length);
+                const isValid = validateServicePhone(phoneValue);
+                console.log('[DEBUG] 联系电话校验 - 校验结果:', isValid);
+                if (!isValid) {
+                    console.log('[DEBUG] 联系电话校验 - 校验失败，返回错误');
+                    callback(t("请输入有效的联系电话"));
                     return false;
                 }
+                console.log('[DEBUG] 联系电话校验 - 校验成功');
                 return true;
             },
             trigger: ["blur", "change"]

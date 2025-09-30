@@ -398,21 +398,12 @@ const selectSort = (sortValue: string) => {
     }
     params.sortOrder = sortOrder.value;
     
-    console.log('排序参数:', { 
-        sort: params.sort, 
-        order: params.order,
-        sortField: params.sortField, 
-        sortOrder: params.sortOrder,
-        ...(params.isHot !== undefined && { isHot: params.isHot }),
-        ...(params.isNew !== undefined && { isNew: params.isNew })
-    });
     resetProducts();
 };
 
 // 切换列表显示模式
 const toggleListViewMode = () => {
     listViewMode.value = listViewMode.value === 'double' ? 'single' : 'double';
-    console.log('切换列表模式为:', listViewMode.value);
 };
 
 const resetProducts = () => {
@@ -431,8 +422,6 @@ const loadProducts = async () => {
         const cleanParams = Object.fromEntries(
             Object.entries(params).filter(([_, value]) => value !== undefined && value !== '')
         );
-        
-        console.log('最终请求参数:', cleanParams);
         
         const result = await getCateProduct(cleanParams);
         

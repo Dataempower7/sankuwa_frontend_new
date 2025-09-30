@@ -1,5 +1,5 @@
 <template>
-    <tig-layout title="商家入驻协议">
+    <tig-layout title="森酷玩平台入驻规范">
         <view class="agreement-box">
             <rich-text :nodes="content" />
         </view>
