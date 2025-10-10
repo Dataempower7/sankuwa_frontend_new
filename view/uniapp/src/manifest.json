@@ -1,7 +1,7 @@
 {
-    "name" : "tigshop",
-    "appid" : "__UNI__EA5711D",
-    "description" : "",
+    "name" : "sankuwa",
+    "appid" : "__UNI__E11FFCF",
+    "description" : "森酷玩 SANKUWA--让「玩」不止于买，而是共玩、共创、共燃森酷玩是一家垂直于“玩”的多商户体验电商平台，聚焦手游电竞、户外探险、3D 打印、无人机、RC遥控、EDC装备等硬核圈层，为玩家提供“买-学-改-秀-赛\"全链路场景。",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -96,16 +96,16 @@
             },
             "icons" : {
                 "android" : {
-                    "hdpi" : "C:/Users/HY/Desktop/favicon.png",
-                    "xhdpi" : "C:/Users/HY/Desktop/favicon.png",
-                    "xxhdpi" : "C:/Users/HY/Desktop/favicon.png",
-                    "xxxhdpi" : "C:/Users/HY/Desktop/favicon.png"
+                    "hdpi" : "",
+                    "xhdpi" : "",
+                    "xxhdpi" : "",
+                    "xxxhdpi" : ""
                 },
                 "ios" : {
                     "appstore" : "",
                     "iphone" : {
-                        "app@2x" : "C:/Users/HY/Desktop/favicon.png",
-                        "app@3x" : "C:/Users/HY/Desktop/favicon.png",
+                        "app@2x" : "",
+                        "app@3x" : "",
                         "spotlight@2x" : "",
                         "spotlight@3x" : "",
                         "settings@2x" : "",

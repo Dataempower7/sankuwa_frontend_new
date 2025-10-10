@@ -24,6 +24,10 @@
                 <div class="value">{{ order.user.username || "匿名" }}</div>
             </div>
             <div class="item">
+                <div class="label">收货人手机号：</div>
+                <div class="value">{{ order.user.mobile || "-" }}</div>
+            </div>
+            <div class="item">
                 <div class="label">下单时间：</div>
                 <div class="value">{{ order.addTime || "-" }}</div>
             </div>
