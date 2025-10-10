@@ -18,10 +18,10 @@
                     <view class="reset-title">{{ $t("找回密码") }}</view>
                     
                     <block v-if="step === 1">
-                        <stepOne v-model:step="step" v-model:mobile-key="mobileKey" />
+                        <stepOne v-model:step="step" v-model:mobile-key="mobileKey" v-model:mobile="mobile" />
                     </block>
                     <up-transition :show="step === 2" :mode="'fade-left'">
-                        <stepTow v-model:step="step" v-model:mobile-key="mobileKey" />
+                        <stepTow v-model:step="step" v-model:mobile-key="mobileKey" v-model:mobile="mobile" />
                     </up-transition>
                 </view>
             </view>
@@ -36,6 +36,7 @@ import stepTow from "./src/stepTow..vue";
 
 const step = ref(1);
 const mobileKey = ref("");
+const mobile = ref("");
 
 const goBack = () => {
     uni.navigateBack();
@@ -64,22 +65,22 @@ page {
 }
 
 .back-icon {
-    width: 40rpx;
-    height: 40rpx;
+    width: 50rpx;
+    height: 50rpx;
+    margin-top: 45px;
+  
 }
 
 /* 重置密码容器 */
 .reset-container {
-    padding: 0 40rpx;
-    min-height: 100vh;
+    padding: 300rpx 40rpx 40rpx;
     background: #ffffff;
 }
 
 /* 品牌标识区域 */
 .brand-section {
     text-align: center;
-    margin-top: 180rpx;
-    margin-bottom: 80rpx;
+    margin-bottom: 60rpx;
     background: transparent;
 }
 

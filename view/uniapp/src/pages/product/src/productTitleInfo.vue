@@ -173,9 +173,20 @@ const addCollect = async () => {
 const showShare = ref(false);
 const handleShare = () => {
     if (!userStore.token) {
-        uni.navigateTo({
-            url: "/pages/login/index"
-        });
+        // 未登录时，检查是否在微信环境
+        if (
+            configStore.openWechatOauth === 1 &&
+            configStore.openWechatRegister === 1 &&
+            (configStore.XClientType === "miniProgram" || configStore.XClientType === "wechat")
+        ) {
+            // 微信环境下触发快捷登录弹窗
+            userStore.setAuthType("wechatLogin");
+        } else {
+            // 非微信环境跳转到登录页面
+            uni.navigateTo({
+                url: "/pages/login/index"
+            });
+        }
         return;
     }
     showShare.value = true;

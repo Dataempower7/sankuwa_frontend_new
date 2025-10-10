@@ -111,7 +111,24 @@ const showShareFriend = computed(() => {
 const showGuide = ref(false);
 const handleShareFriend = () => {
     emits("update:modelValue", false);
-    showGuide.value = true;
+    
+    // 检查是否在微信环境
+    if (configStore.XClientType === "miniProgram" || configStore.XClientType === "wechat") {
+        // 检查是否已登录
+        if (!userStore.token) {
+            // 未登录，调用统一的登录处理函数
+            handleLogin();
+            return;
+        }
+        
+        // 已登录，显示分享引导页
+        showGuide.value = true;
+    } else {
+        uni.showToast({
+            title: t("请在微信中打开"),
+            icon: "none"
+        });
+    }
 };
 </script>
 

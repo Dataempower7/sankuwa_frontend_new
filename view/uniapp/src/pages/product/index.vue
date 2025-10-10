@@ -236,6 +236,7 @@
             </tig-layout>
         </view>
         <tig-loadingpage v-model="loadEndStatus" />
+        <tig-wechart-login @login-success="handleLoginSuccess" />
     </view>
 </template>
 
@@ -567,6 +568,15 @@ onShareTimeline(() => {
         imageUrl: imageFormat(product.value.picUrl!)
     };
 });
+
+// 登录成功回调
+const handleLoginSuccess = () => {
+    // 登录成功后可以刷新页面数据或执行其他操作
+    uni.showToast({
+        title: "登录成功",
+        icon: "success"
+    });
+};
 
 const showService = computed(() => {
     if (Object.keys(shopInfo.value).length > 0) {

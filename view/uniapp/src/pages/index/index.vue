@@ -111,7 +111,7 @@
                 <view v-if="topAdvertisements.length > 0" class="banner-container">
                     <swiper class="banner-swiper" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="1000" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff">
                         <swiper-item v-for="(advertisement, index) in topAdvertisements" :key="advertisement.id || index">
-                            <image class="banner-image" :src="advertisement.imageUrl" mode="aspectFill" @click="advertisementClick(advertisement)" />
+                            <image class="banner-image" :src="advertisement.imageUrl" mode="aspectFill" />
                         </swiper-item>
                     </swiper>
                 </view>

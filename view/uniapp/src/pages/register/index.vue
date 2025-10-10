@@ -354,7 +354,7 @@ page {
 
 .register-container {
     min-height: 100vh;
-    background: #f5f7fa;
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -375,8 +375,9 @@ page {
 }
 
 .back-icon {
-    width: 40rpx;
-    height: 40rpx;
+    width: 50rpx;
+    height: 50rpx;
+    margin-top: 45px;
 }
 
 /* 品牌标识区域 */
@@ -403,7 +404,7 @@ page {
 .register-card {
     width: 100%;
     max-width: 800rpx;
-    background: #f5f7fa;
+    background: #ffffff;
     border-radius: 16rpx;
     padding: 40rpx;
 }
@@ -412,7 +413,7 @@ page {
 .input-group {
     display: flex;
     align-items: center;
-    background: #ffffff;
+    background: #f5f7fa;
     border-radius: 12rpx;
     padding: 0 20rpx;
     height: 100rpx;
@@ -507,7 +508,7 @@ page {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 110rpx 0 25rpx;
+    margin: 50rpx 0 25rpx;
 }
 
 .agreement-section {
@@ -593,14 +594,46 @@ checkbox {
 }
 
 /* 输入框内容样式 */
-.uni-easyinput__content {
-    background: transparent;
+:deep(.uni-easyinput) {
+    background-color: #f5f7fa !important;
 }
 
-.uni-easyinput__content-input {
-    background: transparent;
+:deep(.uni-easyinput__content) {
+    background-color: #f5f7fa !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+:deep(.uni-easyinput__content-input) {
+    background-color: #f5f7fa !important;
+    border: none !important;
     font-size: 28rpx;
     color: #333;
+}
+
+/* 输入框聚焦状态 */
+:deep(.uni-easyinput__content-focus) {
+    background-color: #f5f7fa !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 直接针对input元素 */
+:deep(input) {
+    background-color: #f5f7fa !important;
+    border: none !important;
+}
+
+/* 确保输入框内部背景一致 */
+.input-group :deep(.uni-easyinput__content) {
+    background-color: #f5f7fa !important;
+    border: none !important;
+}
+
+.custom-input :deep(.uni-easyinput__content) {
+    background-color: #f5f7fa !important;
+    border: none !important;
 }
 
 /* 复选框组件样式 */

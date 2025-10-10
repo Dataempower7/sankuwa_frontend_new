@@ -364,7 +364,7 @@ const handleReset = () => {
 <style lang="scss" scoped>
 .login-container {
     min-height: 100vh;
-    background: #f5f7fa;
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -387,7 +387,7 @@ const handleReset = () => {
 .back-icon {
     width: 50rpx;
     height: 50rpx;
-    margin-top: 50rpx;
+    margin-top: 70rpx;
 }
 
 /* 品牌标识区域 */
@@ -414,7 +414,7 @@ const handleReset = () => {
 .login-card {
     width: 100%;
     max-width: 800rpx;
-    background: #f5f7fa;
+    background: #ffffff;
     border-radius: 16rpx;
     padding: 40rpx;
 }
@@ -423,7 +423,7 @@ const handleReset = () => {
 .input-group {
     display: flex;
     align-items: center;
-    background: #FFFFFE;
+    background: #f5f7fa;
     border-radius: 12rpx;
     padding: 0 20rpx;
     height: 100rpx;
@@ -721,42 +721,42 @@ checkbox {
 
 /* 输入框背景颜色样式优化 */
 :deep(.uni-easyinput) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
 }
 
 :deep(.uni-easyinput__content) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
 }
 
 :deep(.uni-easyinput__content-input) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
 }
 
 /* 输入框聚焦状态 */
 :deep(.uni-easyinput__content-focus) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
     box-shadow: none !important;
 }
 
 /* 直接针对input元素 */
 :deep(input) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
 }
 
-/* 确保输入框内部透明 */
+/* 确保输入框内部背景一致 */
 .input-group :deep(.uni-easyinput__content) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
 }
 
 .custom-input :deep(.uni-easyinput__content) {
-    background-color: transparent !important;
+    background-color: #f5f7fa !important;
     border: none !important;
 }
 </style>

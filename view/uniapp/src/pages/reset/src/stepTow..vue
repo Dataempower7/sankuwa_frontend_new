@@ -12,7 +12,7 @@
             maxlength="20"
             @input="changeFristPassword"
         />
-        <view :class="'password-toggle iconfont ' + (passwordType[0] == 'text' ? 'icon-xianshi' : 'icon-yincang')" @click="passwordTypeChange(0)" />
+        <view :class="'password-toggle iconfont ' + (passwordType[0] === 'text' ? 'icon-yincang' : 'icon-xianshi')" @click="passwordTypeChange(0)" />
     </view>
 
     <!-- 确认密码输入 -->
@@ -28,7 +28,7 @@
             maxlength="20"
             @input="changeSecondPassword"
         />
-        <view :class="'password-toggle iconfont ' + (passwordType[1] == 'text' ? 'icon-xianshi' : 'icon-yincang')" @click="passwordTypeChange(1)" />
+        <view :class="'password-toggle iconfont ' + (passwordType[1] === 'text' ? 'icon-yincang' : 'icon-xianshi')" @click="passwordTypeChange(1)" />
     </view>
 
     <!-- 确认按钮 -->
@@ -58,10 +58,13 @@ const { t } = useI18n();
 
 const mobileKey = defineModel("mobileKey");
 const step = defineModel("step");
+const mobile = defineModel("mobile");
 
 const passwordType = ref(["password", "password"]);
 const passwordTypeChange = (index: number) => {
-    passwordType.value[index] = passwordType.value[index] == "password" ? "text" : "password";
+    const newTypes = [...passwordType.value];
+    newTypes[index] = newTypes[index] === "password" ? "text" : "password";
+    passwordType.value = newTypes;
 };
 
 const fristPassword = ref("");
@@ -114,6 +117,16 @@ const handleResetPassword = async () => {
             icon: "none"
         });
     }
+    
+    // 验证 mobileKey 是否存在
+    if (!mobileKey.value) {
+        return uni.showToast({
+            title: t("验证信息已失效，请重新获取验证码"),
+            duration: 1500,
+            icon: "none"
+        });
+    }
+    
     try {
         isLoading.value = true;
         const result = await forgetPassword({
@@ -139,6 +152,7 @@ const handleResetPassword = async () => {
         });
         step.value = 1;
         mobileKey.value = "";
+        mobile.value = "";
         fristPassword.value = "";
         secondPassword.value = "";
     } finally {

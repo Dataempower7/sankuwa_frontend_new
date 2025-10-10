@@ -38,7 +38,7 @@
             placeholder-class="custom-placeholder"
             :value="mobileCode"
             name="mobile_code"
-            class="custom-input verification-input"
+            class="verification-input"
             maxlength="6"
             @input="mobileCodeInput"
         />
@@ -61,7 +61,8 @@
         :disabled="isDisabled" 
         class="next-button"
         color="#2F3C51"
-        style="border-radius: 8px; height: 45px;"
+        style="border-radius: 8px; height: 45px; "
+        :custom-style="{ marginTop: '50px' }"
         @click="handleNext"
     >
         {{ $t("下 一 步") }}
@@ -82,6 +83,7 @@ import VerificationCode from "@/components/verificationCode/index.vue";
 
 const mobileKey = defineModel("mobileKey");
 const step = defineModel("step");
+const mobileModel = defineModel("mobile");
 const configStore = useConfigStore();
 const { t } = useI18n();
 
@@ -173,11 +175,14 @@ const handleNext = async () => {
     }
     isLoading.value = true;
     try {
+        const fullMobile = configStore.isOpenMobileAreaCode ? mobileAreaCode.value + mobile.value : mobile.value;
         const result = await checkMobile({
-            mobile: configStore.isOpenMobileAreaCode ? mobileAreaCode.value + mobile.value : mobile.value,
+            mobile: fullMobile,
             code: mobileCode.value
         });
-        mobileKey.value = result.item;
+        // checkMobile 直接返回 mobileKey 字符串，而不是对象
+        mobileKey.value = result;
+        mobileModel.value = fullMobile;
         step.value = 2;
     } catch (error: any) {
         console.error(error);
@@ -196,7 +201,7 @@ const handleToLogin = () => {
         url: "/pages/login/index"
     });
 };
-</script>
+</script>   
 
 <style lang="scss" scoped>
 /* 输入框组样式 */
@@ -246,18 +251,45 @@ const handleToLogin = () => {
 /* 验证码相关样式 */
 .verification-group {
     position: relative;
+    overflow: visible;
 }
 
 .verification-input {
-    padding-right: 0rpx;
+    flex: 1;
+    background: transparent;
+    font-size: 28rpx;
+    color: #333;
+    border: none;
+    outline: none;
+    margin-right: 20rpx;
+    z-index: 1;
 }
 
 .verification-btn {
-    position: absolute;
-    right: 20rpx;
-    top: 50%;
-    transform: translateY(-50%);
     min-width: 160rpx;
+    height: 70rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 10;
+    position: relative;
+}
+
+/* 覆盖验证码组件样式 */
+:deep(.verify-btn) {
+    color: #5A7BB3 !important;
+    font-size: 28rpx !important;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+:deep(.box) {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 按钮样式 */
