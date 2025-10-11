@@ -226,12 +226,18 @@
                     <view class="product-nav-tabs">
                         <view
                             class="nav-tab-item"
-                            :class="{ active: activeTabIndex === index }"
+                            :class="{ active: activeTabIndex === index, loading: productLoading && activeTabIndex === index }"
                             v-for="(tab, index) in productTabs"
                             :key="index"
                             @click="switchTab(index)"
                         >
-                            {{ tab.name }}
+                            <view class="tab-content">
+                                <!-- 加载时显示图标，不加载时显示文字 -->
+                                <text v-if="!(productLoading && activeTabIndex === index)" class="tab-text">{{ tab.name }}</text>
+                                <view v-else class="tab-loading-icon">
+                                    <up-loading-icon mode="circle" size="32rpx" color="#000000" />
+                                </view>
+                            </view>
                             <!-- 分隔符 -->
                             <view v-if="index < productTabs.length - 1" class="nav-tab-divider"></view>
                         </view>
@@ -240,14 +246,17 @@
 
                 <!-- 商品展示区域 -->
                 <view class="product-display-container">
-                    <view v-if="productLoading" class="loading-container">
+                    <!-- 首次加载时显示 loading -->
+                    <view v-if="productLoading && currentProducts.length === 0" class="loading-container">
                         <up-loading-icon mode="circle" />
                     </view>
 
-                    <view v-else-if="currentProducts.length === 0" class="empty-container">
+                    <!-- 没有商品时显示空状态 -->
+                    <view v-else-if="!productLoading && currentProducts.length === 0" class="empty-container">
                         <up-empty :icon="staticResource('salesman/no_order.png')" :text="$t('暂无商品')" />
                     </view>
 
+                    <!-- 有商品时显示商品列表 -->
                     <view v-else>
                         <view class="products-grid">
                             <view
@@ -278,7 +287,9 @@
                             </view>
                         </view>
 
-                        <!-- 更换一批按钮 -->
+
+                        <!-- 
+                        更换一批按钮 
                         <view class="refresh-products-container">
                             <view class="refresh-button" @click="refreshProducts" :class="{ loading: refreshLoading }">
                                 <view class="refresh-icon-wrapper">
@@ -295,13 +306,27 @@
                     </view>
                 </view>
 
-                <!-- 平台简介 - 放在推荐内容后面  -->
+               平台简介 - 放在推荐内容后面  
                 <view class="platform-intro">
                     <view class="intro-image-wrapper">
                         <image class="intro-image" style="margin-left: 25rpx; width: 95%; margin-top: -15rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/175869589419bZDy6bxVcDSCrKao.jpeg" mode="widthFix" />
+                    </view>-->
+
+                        <!-- 加载更多状态 -->
+                        <view v-if="productLoading && currentProducts.length > 0" class="loading-more">
+                            <up-loading-icon mode="circle" size="40rpx" />
+                            <text class="loading-more-text">{{ $t('加载中...') }}</text>
+                        </view>
+
+                        <!-- 没有更多数据提示 -->
+                        <view v-if="noMoreData && currentProducts.length > 0" class="no-more-data">
+                            <text>{{ $t('没有更多商品了') }}</text>
+                        </view>
                     </view>
-                </view>
+                </view>  
                 
+
+
             </view>
         </template>
        
@@ -388,11 +413,22 @@ const productLoading = ref(false);
 const currentProducts = ref<GetProductFilterResult[]>([]);
 const refreshLoading = ref(false);
 const currentPage = ref(1);
+const noMoreData = ref(false);
 
 // 公告消息数据
 const noticeMessages = ref<any[]>([]);
 const currentNoticeIndex = ref(0);
 const noticeTimer = ref<ReturnType<typeof setInterval> | null>(null);
+
+// 随机打乱数组的函数（Fisher-Yates 洗牌算法）
+const shuffleArray = <T>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
 
 // 秒杀相关数据
 const countdownTime = ref({
@@ -705,18 +741,30 @@ const onNavScroll = (e: any) => {
 };
 
 // 切换商品标签页
-const switchTab = (index: number) => {
-    console.log('切换标签页:', index, productTabs.value[index]?.name);
-    if (activeTabIndex.value === index) return;
+const switchTab = async (index: number) => {
+    // 如果点击的是当前标签页，则刷新数据
+    if (activeTabIndex.value === index) {
+        currentPage.value = 1; // 重置页码
+        noMoreData.value = false; // 重置没有更多数据状态
+        await loadTabProducts(false); // 刷新当前标签页的数据
+        return;
+    }
 
+    // 切换到新的标签页
     activeTabIndex.value = index;
     currentPage.value = 1; // 重置页码
-    loadTabProducts();
+    noMoreData.value = false; // 重置没有更多数据状态
+    
+    // 不清空商品列表，直接加载新数据替换，避免页面跳动
+    await loadTabProducts(false); // false 表示不是追加，而是替换
 };
 
 // 加载当前标签页的商品
-const loadTabProducts = async () => {
+const loadTabProducts = async (append: boolean = false) => {
     if (productLoading.value) return;
+    
+    // 如果没有更多数据了，不再请求
+    if (noMoreData.value && append) return;
 
     productLoading.value = true;
 
@@ -730,13 +778,39 @@ const loadTabProducts = async () => {
 
         const result = await getCateProduct(params);
 
-        currentProducts.value = result.records || [];
+        if (result.records && result.records.length > 0) {
+            // 对商品进行随机排序
+            const shuffledRecords = shuffleArray(result.records);
+            
+            if (append) {
+                // 追加模式：将新数据添加到现有数据后面
+                currentProducts.value = [...currentProducts.value, ...shuffledRecords];
+            } else {
+                // 替换模式：直接替换
+                currentProducts.value = shuffledRecords;
+            }
+            
+            // 如果返回的数据少于请求的数量，说明没有更多数据了
+            if (result.records.length < 12) {
+                noMoreData.value = true;
+            }
+        } else {
+            // 没有返回数据
+            if (append) {
+                noMoreData.value = true;
+            } else {
+                currentProducts.value = [];
+            }
+        }
     } catch (error) {
+        console.error('加载商品失败:', error);
         uni.showToast({
             title: '加载商品失败',
             icon: 'none'
         });
-        currentProducts.value = [];
+        if (!append) {
+            currentProducts.value = [];
+        }
     } finally {
         productLoading.value = false;
     }
@@ -1188,7 +1262,7 @@ onLoad(async (options: any) => {
     startCountdown();
 
     // 加载默认商品数据（推荐好物）
-    await loadTabProducts();
+    await loadTabProducts(false);
 
     // #ifdef APP-PLUS || APP-HARMONY
     checkAppUpdate();
@@ -1204,21 +1278,15 @@ onUnload(() => {
 
 
 onReachBottom(() => {
-    if (!loading.value && !loadend.value) {
-        page.value++;
-        getProductList();
+    // 当滑动到底部时，加载更多商品
+    if (!productLoading.value && !noMoreData.value && currentProducts.value.length > 0) {
+        currentPage.value++; // 增加页码
+        loadTabProducts(true); // true 表示追加模式
     }
 });
 
 onShow(() => {
-    if (scrollTop.value > 0) {
-        setTimeout(() => {
-            uni.pageScrollTo({
-                scrollTop: scrollTop.value,
-                duration: 0
-            });
-        }, 20);
-    }
+    // 不再自动滚动到之前的位置，避免干扰用户浏览
     uni.hideTabBar();
     
     // 页面显示时恢复公告轮播和倒计时
@@ -1262,8 +1330,9 @@ page {
 .index-page .nav-tab-item {
     flex: 1 !important;
     height: 88rpx !important;
-    line-height: 88rpx !important;
-    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     font-size: 28rpx !important;
     color: #666666 !important;
     background-color: #ffffff !important;
@@ -1272,10 +1341,46 @@ page {
     transition: all 0.3s ease !important;
 }
 
+.index-page .nav-tab-item .tab-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8rpx !important;
+    min-width: 100rpx !important;
+    height: 100% !important;
+}
+
+.index-page .nav-tab-item .tab-text {
+    animation: fadeIn 0.3s ease !important;
+}
+
+.index-page .nav-tab-item .tab-loading-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: fadeIn 0.3s ease !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .index-page .nav-tab-item.active {
     color: #000000 !important;
-    font-weight: bold !important;
+    font-weight: 500 !important;
     font-size: 30rpx !important;
+}
+
+.index-page .nav-tab-item.loading {
+    pointer-events: none !important;
+    opacity: 0.8 !important;
 }
 
 /* 分隔符样式 */
@@ -1437,6 +1542,57 @@ page {
 
 .refresh-button:active .refresh-text {
     color: #3544BA !important;
+}
+
+/* 加载更多状态 */
+.loading-more {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 40rpx 0 !important;
+    width: 100% !important;
+}
+
+.loading-more-text {
+    font-size: 24rpx !important;
+    color: #999999 !important;
+    margin-top: 20rpx !important;
+}
+
+/* 没有更多数据提示 */
+.no-more-data {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 40rpx 0 60rpx !important;
+    width: 100% !important;
+}
+
+.no-more-data text {
+    font-size: 24rpx !important;
+    color: #999999 !important;
+    position: relative !important;
+}
+
+.no-more-data text::before,
+.no-more-data text::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    width: 60rpx !important;
+    height: 1rpx !important;
+    background-color: #e0e0e0 !important;
+}
+
+.no-more-data text::before {
+    right: 100% !important;
+    margin-right: 20rpx !important;
+}
+
+.no-more-data text::after {
+    left: 100% !important;
+    margin-left: 20rpx !important;
 }
 </style>
 <style lang="scss" scoped>
@@ -2235,18 +2391,45 @@ page {
 .nav-tab-item {
     flex: 1;
     height: 88rpx;
-    line-height: 88rpx;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 28rpx;
     color: #666666;
     background-color: #ffffff;
     border-bottom: 3rpx solid transparent;
     box-sizing: border-box;
+    transition: all 0.3s ease;
+    
+    .tab-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8rpx;
+        min-width: 100rpx;
+        height: 100%;
+    }
+    
+    .tab-text {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-loading-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
 }
 
 .nav-tab-item.active {
     color: #000000;
     font-weight: bold;
+}
+
+.nav-tab-item.loading {
+    pointer-events: none;
+    opacity: 0.8;
 }
 
 /* 商品展示区域 */
