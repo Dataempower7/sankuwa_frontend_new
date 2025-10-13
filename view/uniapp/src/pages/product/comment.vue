@@ -115,7 +115,9 @@ onUnload(() => {
 <style lang="scss" scoped>
 .product-comment-card {
     background-color: #fff;
-    padding: 20rpx 20rpx 0 20rpx;
+    padding: 25rpx;
+    margin: 15rpx;
+    border-radius: 30rpx;
     border-top: 1rpx solid #eee;
     .comment-item {
         border-bottom: 1rpx solid #eee;

@@ -584,13 +584,13 @@ const getPicUrls = (pics: any[]) => {
 
 .info-content {
     background-color: #fff;
-    padding: 20rpx 0;
-    margin-top: 20rpx;
+    border-radius: 20rpx;
+    margin: 20rpx;
+    padding: 30rpx;
 
     .info-content-title {
         color: #000;
         font-weight: 500;
-        padding: 10rpx 20rpx;
     }
 
     .info-content-product {
@@ -652,7 +652,7 @@ const getPicUrls = (pics: any[]) => {
     }
 
     .after-sale {
-        padding: 0 20rpx;
+        padding: 10rpx 0;
         padding-top: 15rpx;
         .after-sale-item {
             display: flex;

@@ -752,7 +752,7 @@
                     </view>
                 </template>
 
-                <!-- 待评论订单的更多操作 -->
+                <!-- 待评论订单的更多操作 
                 <template v-if="orderInfo.orderStatus === 5 && orderInfo.availableActions?.toComment">
                     <view class="dropdown-item" @tap.stop="handleAfterSaleForCompleted" @click.stop="handleAfterSaleForCompleted">
                         <text class="dropdown-text">申请售后</text>
@@ -763,7 +763,7 @@
                     <view class="dropdown-item" @tap.stop="handleLogistics" @click.stop="handleLogistics">
                         <text class="dropdown-text">物流详情</text>
                     </view>
-                </template>
+                </template> -->
 
                 <!-- 已完成订单的更多操作 -->
                 <template v-if="orderInfo.orderStatus === 5">
@@ -1163,7 +1163,7 @@ const handleDeleteOrder = () => {
 const handleAfterSaleForCompleted = () => {
     closeMoreActions();
     uni.navigateTo({
-        url: `/pages/user/afterSale/apply?orderId=${orderInfo.value.orderId}`
+        url: `/pages/user/afterSale/edit?orderId=${orderInfo.value.orderId}`
     });
 };
 
@@ -1171,7 +1171,7 @@ const handleAfterSaleForCompleted = () => {
 const handleLogistics = () => {
     closeMoreActions();
     uni.navigateTo({
-        url: `/pages/user/order/logistics?orderId=${orderInfo.value.orderId}`
+        url: `/pages/user/order/shoppingInfo?id=${orderInfo.value.orderId}`
     });
 };
 
@@ -1179,7 +1179,7 @@ const handleLogistics = () => {
 const handleAfterSaleForReceiving = () => {
     closeMoreActions();
     uni.navigateTo({
-        url: `/pages/user/afterSale/apply?orderId=${orderInfo.value.orderId}`
+        url: `/pages/user/afterSale/edit?orderId=${orderInfo.value.orderId}`
     });
 };
 

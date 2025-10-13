@@ -212,6 +212,7 @@ import { orderInvoiceInsert } from "@/api/user/invoiceManagemen";
 
 // 页面参数
 const orderId = ref<number>(0);
+const invoiceId = ref<number>(0); // 发票ID，用于编辑模式
 
 // 订单信息
 const orderInfo = ref<any>({});
@@ -229,6 +230,11 @@ const formState = reactive({
     companyBank: "",
     companyAccount: ""
 });
+
+// 企业名称自动识别相关状态
+const isSearchingCompany = ref(false);
+const isAutoFilled = ref(false);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // 表单验证规则
 const rules: any = {
@@ -260,6 +266,9 @@ onLoad((options: any) => {
     if (options.orderId) {
         orderId.value = parseInt(options.orderId);
         getOrderDetail();
+    }
+    if (options.invoiceId) {
+        invoiceId.value = parseInt(options.invoiceId);
     }
 });
 
@@ -392,6 +401,7 @@ const onSubmit = () => {
 
                 // 准备提交数据
                 const submitData = {
+                    id: invoiceId.value || null, // 编辑模式时传递发票ID
                     orderId: orderId.value,
                     invoiceType: formState.invoiceType,
                     titleType: formState.titleType,
