@@ -50,13 +50,9 @@
                                     </template>
                                     <template v-else>
                                         <format-price
-                                            :font-style="{ fontSize: '32rpx' }"
-                                            :currency-style="{
-                                                fontSize: '22rpx'
-                                            }"
-                                            :decimals-style="{
-                                                fontSize: '25rpx'
-                                            }"
+                                            :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#d1a671' }"
                                             :price-data="item.price"
                                         />
                                     </template>
@@ -134,13 +130,9 @@
                                     </template>
                                     <template v-else>
                                         <format-price
-                                            :font-style="{ fontSize: '32rpx' }"
-                                            :currency-style="{
-                                                fontSize: '22rpx'
-                                            }"
-                                            :decimals-style="{
-                                                fontSize: '25rpx'
-                                            }"
+                                            :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
+                                            :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#d1a671' }"
                                             :price-data="item.price"
                                         />
                                     </template>
@@ -339,7 +331,12 @@ const handleClose = () => {
 }
 
 .activity-box {
-    height: 55rpx;
+    min-height: 0;
+    height: auto;
+    
+    &:not(:empty) {
+        min-height: 55rpx;
+    }
 }
 
 .item-li {

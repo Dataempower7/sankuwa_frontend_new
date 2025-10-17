@@ -406,7 +406,7 @@ const productTabs = ref([
     { name: '推荐好物', key: 'recommend', params: {} },
     { name: '新品推荐', key: 'new', params: { isNew: 1 } },
     { name: '热销产品', key: 'hot', params: { isHot: 1 } },
-    { name: 'SANKUWA', key: 'sankuwa', params: { categoryId: 891 } }
+    { name: '赫利肯', key: 'helikon', params: { categoryId: 891 } }
 ]);
 const activeTabIndex = ref(0);
 const productLoading = ref(false);
@@ -816,43 +816,43 @@ const loadTabProducts = async (append: boolean = false) => {
     }
 };
 
-// 刷新商品数据（换一批）
-const refreshProducts = async () => {
-    if (refreshLoading.value || productLoading.value) return;
+// // 刷新商品数据（换一批）
+// const refreshProducts = async () => {
+//     if (refreshLoading.value || productLoading.value) return;
 
-    refreshLoading.value = true;
+//     refreshLoading.value = true;
 
-    try {
-        // 增加页码来获取不同的商品
-        currentPage.value += 1;
+//     try {
+//         // 增加页码来获取不同的商品
+//         currentPage.value += 1;
 
-        const currentTab = productTabs.value[activeTabIndex.value];
-        const params = {
-            page: currentPage.value,
-            size: 12,
-            ...currentTab.params
-        };
+//         const currentTab = productTabs.value[activeTabIndex.value];
+//         const params = {
+//             page: currentPage.value,
+//             size: 12,
+//             ...currentTab.params
+//         };
 
-        const result = await getCateProduct(params);
+//         const result = await getCateProduct(params);
 
-        if (result.records && result.records.length > 0) {
-            currentProducts.value = result.records;
+//         if (result.records && result.records.length > 0) {
+//             currentProducts.value = result.records;
            
-        } else {
-            // 如果没有更多数据，重置到第一页
-            currentPage.value = 1;
-            await loadTabProducts();
+//         } else {
+//             // 如果没有更多数据，重置到第一页
+//             currentPage.value = 1;
+//             await loadTabProducts();
            
-        }
-    } catch (error) {
-        console.error('刷新商品失败:', error);
-        uni.showToast({
-            icon: 'none'
-        });
-    } finally {
-        refreshLoading.value = false;
-    }
-};
+//         }
+//     } catch (error) {
+//         console.error('刷新商品失败:', error);
+//         uni.showToast({
+//             icon: 'none'
+//         });
+//     } finally {
+//         refreshLoading.value = false;
+//     }
+// };
 
 // 跳转到商品详情页
 const goToProductDetail = (productId?: number) => {
@@ -2211,7 +2211,7 @@ page {
     overflow: hidden;
     box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
     position: relative;
-    z-index: 100;
+    z-index: 1; /* 降低 z-index，避免覆盖底部 tabbar */
 
     .nav-scroll-view {
         width: 100%;
@@ -2220,7 +2220,6 @@ page {
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
         position: relative;
-        z-index: 1;
 
         .nav-grid {
             display: flex;
@@ -2232,7 +2231,6 @@ page {
             /* 添加过渡动画 */
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
-            z-index: 2;
 
             /* 每页显示8个项目的容器 */
             .nav-page {
@@ -2245,7 +2243,6 @@ page {
                 /* 添加页面过渡效果 */
                 transition: all 0.3s ease;
                 position: relative;
-                z-index: 3;
 
                 .nav-grid-item {
                     width: 25%;
@@ -2257,17 +2254,9 @@ page {
                     text-align: center;
                     padding: 10rpx;
                     box-sizing: border-box;
-                    /* 添加点击效果 */
-                    transition: all 0.2s ease;
                     border-radius: 8rpx;
                     position: relative;
-                    z-index: 10;
                     cursor: pointer;
-
-                    &:active {
-                        transform: scale(0.95);
-                        background-color: rgba(0, 0, 0, 0.05);
-                    }
 
                     .nav-grid-icon-wrapper {
                         width: 90rpx;
@@ -2278,10 +2267,8 @@ page {
                         justify-content: center;
                         margin-bottom: 8rpx;
                         box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-                        transition: all 0.3s ease;
 
                         .nav-grid-icon {
-                            transition: transform 0.3s ease;
                             width: 60px;
                             height: 60px;
                         }
@@ -2295,46 +2282,7 @@ page {
                         word-break: break-all;
                         margin-top: 8rpx;
                         font-weight: 500;
-                        transition: color 0.3s ease;
                     }
-
-                    /* 点击效果优化 */
-                    &:active {
-                        .nav-grid-icon-wrapper {
-                            transform: scale(1.1);
-                            box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
-
-                            .nav-grid-icon {
-                                transform: scale(1.1);
-                            }
-                        }
-
-                        .nav-grid-text {
-                            color: #3A41BC;
-                        }
-                    }
-            }
-        }
-    }
-
-    /* 滚动指示器 */
-    .nav-indicators {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15rpx 0 10rpx;
-        gap: 12rpx;
-
-        .indicator-dot {
-            width: 12rpx;
-            height: 12rpx;
-            border-radius: 50%;
-            background-color: #e0e0e0;
-            transition: all 0.3s ease;
-
-            &.active {
-                background-color: #3A41BC;
-                transform: scale(1.2);
             }
         }
     }

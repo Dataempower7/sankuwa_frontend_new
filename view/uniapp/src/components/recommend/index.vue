@@ -14,9 +14,9 @@
 
 <script setup lang="ts">
 import masonry from "@/components/masonry/masonry.vue";
-import { useList } from "@/hooks";
-import { getGuessLikeIds, getProductsList } from "@/api/common";
+import { getCateProduct } from "@/api/home/home";
 import { ref } from "vue";
+import getPromotionList from "@/utils/getPromotionList";
 
 defineProps({
     // 是否显示
@@ -28,36 +28,86 @@ defineProps({
 
 defineEmits(["callback"]);
 
-const ids = ref("");
+// 商品列表数据
+const guessLike = ref<any[]>([]);
+const promotionList = ref<Record<string, any>>({});
+const isLoading = ref(false);
 
-const {
-    data: guessLike,
-    promotionList,
-    getList
-} = useList(getProductsList, {
-    params: {
-        ids: ids.value
-    },
-    path: {
-        dataKey: "records"
-    },
-    immediate: false,
-    needPromotionList: true,
-    needReachBottom: true
-});
+// 多重随机洗牌算法：更激进的打乱效果
+const shuffleArray = <T>(array: T[]): T[] => {
+    let newArray = [...array];
+    
+    // 第一步：分块打乱 - 将数组分成多个小块，每个块内部打乱
+    const chunkSize = Math.ceil(newArray.length / 5); // 分成5块
+    const chunks: T[][] = [];
+    
+    for (let i = 0; i < newArray.length; i += chunkSize) {
+        const chunk = newArray.slice(i, i + chunkSize);
+        // 对每个块进行Fisher-Yates洗牌
+        for (let j = chunk.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [chunk[j], chunk[k]] = [chunk[k], chunk[j]];
+        }
+        chunks.push(chunk);
+    }
+    
+    // 第二步：打乱块的顺序
+    for (let i = chunks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chunks[i], chunks[j]] = [chunks[j], chunks[i]];
+    }
+    
+    // 第三步：重新合并并再次整体洗牌
+    newArray = chunks.flat();
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    
+    return newArray;
+};
 
-const getGuessLikeIdsData = async () => {
+// 加载商品数据（只加载一次，16条数据）
+const loadProducts = async () => {
+    if (isLoading.value) return;
+    
+    isLoading.value = true;
     try {
-        const result = await getGuessLikeIds({ page: 1, size: 10 });
-        ids.value = result;
-        getList({
-            ids: ids.value
+        const result = await getCateProduct({
+            page: 1,
+            size: 16, // 只获取16条数据
+            // 不传categoryId，获取所有分类的商品
         });
+        
+        if (result.records && result.records.length > 0) {
+            // 打乱商品顺序，让每次加载的数据看起来都不一样
+            const shuffledRecords = shuffleArray(result.records);
+            guessLike.value = shuffledRecords;
+            
+            // 获取促销信息
+            try {
+                const productIds = result.records.map((item: any) => ({
+                    productId: item.productId,
+                    product_id: item.productId
+                }));
+                const resPromotion = await getPromotionList({
+                    products: productIds as any,
+                    from: "list"
+                });
+                promotionList.value = resPromotion;
+            } catch (err) {
+                console.error("获取促销信息失败:", err);
+            }
+        }
     } catch (error) {
-        console.error("获取猜你喜欢商品ID失败", error);
+        console.error("加载推荐商品失败:", error);
+    } finally {
+        isLoading.value = false;
     }
 };
-getGuessLikeIdsData();
+
+// 初始加载
+loadProducts();
 </script>
 
 <style lang="scss" scoped>

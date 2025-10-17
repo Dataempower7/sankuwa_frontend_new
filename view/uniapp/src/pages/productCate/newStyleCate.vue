@@ -133,6 +133,7 @@
                         scroll-y 
                         class="product-scroll" 
                         @scrolltolower="loadMoreProducts"
+                        :lower-threshold="100"
                         :enhanced="true"
                         :show-scrollbar="false"
                         :enable-back-to-top="true"
@@ -203,10 +204,15 @@
                             </view>
                         </view>
                         
-                        <!-- 加载更多 -->
-                        <view v-if="hasMore && !loading" class="load-more">
-                            <up-loading-icon mode="circle" />
-                            <text class="load-text">{{ $t("加载中...") }}</text>
+                        <!-- 加载更多提示 -->
+                        <view v-if="isLoadingMore" class="load-more">
+                            <up-loading-icon mode="circle" size="40rpx" />
+                            <text class="load-text">{{ $t("加载中") }}</text>
+                        </view>
+                        
+                        <!-- 没有更多数据提示 -->
+                        <view v-if="!hasMore && productList.length > 0" class="no-more">
+                            <text class="no-more-text">{{ $t("没有更多商品了") }}</text>
                         </view>
                     </scroll-view>
                 </view>
@@ -249,6 +255,7 @@ const catId = defineModel("catId", {
 
 // 数据状态
 const loading = ref(false);
+const isLoadingMore = ref(false); // 是否正在加载更多（用于防止重复触发）
 const firstLevelCategories = ref<filterSeleted[]>([]); // 一级分类（顶部圆形图标）
 const secondLevelCategories = ref<filterSeleted[]>([]); // 二级分类（左侧菜单）
 const thirdLevelCategories = ref<filterSeleted[]>([]); // 三级分类（筛选条件上方）
@@ -281,7 +288,7 @@ const sortOptions = [
 const params = reactive({
     categoryId: 0, // 最终的分类ID（可能是一级、二级或三级）
     page: 1,
-    size: 20,
+    size: 12, // 每页12条，后期由后端实现打乱算法
     sort: '',
     order: 'desc',
     sortField: '', // 添加后端期望的排序字段
@@ -406,6 +413,40 @@ const toggleListViewMode = () => {
     listViewMode.value = listViewMode.value === 'double' ? 'single' : 'double';
 };
 
+// 多重随机洗牌算法：更激进的打乱效果
+const shuffleArray = <T>(array: T[]): T[] => {
+    let newArray = [...array];
+    
+    // 第一步：分块打乱 - 将数组分成多个小块，每个块内部打乱
+    const chunkSize = Math.ceil(newArray.length / 5); // 分成5块
+    const chunks: T[][] = [];
+    
+    for (let i = 0; i < newArray.length; i += chunkSize) {
+        const chunk = newArray.slice(i, i + chunkSize);
+        // 对每个块进行Fisher-Yates洗牌
+        for (let j = chunk.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [chunk[j], chunk[k]] = [chunk[k], chunk[j]];
+        }
+        chunks.push(chunk);
+    }
+    
+    // 第二步：打乱块的顺序
+    for (let i = chunks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chunks[i], chunks[j]] = [chunks[j], chunks[i]];
+    }
+    
+    // 第三步：重新合并并再次整体洗牌
+    newArray = chunks.flat();
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    
+    return newArray;
+};
+
 const resetProducts = () => {
     productList.value = [];
     params.page = 1;
@@ -425,10 +466,15 @@ const loadProducts = async () => {
         
         const result = await getCateProduct(cleanParams);
         
+        // 只在第一页且不是价格排序时打乱数据
+        // 综合、热销、新品都会打乱；价格排序保持原有顺序；分页加载时不打乱
+        const shouldShuffle = params.page === 1 && selectedSort.value !== 'price';
+        const records = shouldShuffle && result.records ? shuffleArray(result.records) : (result.records || []);
+        
         if (params.page === 1) {
-            productList.value = result.records || [];
+            productList.value = records;
         } else {
-            productList.value.push(...(result.records || []));
+            productList.value.push(...records);
         }
         
         hasMore.value = (result.records?.length || 0) >= params.size;
@@ -440,10 +486,17 @@ const loadProducts = async () => {
 };
 
 const loadMoreProducts = () => {
-    if (!hasMore.value || loading.value) return;
+    // 防止重复触发：如果正在加载、没有更多数据、或正在加载更多，则直接返回
+    if (loading.value || !hasMore.value || isLoadingMore.value) return;
     
+    isLoadingMore.value = true;
     params.page += 1;
-    loadProducts();
+    
+    // 延迟执行，提升流畅性
+    setTimeout(async () => {
+        await loadProducts();
+        isLoadingMore.value = false;
+    }, 100);
 };
 
 // 加载二级分类
@@ -1141,14 +1194,50 @@ onMounted(() => {
     
     .load-more {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 15rpx;
         padding: 40rpx 0;
+        gap: 0;
         
         .load-text {
-            font-size: 26rpx;
-            color: #999;
+            font-size: 24rpx;
+            color: #999999;
+            margin-top: 20rpx;
+        }
+    }
+    
+    .no-more {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40rpx 0 60rpx;
+        width: 100%;
+        
+        .no-more-text {
+            font-size: 24rpx;
+            color: #999999;
+            position: relative;
+            
+            &::before,
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                width: 60rpx;
+                height: 1rpx;
+                background-color: #E5E5E5;
+            }
+            
+            &::before {
+                right: 100%;
+                margin-right: 20rpx;
+            }
+            
+            &::after {
+                left: 100%;
+                margin-left: 20rpx;
+            }
         }
     }
 }

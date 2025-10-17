@@ -397,6 +397,7 @@ onShow(() => {
     uni.hideTabBar();
     getCartList();
 });
+
 const isLoad = ref(true);
 const showLogin = ref(!uni.getStorageSync("token"));
 
