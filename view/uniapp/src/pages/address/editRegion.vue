@@ -49,9 +49,9 @@
                     </uni-forms-item>
 
                     <!-- 设为默认地址 -->
-                    <uni-forms-item :label="$t('设为默认地址')" name="isDefault" ">
-                        <view class="switch" style="    justify-content: flex-end;">
-                            <u-switch v-model="isDefault" active-color="#3544BA"  />
+                    <uni-forms-item :label="$t('设为默认地址')" name="isDefault">
+                        <view class="switch" style="justify-content: flex-end;">
+                            <u-switch v-model="isDefault" active-color="#3544BA" />
                         </view>
                     </uni-forms-item>
                 </uni-forms>
@@ -161,7 +161,9 @@ const rules = {
 
 onShow(() => {
     nextTick(() => {
-        formRef.value.setRules(rules);
+        if (formRef.value && formRef.value.setRules) {
+            formRef.value.setRules(rules);
+        }
     });
 });
 
@@ -206,7 +208,6 @@ const showManualInputTip = () => {
 // 处理位置导入（支持完整的省市区街道信息）
 const handleLocationImport = async (locationData: any) => {
     try {
-        console.log('处理位置导入数据:', locationData);
 
         // 若包含收货人信息（来自 wx.chooseAddress），预填
         if (locationData.consignee) {
@@ -235,7 +236,8 @@ const handleLocationImport = async (locationData: any) => {
         // 构建详细地址（包含街道信息）
         let detailAddress = '';
         
-        // 优先使用原始的detail字段
+        // 优先使用 detail 字段（所有类型统一处理）
+        // 对于 map_location，detail 已经去掉了省市区，只包含街道+门牌号
         if (locationData.detail) {
             detailAddress = locationData.detail;
         } else {
@@ -262,7 +264,7 @@ const handleLocationImport = async (locationData: any) => {
 
         nextTick(() => {
             let message = t("位置信息已自动填入，请完善收货人和联系方式");
-            let iconType = "success";
+            let iconType: 'success' | 'none' = 'success';
             
             // 根据导入类型显示不同提示
             if (locationData.type === 'wechat_address') {
@@ -271,6 +273,18 @@ const handleLocationImport = async (locationData: any) => {
             } else if (locationData.type === 'location_address') {
                 // 定位获取的地址
                 message = t("定位成功！地址信息已自动填入，请完善收货人信息");
+            } else if (locationData.type === 'map_location') {
+                // 地图选点导入
+                message = t("地址选择成功！请完善收货人信息");
+                console.log('地图选点导入:', {
+                    省市区: locationData.regions,
+                    详细地址: locationData.detail + ' (已去掉省市区)',
+                    街道: locationData.township,
+                    街路: locationData.street,
+                    门牌号: locationData.streetNumber,
+                    POI: locationData.poi,
+                    坐标: `${locationData.latitude}, ${locationData.longitude}`
+                });
             }
             
             // 如果有街道信息，给出特别提示

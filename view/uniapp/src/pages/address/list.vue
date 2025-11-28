@@ -35,7 +35,7 @@
             <view class="empty-content">
                 <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg" mode="aspectFit" />
                 <text class="empty-text">{{ $t("暂无收货地址") }}</text>
-                <text class="empty-desc">{{ $t("快速获取微信位置或手动添加收货地址") }}</text>
+                <text class="empty-desc">{{ $t("快速获取位置或手动添加收货地址") }}</text>
             </view>
         </view>
 
@@ -51,7 +51,7 @@
                             <text>{{ $t("一键导入地址") }}</text>
                         </view>
                     </tig-button>
-                    <tig-button class="add-address-btn" style="border-color: #3544ba;"  @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
+                    <tig-button class="add-address-btn" style="border-color: #3544ba;" @click="handleAdd">{{ $t("添加新地址") }}</tig-button>
                 </template>
                 <!-- 有地址时只显示添加按钮 -->
                 <template v-else>
@@ -61,12 +61,16 @@
         </tig-fixed-placeholder>
 
         <tig-loadingpage v-model="isLoading" />
+        
+        <!-- 地图选点弹窗 -->
+        <MapPickerPopup v-model="showMapPicker" @confirm="handleMapPickerConfirm" />
     </tig-layout>
 </template>
 
 <script lang="ts" setup>
 import { getAddressList, delAddress, selectedAddress } from "@/api/user/address";
 import type { AddressFilterResult } from "@/types/user/address";
+import MapPickerPopup from "@/components/MapPicker/index.vue";
 import { reactive, ref } from "vue";
 import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { mobileConceal, currRoute } from "@/utils";
@@ -151,19 +155,55 @@ const handleAdd = () => {
     });
 };
 
-const handleImportAddress = async () => {
+// 地图选点弹窗显示状态
+const showMapPicker = ref(false);
+
+// 地图选点确认
+const handleMapPickerConfirm = (addressData: any) => {
+    
+    // 将地址数据传递给编辑页面
+    // detail字段已经去掉了省市区，只包含街道及详细地址
+    const addressInfo = encodeURIComponent(JSON.stringify({
+        regions: [addressData.province, addressData.city, addressData.district].filter(Boolean),
+        detail: addressData.detail || '',  // 街道+门牌号（不含省市区）
+        type: 'map_location',
+        provinceName: addressData.province,
+        cityName: addressData.city,
+        countyName: addressData.district,
+        township: addressData.township || '',
+        street: addressData.street || '',
+        streetNumber: addressData.streetNumber || '',
+        poi: addressData.poi || '',
+        latitude: addressData.latitude,
+        longitude: addressData.longitude
+    }));
+    
+    
+    uni.navigateTo({
+        url: `/pages/address/editRegion?import=true&location=${addressInfo}`
+    });
+};
+
+const handleImportAddress = () => {
+    // APP/H5环境：显示地图选点弹窗
+    // #ifndef MP-WEIXIN
+    showMapPicker.value = true;
+    return;
+    // #endif
+    
+    // 微信小程序：使用原有逻辑（微信地址簿）
     uni.showLoading({
         title: t('获取地址信息...'),
         mask: true
     });
     
-    try {
-        const result = await importAddressOneClick();
+    importAddressOneClick().then(result => {
         uni.hideLoading();
         
         if (result.success) {
             let addressInfo;
             
+            // 根据不同类型处理地址数据
             if (result.type === 'wechat_address') {
                 // 微信地址簿的数据
                 const regions = [result.provinceName, result.cityName, result.countyName].filter(Boolean);
@@ -176,13 +216,20 @@ const handleImportAddress = async () => {
                     mobile: result.telNumber
                 }));
             } else {
-                // 定位获取的地址数据
-                const regions = [result.provinceName, result.cityName, result.countyName].filter(Boolean);
+                // 高德地图定位获取的地址数据
                 addressInfo = encodeURIComponent(JSON.stringify({
-                    regions,
-                    detail: result.detailInfo || result.fullAddress || '',
-                    fullAddress: result.fullAddress || result.detailInfo || '',
-                    type: 'location_address'
+                    regions: result.regions || [],
+                    detail: result.detail || '',
+                    fullAddress: result.fullAddress || '',
+                    type: 'amap_location',
+                    provinceName: result.provinceName || '',
+                    cityName: result.cityName || '',
+                    countyName: result.countyName || '',
+                    townName: result.townName || '',
+                    streetName: result.streetName || '',
+                    streetNumber: result.streetNumber || '',
+                    nearbyPoi: result.nearbyPoi || '',
+                    nearbyRoad: result.nearbyRoad || ''
                 }));
             }
             
@@ -190,7 +237,7 @@ const handleImportAddress = async () => {
                 url: `/pages/address/editRegion?import=true&location=${addressInfo}` 
             });
         } else {
-            // 导入失败，跳转到手动添加
+            // 导入失败，显示提示
             uni.showModal({
                 title: t('导入失败'),
                 content: t(result.message || '无法获取地址信息，请手动输入'),
@@ -200,18 +247,14 @@ const handleImportAddress = async () => {
                 }
             });
         }
-    } catch (error) {
+    }).catch(error => {
         uni.hideLoading();
         console.error('一键导入地址失败:', error);
-        uni.showModal({
-            title: t('导入失败'),
-            content: t('地址获取失败，请手动输入'),
-            showCancel: false,
-            success: () => {
-                uni.navigateTo({ url: "/pages/address/editRegion" });
-            }
+        uni.showToast({
+            title: '导入失败',
+            icon: 'none'
         });
-    }
+    });
 };
 
 const isCheckedId = ref();
