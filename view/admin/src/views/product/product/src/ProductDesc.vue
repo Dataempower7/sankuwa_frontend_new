@@ -208,7 +208,7 @@ const onOk = () => {
     flex-wrap: wrap;
 }
 
-.goods-info-edit-act :deep .add-item {
+.goods-info-edit-act :deep(.add-item) {
     transition: all 0.3s;
     margin-right: 10px;
     display: flex;
@@ -220,16 +220,16 @@ const onOk = () => {
     color: #333;
 }
 
-.goods-info-edit-act :deep .add-item:hover {
+.goods-info-edit-act :deep(.add-item:hover) {
     background: rgba(0, 0, 0, 0.1);
     color: #333;
 }
 
-.goods-info-edit-act :deep .add-item i,
-svg {
+.goods-info-edit-act :deep(.add-item i,
+svg) {
     padding-right: 3px;
 }
-.goods-info-edit-act :deep .add-item svg {
+.goods-info-edit-act :deep(.add-item svg) {
     padding-top: 1px;
 }
 
@@ -313,7 +313,7 @@ svg {
     background: #333;
 }
 
-.info-edit-con-list .info-edit-list-item :deep .btn-edit {
+.info-edit-con-list .info-edit-list-item :deep(.btn-edit) {
     display: none;
     position: absolute;
     bottom: 0;
@@ -327,7 +327,7 @@ svg {
     text-align: center;
 }
 
-.info-edit-con-list .info-edit-list-item:hover :deep .btn-edit {
+.info-edit-con-list .info-edit-list-item:hover :deep(.btn-edit) {
     display: block;
 }
 

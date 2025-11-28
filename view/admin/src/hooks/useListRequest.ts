@@ -8,7 +8,7 @@ export function useListRequest<T, P>(options: {
     ComputedRef<(params: P) => Promise<{ records: T[]; total: number }>>;
     getPageSize?: () => number;
     idKey?: string;
-}) {
+},ignoreResetParam: string[] = []) {
     const config = useConfigStore();
     const pageSize = options.getPageSize ? options.getPageSize() : config.get('pageSize');
     const idKey = options.idKey || 'id';
@@ -37,7 +37,16 @@ export function useListRequest<T, P>(options: {
 
     // 新增重置参数方法
     const resetParams = () => {
-        Object.assign(filterParams, initialParams);
+        if(ignoreResetParam.length == 0) {
+            Object.assign(filterParams, initialParams);
+        } else {
+            for (let key in initialParams) {
+                if (!ignoreResetParam.includes(key)) {
+                    // @ts-expect-error
+                    filterParams[key] = initialParams[key];
+                }
+            }
+        }
         loadData();
     };
 
@@ -80,16 +89,18 @@ export function useListRequest<T, P>(options: {
     };
 
     const onSelectChange = (items: T[]) => {
+        console.log(items, 9999);
         selectedIds.value = items.map((item: any) => item[idKey]);
+        console.log(selectedIds.value);
     };
 
-    const onBatchAction = async (action: string, apiFunction: (type: string, data: object) => Promise<any>) => {
+    const onBatchAction = async (action: string, apiFunction: (type: string, data: object) => Promise<any>, args: any) => {
         if (selectedIds.value.length === 0) {
             message.warning('请至少选择一项');
             return;
         }
         try {
-            await apiFunction(action, { ids: selectedIds.value });
+            await apiFunction(action, { ids: selectedIds.value, ...args });
             message.success('操作成功');
             loadData();
             selectedIds.value = [];

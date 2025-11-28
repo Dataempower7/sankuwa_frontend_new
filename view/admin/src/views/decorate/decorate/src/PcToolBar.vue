@@ -39,6 +39,7 @@
 import { ref, defineAsyncComponent, onMounted, shallowRef } from "vue";
 import draggable from "vuedraggable";
 import { cloneDeep } from "lodash";
+import { isOverseas } from "@/utils/version";
 const props = defineProps({
     modules: {
         type: Object,
@@ -49,7 +50,7 @@ const emit = defineEmits(["item-added"]);
 const modules = ref(props.modules);
 const toolList = ref([
     { type: "pcBanner", url: "pc", label: "轮播Banner", content: "", module: {}, isShow: true },
-    { type: "pcBanner2", url: "pc", label: "轮播Banner2", content: "", module: {}, isShow: true },
+    { type: "pcBanner2", url: "pc", label: "轮播Banner2", content: "", module: {}, isShow: isOverseas() ? true : false },
     { type: "pcGroupBanner", url: "pc", label: "分组轮播Banner", content: "", module: {}, isShow: true },
     { type: "pcSeckill", url: "pc", label: "秒杀模块", content: "", module: {}, isShow: true },
     { type: "pcCoupon", url: "pc", label: "优惠券模块", content: "", module: {}, isShow: true },
@@ -63,6 +64,7 @@ const toolList = ref([
     { type: "pcCustomAd2", url: "pc", label: "自定义模块二", content: "", module: {}, isShow: true },
     { type: "pcCategoryNav", url: "pc", label: "分类导航", content: "", module: {}, isShow: true },
     { type: "pcCategoryNav3", url: "pc", label: "分类导航3", content: "", module: {}, isShow: true },
+    { type: "pcGroupon", url: "pc", label: "拼团", content: "", module: {}, isShow: true }
 ]);
 const clone = (obj: any) => {
     let newObj = cloneDeep(obj);

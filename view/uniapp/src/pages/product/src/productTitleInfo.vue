@@ -1,7 +1,7 @@
 <template>
     <view class="product-title-info">
         <view class="title-info-top">
-            <template v-if="isSeckill || isDiscount">
+            <template v-if="isSeckill || isDiscount || isGroupon">
                 <view class="title-info-bottom line2">
                     {{ productInfo.productName }}
                 </view>
@@ -65,7 +65,7 @@
                 </view>
             </view>
         </template>
-        <view v-if="!isSeckill && !isDiscount" class="title-info-bottom line2">
+        <view v-if="!isSeckill && !isDiscount && !isGroupon" class="title-info-bottom line2">
             {{ productInfo.productName }}
         </view>
         <productShare v-model="showShare" :product-id="Number(productId)" :product-info="productInfo" :product-price="productPrice" />
@@ -102,6 +102,10 @@ const props = defineProps({
         default: 0
     },
     isDiscount: {
+        type: Number,
+        default: 0
+    },
+    isGroupon: {
         type: Number,
         default: 0
     },

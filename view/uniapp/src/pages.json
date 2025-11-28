@@ -62,6 +62,12 @@
         },
         {
             "path": "pages/reset/index"
+        },
+        {
+            "path": "pages/groupon/mylist"
+        },
+        {
+            "path": "pages/groupon/list"
         }
     ],
     "subPackages": [
@@ -119,6 +125,43 @@
             ]
         },
         {
+            "root": "pages/buyerShow",
+            "pages": [
+                {
+                    "path": "index",
+                    "meta": {
+                        "sync": true,
+                        "title": "买家秀",
+                        "group": "买家秀"
+                    }
+                },
+                {
+                    "path": "addBuyerShow",
+                    "meta": {
+                        "sync": true,
+                        "title": "发布买家秀",
+                        "group": "买家秀"
+                    }
+                },
+                {
+                    "path": "buyerShowDetail",
+                    "meta": {
+                        "sync": true,
+                        "title": "买家秀详情",
+                        "group": "买家秀"
+                    }
+                },
+                {
+                    "path": "comments",
+                    "meta": {
+                        "sync": true,
+                        "title": "评论",
+                        "group": "买家秀"
+                    }
+                }
+            ]
+        },
+        {
             "root": "pages/product",
             "pages": [
                 {
@@ -142,6 +185,14 @@
                     "meta": {
                         "sync": true,
                         "title": "商品评价",
+                        "group": "商品"
+                    }
+                },
+                {
+                    "path": "groupBuying",
+                    "meta": {
+                        "sync": true,
+                        "title": "拼团",
                         "group": "商品"
                     }
                 }
@@ -531,6 +582,17 @@
                 },
                 {
                     "path": "levelCenter/benefit"
+                }
+            ]
+        },
+        {
+            "root": "pages/ai",
+            "pages": [
+                {
+                    "path": "index",
+                    "style": {
+                        "navigationBarTitleText": "AI助手"
+                    }
                 }
             ]
         }

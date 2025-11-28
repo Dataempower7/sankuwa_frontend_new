@@ -9,6 +9,9 @@
                     <el-form-item label="上级分类" prop="parentId">
                         <SelectShopProductCategory v-if="!loading" v-model:categoryId="formState.parentId" :multiple="false" style="width: 100%"></SelectShopProductCategory>
                     </el-form-item>
+                    <el-form-item label="分类图片" prop="categoryPic">
+                        <FormAddGallery v-model:photo="formState.categoryPic"></FormAddGallery>
+                    </el-form-item>
                     <el-form-item label="排序" prop="sortOrder">
                         <TigInput classType="tig-form-input" type="integer" v-model="formState.sortOrder" />
                     </el-form-item>
@@ -29,6 +32,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, shallowRef } from "vue";
+import { FormAddGallery } from "@/components/gallery";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 import {  SelectShopProductCategory } from "@/components/select";

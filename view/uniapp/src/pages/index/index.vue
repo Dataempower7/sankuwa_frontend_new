@@ -15,7 +15,7 @@
                     <view class="user-info" @click="handleUserNameClick">
                         <image
                             class="user-avatar"
-                            :src="userStore.token ? userStore.userInfo.avatar || '/static/images/common/avatar_empty.png' : '/static/images/common/avatar_empty.png'"
+                            :src="userAvatar"
                             mode="aspectFill"
                             @click.stop="handleAvatarClick"
                         />
@@ -111,7 +111,7 @@
                 <view v-if="topAdvertisements.length > 0" class="banner-container">
                     <swiper class="banner-swiper" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="1000" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff">
                         <swiper-item v-for="(advertisement, index) in topAdvertisements" :key="advertisement.id || index">
-                            <image class="banner-image" :src="advertisement.imageUrl" mode="aspectFill" />
+                            <image class="banner-image" :src="advertisement.imageUrl" mode="aspectFill" @click="handleAdClick(index)" />
                         </swiper-item>
                     </swiper>
                 </view>
@@ -146,22 +146,6 @@
                     <!-- 秒杀板块 -->
                     <view class="seckill-card" @click="goToSeckillList">
                         <image class="seckill-bg" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758694676IvkC0QflsmbZYSMbc1.jpeg" mode="aspectFill" />
-                        <!-- <view class="seckill-content">
-                            <view class="seckill-products">
-                                <view 
-                                    v-for="(product, index) in seckillData.slice(0, 2)" 
-                                    :key="product.productId || index"
-                                    class="seckill-product-item"
-                                    @click.stop="goToProductDetail(product.productId)"
-                                >
-                                    <image class="product-image" :src="product.picThumb" mode="aspectFill" />
-                                    <view class="product-price">
-                                        <text class="current-price">¥{{ product.seckillPrice }}</text>
-                                        <text class="original-price">¥{{ product.marketPrice }}</text>
-                                    </view>
-                                </view>
-                            </view>
-                        </view> -->
                     </view>
                     
                     <!-- 右侧板块 -->
@@ -183,6 +167,11 @@
                         </view>
                     </view>
                 </view>
+
+                 <!-- AI浮动按钮 -->
+                <view class="ai-float-button" @click="goToAI" style="position: fixed; right: 10rpx; top: 62%; transform: translateY(-50%); z-index: 999;">
+                    <image class="ai-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202511/17633605914a9ybDSUc9ZjgiCO1i.jpeg" style="width: 80rpx; height: 80rpx; border-radius: 50%; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);" mode="aspectFill" />
+                </view>
                 
 
                 <!-- 金刚区/一级目录 -->
@@ -199,10 +188,12 @@
                         @scroll="onNavScroll"
                     >
                         <view class="nav-grid">
+                            <!-- 分类视图 -->
                             <view
                                 class="nav-page"
                                 v-for="(pageItems, pageIndex) in navPages"
                                 :key="`page-${pageIndex}`"
+                                v-show="!showBrandColumn"
                             >
                                 <view
                                     class="nav-grid-item"
@@ -216,10 +207,38 @@
                                     <text class="nav-grid-text">{{ nav.categoryName }}</text>
                                 </view>
                             </view>
+                            
+                            <!-- 品牌专栏视图 -->
+                            <view
+                                class="nav-page"
+                                v-for="(pageItems, pageIndex) in brandPages"
+                                :key="`brand-page-${pageIndex}`"
+                                v-show="showBrandColumn"
+                            >
+                                <view
+                                    class="nav-grid-item"
+                                    v-for="brand in pageItems"
+                                    :key="brand.id"
+                                    @click.stop="brandClick(brand)"
+                                >
+                                    <view class="nav-grid-icon-wrapper">
+                                        <image class="nav-grid-icon" :src="brand.logo" mode="aspectFit" />
+                                    </view>
+                                    <text class="nav-grid-text">{{ brand.name }}</text>
+                                </view>
+                            </view>
                         </view>
                     </scroll-view>
+                    
+                    <!-- 切换按钮 - 放在金刚区内部底部 -->
+                    <view class="switch-toggle-wrapper">
+                        <view class="switch-toggle-button" @click="toggleView">
+                            <text class="toggle-text" :class="{ active: !showBrandColumn }">精选类目</text>
+                            <view class="toggle-divider"></view>
+                            <text class="toggle-text" :class="{ active: showBrandColumn }">精选品牌</text>
+                        </view>
+                    </view>
                 </view>
-
 
                 <!-- 商品导航栏 -->
                 <view class="product-nav-container">
@@ -252,65 +271,19 @@
                     </view>
 
                     <!-- 没有商品时显示空状态 -->
-                    <view v-else-if="!productLoading && currentProducts.length === 0" class="empty-container">
-                        <up-empty :icon="staticResource('salesman/no_order.png')" :text="$t('暂无商品')" />
+                    <view v-else-if="!productLoading && currentProducts.length === 0" style="display: flex; justify-content: center; align-items: center; min-height: 60vh; padding: 40rpx;">
+                        <view style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <image style="width: 300rpx; height: 300rpx; margin-bottom: 40rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg" mode="aspectFit" />
+                            <text style="font-size: 32rpx; color: #333; font-weight: 500; margin-bottom: 16rpx;">{{ $t("暂无商品") }}</text>
+                            <text style="font-size: 28rpx; color: #999; line-height: 1.5;">{{ $t("敬请期待更多精彩商品") }}</text>
+                        </view>
                     </view>
 
-                    <!-- 有商品时显示商品列表 -->
+                    <!-- 有商品时显示商品列表 - 使用瀑布流 -->
                     <view v-else>
-                        <view class="products-grid">
-                            <view
-                                class="product-item"
-                                v-for="(product, index) in currentProducts"
-                                :key="product.productId || index"
-                                @click="goToProductDetail(product.productId)"
-                            >
-                                <view class="product-image-wrapper">
-                                    <image class="product-image" :src="product.picThumb" mode="aspectFill" />
-                                    <!-- 缺货/下架状态 -->
-                                    <view v-if="product.productStock === 0 || product.productStatus === 0" class="product-status">
-                                        <text class="status-text">{{ product.productStock === 0 ? $t("已售罄") : $t("已下架") }}</text>
-                                    </view>
-                                </view>
-
-                                <view class="product-info">
-                                    <view class="product-title">{{ product.productName }}</view>
-                                    <view class="product-price">
-                                        <format-price
-                                            :decimals-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
-                                            :currency-style="{ fontSize: '20rpx', fontWeight: 'bold', color: '#d1a671' }"
-                                            :font-style="{ fontSize: '28rpx', fontWeight: 'bold', color: '#d1a671' }"   
-                                            :price-data="product.productPrice"
-                                        />
-                                    </view>
-                                </view>
-                            </view>
+                        <view class="masonry-wrapper">
+                            <masonry :commodity-list="currentProducts" :promotion-list="promotionList" />
                         </view>
-
-
-                        <!-- 
-                        更换一批按钮 
-                        <view class="refresh-products-container">
-                            <view class="refresh-button" @click="refreshProducts" :class="{ loading: refreshLoading }">
-                                <view class="refresh-icon-wrapper">
-                                    <image
-                                        class="refresh-icon"
-                                        src="/static/images/home/flushed.png"
-                                        mode="aspectFit"
-                                        :class="{ 'loading-rotate': refreshLoading }"
-                                    />
-                                </view>
-                                <text class="refresh-text">{{ $t('换一批') }}</text>
-                            </view>
-                        </view>
-                    </view>
-                </view>
-
-               平台简介 - 放在推荐内容后面  
-                <view class="platform-intro">
-                    <view class="intro-image-wrapper">
-                        <image class="intro-image" style="margin-left: 25rpx; width: 95%; margin-top: -15rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/175869589419bZDy6bxVcDSCrKao.jpeg" mode="widthFix" />
-                    </view>-->
 
                         <!-- 加载更多状态 -->
                         <view v-if="productLoading && currentProducts.length > 0" class="loading-more">
@@ -324,13 +297,12 @@
                         </view>
                     </view>
                 </view>  
-                
-
-
             </view>
         </template>
        
         <tig-back-top :scrollTop="scrollTop"></tig-back-top>
+        
+       
     </view>
 </tig-layout>
 </template>
@@ -341,6 +313,7 @@ import { onLoad, onReachBottom, onShow, onShareAppMessage, onShareTimeline, onUn
 import { getIndex, getSplashAd, getCateProduct, getHomeSeckill, getTopAdvertisement } from "@/api/home/home";
 import { getArticleList } from "@/api/article/article";
 import { getCategoryAll } from "@/api/productCate/productCate";
+import { getFeaturedBrands } from "@/api/product/brand";
 import SplashAd from "@/components/modules/SplashAd/index.vue";
 import masonry from "@/components/masonry/masonry.vue";
 import previewTip from "./src/previewTip.vue";
@@ -348,10 +321,12 @@ import type { GetProductFilterResult, SeckillListResponse, TopAdvertisementItem,
 import type { ArticleFilterState } from "@/types/article/article";
 import type { SeckillFilterState } from "@/types/seckill/seckill";
 import type { filterSeleted } from "@/types/productCate/productCate";
+import getPromotionList from "@/utils/getPromotionList";
 import { useConfigStore } from "@/store/config";
 import { usecatnavStore } from "@/store/catnav";
 import { useUserStore } from "@/store/user";
 import { staticResource } from "@/utils";
+import { imageFormat } from "@/utils/format";
 import checkAppUpdate from "@/utils/checkAppUpdate";
 import { useScrollTop } from "@/hooks";
 
@@ -360,6 +335,15 @@ const { scrollTop } = useScrollTop(onPageScroll);
 const configStore = useConfigStore();
 const catnavStore = usecatnavStore();
 const userStore = useUserStore();
+
+// 格式化用户头像
+const userAvatar = computed(() => {
+    if (!userStore.token || !userStore.userInfo.avatar) {
+        return 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176173034416OBe7LxG3pY6RU3XK.jpeg';
+    }
+    const formattedAvatar = imageFormat(userStore.userInfo.avatar);
+    return formattedAvatar || 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176173034416OBe7LxG3pY6RU3XK.jpeg';
+});
 
 // 开屏广告相关
 const adType = ref<"image" | "video">("image");
@@ -401,9 +385,26 @@ const navPages = computed(() => {
 // 当前滚动页面索引
 const currentNavPageIndex = ref(0);
 
+// 品牌专栏相关数据
+const showBrandColumn = ref(false);
+const brandList = ref<any[]>([]);
+const brandDataLoaded = ref(false); // 品牌数据是否已加载
+
+// 将品牌数据按每页8个进行分组
+const brandPages = computed(() => {
+    const pages = [];
+    const itemsPerPage = 8;
+
+    for (let i = 0; i < brandList.value.length; i += itemsPerPage) {
+        pages.push(brandList.value.slice(i, i + itemsPerPage));
+    }
+
+    return pages;
+});
+
 // 商品导航栏相关数据
 const productTabs = ref([
-    { name: '推荐好物', key: 'recommend', params: {} },
+    { name: '好物推荐', key: 'recommend', params: {} },
     { name: '新品推荐', key: 'new', params: { isNew: 1 } },
     { name: '热销产品', key: 'hot', params: { isHot: 1 } },
     { name: '赫利肯', key: 'helikon', params: { categoryId: 891 } }
@@ -411,24 +412,15 @@ const productTabs = ref([
 const activeTabIndex = ref(0);
 const productLoading = ref(false);
 const currentProducts = ref<GetProductFilterResult[]>([]);
-const refreshLoading = ref(false);
+const promotionList = ref<Record<string, any>>({}); // 促销信息列表
 const currentPage = ref(1);
 const noMoreData = ref(false);
+let currentRequestId = 0; // 用于标识请求的唯一ID，解决竞态问题
 
 // 公告消息数据
 const noticeMessages = ref<any[]>([]);
 const currentNoticeIndex = ref(0);
 const noticeTimer = ref<ReturnType<typeof setInterval> | null>(null);
-
-// 随机打乱数组的函数（Fisher-Yates 洗牌算法）
-const shuffleArray = <T>(array: T[]): T[] => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-};
 
 // 秒杀相关数据
 const countdownTime = ref({
@@ -444,6 +436,26 @@ const initRecommendProducts = () => {
     page.value = 1;
     loadend.value = false;
     commodityList.value = [];
+};
+
+// 获取精选品牌数据
+const getBrandData = async () => {
+    try {
+        const result:any = await getFeaturedBrands(); 
+        if (result && Array.isArray(result)) {
+            brandList.value = result.map((brand: any) => ({
+                id: brand.brandId,
+                name: brand.brandName,
+                logo: imageFormat(brand.brandLogo), // 格式化图片路径
+                categoryId: brand.categoryId || 0
+            }));
+            brandDataLoaded.value = true; // 标记数据已加载
+        } else {
+            console.warn('品牌API返回数据格式不正确或为空', result);
+        }
+    } catch (error) {
+        console.error('❌ 获取品牌数据失败:', error);
+    }
 };
 
 // 获取消息公告数据
@@ -502,18 +514,7 @@ const getNoticeData = async () => {
     }
 };
 
-// 获取秒杀数据
-const getSeckillData = async () => {
-    try {
-        const result = await getHomeSeckill();
-        if (result && (result as any).data && (result as any).data.records) {
-            // 只取前2个商品用于展示
-            seckillData.value = (result as any).data.records.slice(0, 2);
-        }
-    } catch (error) {
-        console.error("获取秒杀数据失败:", error);
-    }
-};
+
 
 // 获取顶部广告数据（用于轮播图）
 const getTopAdvertisementData = async () => {
@@ -584,7 +585,7 @@ const getCategoryNavData = async () => {
 };
 
 
-
+// 获取商品列表
 const getProductList = async () => {
     bottomLoading.value = true;
     try {
@@ -609,9 +610,6 @@ const getIndexData = async () => {
         
         // 获取公告数据
         await getNoticeData();
-        
-        // 获取秒杀数据
-        await getSeckillData();
         
         // 获取顶部广告数据（用于轮播图）
         await getTopAdvertisementData();
@@ -732,6 +730,37 @@ const navClick = (nav: filterSeleted, pageIndex?: number, itemIndex?: number) =>
     });
 };
 
+// 切换视图（分类/品牌）
+const toggleView = async () => {
+    showBrandColumn.value = !showBrandColumn.value;
+    
+    // 如果切换到品牌专栏且数据未加载，则加载品牌数据
+    if (showBrandColumn.value && !brandDataLoaded.value) {
+        await getBrandData();
+    }
+    
+    
+    // 显示切换提示
+    const title = showBrandColumn.value ? '精选品牌' : '商品分类';
+};
+
+// 品牌点击事件
+const brandClick = (brand: any) => {
+    console.log('点击品牌:', brand);
+    
+    // 跳转到搜索页面，并将品牌名称作为搜索关键词
+    uni.navigateTo({
+        url: `/pages/search/index?keyword=${encodeURIComponent(brand.name)}`,
+        fail: (error) => {
+            console.error('跳转搜索页面失败:', error);
+            uni.showToast({
+                title: '页面跳转失败',
+                icon: 'none'
+            });
+        }
+    });
+};
+
 // 金刚区滚动事件处理
 const onNavScroll = (e: any) => {
     const { scrollLeft } = e.detail;
@@ -744,13 +773,25 @@ const onNavScroll = (e: any) => {
 const switchTab = async (index: number) => {
     // 如果点击的是当前标签页，则刷新数据
     if (activeTabIndex.value === index) {
+        // 重置loading状态，允许新请求
+        productLoading.value = false;
         currentPage.value = 1; // 重置页码
         noMoreData.value = false; // 重置没有更多数据状态
-        await loadTabProducts(false); // 刷新当前标签页的数据
+        
+        // 强制触发Vue响应式更新：先清空数据
+        currentProducts.value = [];
+        promotionList.value = {};
+        
+        // 等待一个微任务，确保DOM更新
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
+        // 加载新数据
+        await loadTabProducts(false);
         return;
     }
 
     // 切换到新的标签页
+    productLoading.value = false; // 重置loading状态
     activeTabIndex.value = index;
     currentPage.value = 1; // 重置页码
     noMoreData.value = false; // 重置没有更多数据状态
@@ -767,6 +808,11 @@ const loadTabProducts = async (append: boolean = false) => {
     if (noMoreData.value && append) return;
 
     productLoading.value = true;
+    
+    // 生成新的请求ID并记录当前的tab索引
+    currentRequestId++;
+    const requestId = currentRequestId;
+    const requestTabIndex = activeTabIndex.value;
 
     try {
         const currentTab = productTabs.value[activeTabIndex.value];
@@ -778,16 +824,44 @@ const loadTabProducts = async (append: boolean = false) => {
 
         const result = await getCateProduct(params);
 
+        // 检查请求返回时，是否还是同一个请求和同一个tab
+        if (requestId !== currentRequestId || requestTabIndex !== activeTabIndex.value) {
+            console.log('请求已过期，忽略结果');
+            return;
+        }
+
         if (result.records && result.records.length > 0) {
-            // 对商品进行随机排序
-            const shuffledRecords = shuffleArray(result.records);
-            
             if (append) {
                 // 追加模式：将新数据添加到现有数据后面
-                currentProducts.value = [...currentProducts.value, ...shuffledRecords];
+                currentProducts.value = [...currentProducts.value, ...result.records];
             } else {
                 // 替换模式：直接替换
-                currentProducts.value = shuffledRecords;
+                currentProducts.value = result.records;
+                // 清空旧的促销信息
+                promotionList.value = {};
+            }
+            
+            // 获取促销信息
+            try {
+                const productIds = result.records.map((item: any) => ({
+                    productId: item.productId,
+                    product_id: item.productId
+                }));
+                const resPromotion = await getPromotionList({
+                    products: productIds as any,
+                    from: "list"
+                });
+                
+                // 再次检查请求是否还有效
+                if (requestId !== currentRequestId || requestTabIndex !== activeTabIndex.value) {
+                    console.log('促销信息请求已过期，忽略结果');
+                    return;
+                }
+                
+                // 合并促销信息
+                promotionList.value = { ...promotionList.value, ...resPromotion };
+            } catch (err) {
+                console.error("获取促销信息失败:", err);
             }
             
             // 如果返回的数据少于请求的数量，说明没有更多数据了
@@ -804,73 +878,81 @@ const loadTabProducts = async (append: boolean = false) => {
         }
     } catch (error) {
         console.error('加载商品失败:', error);
-        uni.showToast({
-            title: '加载商品失败',
-            icon: 'none'
-        });
-        if (!append) {
-            currentProducts.value = [];
+        // 只有当前请求还有效时才显示错误提示
+        if (requestId === currentRequestId && requestTabIndex === activeTabIndex.value) {
+            uni.showToast({
+                title: '加载商品失败',
+                icon: 'none'
+            });
+            if (!append) {
+                currentProducts.value = [];
+            }
         }
     } finally {
-        productLoading.value = false;
+        // 只有当前请求还有效时才重置loading状态
+        if (requestId === currentRequestId && requestTabIndex === activeTabIndex.value) {
+            productLoading.value = false;
+        }
     }
 };
 
-// // 刷新商品数据（换一批）
-// const refreshProducts = async () => {
-//     if (refreshLoading.value || productLoading.value) return;
 
-//     refreshLoading.value = true;
 
-//     try {
-//         // 增加页码来获取不同的商品
-//         currentPage.value += 1;
-
-//         const currentTab = productTabs.value[activeTabIndex.value];
-//         const params = {
-//             page: currentPage.value,
-//             size: 12,
-//             ...currentTab.params
-//         };
-
-//         const result = await getCateProduct(params);
-
-//         if (result.records && result.records.length > 0) {
-//             currentProducts.value = result.records;
-           
-//         } else {
-//             // 如果没有更多数据，重置到第一页
-//             currentPage.value = 1;
-//             await loadTabProducts();
-           
-//         }
-//     } catch (error) {
-//         console.error('刷新商品失败:', error);
-//         uni.showToast({
-//             icon: 'none'
-//         });
-//     } finally {
-//         refreshLoading.value = false;
-//     }
-// };
-
-// 跳转到商品详情页
-const goToProductDetail = (productId?: number) => {
-    if (!productId) {
-        console.warn('商品ID无效');
-        return;
-    }
-
-    uni.navigateTo({
-        url: `/pages/product/index?id=${productId}`,
-        fail: (error) => {
-            console.error('跳转商品详情失败:', error);
+// 处理广告图片点击
+const handleAdClick = (index: number) => {
+    // 根据索引硬编码跳转逻辑
+    switch(index) {
+        case 0:
+            // 拼团活动 - 暂无活动，显示友好提示
             uni.showToast({
-                title: '页面跳转失败',
-                icon: 'none'
+                title: '拼团活动即将上线，敬请期待',
+                icon: 'none',
+                duration: 2000
             });
-        }
-    });
+            break;
+        case 1:
+            // 满减券活动 - 跳转到优惠券页面
+            uni.navigateTo({
+                url: '/pages/coupon/index',
+                fail: (error) => {
+                    console.error('跳转优惠券页面失败:', error);
+                    uni.showToast({
+                        title: '页面跳转失败',
+                        icon: 'none'
+                    });
+                }
+            });
+            break;
+        case 2:
+            // 折扣活动 - 跳转到折扣页面
+            uni.navigateTo({
+                url: '/pages/discount/list',
+                fail: (error) => {
+                    console.error('跳转折扣页面失败:', error);
+                    uni.showToast({
+                        title: '页面跳转失败',
+                        icon: 'none'
+                    });
+                }
+            });
+            break;
+        case 3:
+            // 秒杀活动 - 跳转到秒杀页面
+            uni.navigateTo({
+                url: '/pages/seckill/list',
+                fail: (error) => {
+                    console.error('跳转秒杀页面失败:', error);
+                    uni.showToast({
+                        title: '页面跳转失败',
+                        icon: 'none'
+                    });
+                }
+            });
+            break;
+        default:
+            console.log('未配置的广告位:', index);
+            break;
+    }
 };
 
 // 点击公告跳转详情页
@@ -1138,86 +1220,13 @@ const goToSettings = () => {
     closeSidebar();
 };
 
-
-// 获取秒杀数据
-// const getSeckillData = async () => {
-//     try {
-//         const result = await getHomeSeckill();
-//         if (result && result.data && result.data.length > 0) {
-//             seckillProducts.value = result.data;
-//         } else {
-//             // 默认数据
-//             seckillProducts.value = [
-//                 {
-//                     productId: 1,
-//                     picThumb: "https://via.placeholder.com/120x120",
-//                     seckillPrice: "89",
-//                     marketPrice: "129"
-//                 },
-//                 {
-//                     productId: 2,
-//                     picThumb: "https://via.placeholder.com/120x120", 
-//                     seckillPrice: "9.9",
-//                     marketPrice: "68"
-//                 }
-//             ];
-//         }
-//     } catch (error) {
-//         console.error("获取秒杀数据失败:", error);
-//         // 设置默认数据
-//         seckillProducts.value = [
-//             {
-//                 productId: 1,
-//                 picThumb: "https://via.placeholder.com/120x120",
-//                 seckillPrice: "89",
-//                 marketPrice: "129"
-//             },
-//             {
-//                 productId: 2,
-//                 picThumb: "https://via.placeholder.com/120x120",
-//                 seckillPrice: "9.9", 
-//                 marketPrice: "68"
-//             }
-//         ];
-//     }
-// };
-
-// 开始倒计时
-const startCountdown = () => {
-    if (seckillTimer.value) {
-        clearInterval(seckillTimer.value);
-    }
-    
-    seckillTimer.value = setInterval(() => {
-        let totalSeconds = parseInt(countdownTime.value.hours) * 3600 + 
-                          parseInt(countdownTime.value.minutes) * 60 + 
-                          parseInt(countdownTime.value.seconds);
-        
-        if (totalSeconds > 0) {
-            totalSeconds--;
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            
-            countdownTime.value = {
-                hours: hours.toString().padStart(2, '0'),
-                minutes: minutes.toString().padStart(2, '0'),
-                seconds: seconds.toString().padStart(2, '0')
-            };
-        } else {
-            // 重置倒计时或获取下一场秒杀数据
-            countdownTime.value = { hours: '02', minutes: '00', seconds: '00' };
-        }
-    }, 1000);
+// 跳转到AI页面
+const goToAI = () => {
+    uni.navigateTo({
+        url: '/pages/ai/index'
+    });
 };
 
-// 停止倒计时
-const stopCountdown = () => {
-    if (seckillTimer.value) {
-        clearInterval(seckillTimer.value);
-        seckillTimer.value = null;
-    }
-};
 
 // 页面跳转方法
 const goToSeckillList = () => {
@@ -1257,10 +1266,6 @@ onLoad(async (options: any) => {
     await getSplashAdData();
     await getIndexData();
     
-    // 获取秒杀数据并启动倒计时
-    await getSeckillData();
-    startCountdown();
-
     // 加载默认商品数据（推荐好物）
     await loadTabProducts(false);
 
@@ -1273,7 +1278,6 @@ onUnload(() => {
     catnavStore.reset();
     // 清理定时器
     stopNoticeRotation();
-    stopCountdown();
 });
 
 
@@ -1294,7 +1298,6 @@ onShow(() => {
     if (noticeMessages.value.length > 0) {
         startNoticeRotation();
     }
-    startCountdown();
 });
 
 onShareAppMessage((res) => {
@@ -1404,10 +1407,8 @@ page {
     margin: 20rpx 30rpx 30rpx 30rpx !important;
 }
 
-.index-page .products-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
+.index-page .masonry-wrapper {
+    padding: 0 !important;
 }
 
 .index-page .product-item {
@@ -2234,15 +2235,15 @@ page {
 
             /* 每页显示8个项目的容器 */
             .nav-page {
-                width: 660rpx; /* 调整宽度，留出边距 */
-                margin: 0 15rpx; /* 页面间距 */
+                width: 690rpx;
                 display: flex;
                 flex-wrap: wrap;
                 flex-shrink: 0;
                 border-radius: 12rpx;
                 /* 添加页面过渡效果 */
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 position: relative;
+                animation: fadeIn 0.3s ease-out;
 
                 .nav-grid-item {
                     width: 25%;
@@ -2284,6 +2285,43 @@ page {
                         font-weight: 500;
                     }
             }
+        }
+    }
+}
+
+/* 切换按钮 - 在金刚区内部底部 */
+.switch-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 0 30rpx 16rpx;
+    
+    .switch-toggle-button {
+        display: flex;
+        align-items: center;
+        background: #f5f5f5;
+        border-radius: 30rpx;
+        padding: 4rpx 6rpx;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        .toggle-text {
+            font-size: 22rpx;
+            color: #999;
+            padding: 6rpx 20rpx;
+            border-radius: 26rpx;
+            
+            &.active {
+                background: #667eea;
+                color: #ffffff;
+                font-weight: 600;
+            }
+        }
+        
+        .toggle-divider {
+            width: 1rpx;
+            height: 24rpx;
+            background: #ddd;
+            margin: 0 4rpx;
         }
     }
 }
@@ -2383,27 +2421,46 @@ page {
 /* 商品展示区域 */
 .product-display-container {
     margin: 20rpx 30rpx 30rpx 30rpx;
-}
 
-.loading-container {
-    text-align: center;
-    padding: 80rpx 0;
-}
+    .loading-container {
+        text-align: center;
+        padding: 80rpx 0;
+    }
 
-.empty-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80rpx 0;
-    min-height: 400rpx;
-}
+    /* 缺失页面样式 */
+    .empty-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        padding: 40rpx;
 
-.empty-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+        .empty-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            .empty-image {
+                width: 300rpx;
+                height: 300rpx;
+                margin-bottom: 40rpx;
+            }
+
+            .empty-text {
+                font-size: 32rpx;
+                color: #333;
+                font-weight: 500;
+                margin-bottom: 16rpx;
+            }
+
+            .empty-desc {
+                font-size: 28rpx;
+                color: #999;
+                line-height: 1.5;
+            }
+        }
+    }
 }
 
 .loading-text {
@@ -3978,6 +4035,37 @@ page {
     width: 100%;
 }
 
+/* AI浮动按钮 - 半隐藏在右侧边缘 */
+.ai-float-button {
+    position: fixed;
+    right: -40rpx;  // 向右移动，让按钮有一半在屏幕外
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    box-shadow: -4rpx 4rpx 16rpx rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    animation: aiPulse 2s ease-in-out infinite;
+
+    &:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+}
+
+/* AI按钮呼吸动画 */
+@keyframes aiPulse {
+    0%, 100% {
+        box-shadow: -4rpx 4rpx 16rpx rgba(102, 126, 234, 0.4);
+    }
+    50% {
+        box-shadow: -4rpx 4rpx 24rpx rgba(102, 126, 234, 0.6);
+    }
+}
+
 /* 自定义返回顶部按钮 */
 .custom-back-top {
     position: fixed;
@@ -3993,6 +4081,18 @@ page {
     .back-top-icon {
         width: 96rpx;
         height: 96rpx;
+    }
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10rpx);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 }

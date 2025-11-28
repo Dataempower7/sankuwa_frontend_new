@@ -1,0 +1,1 @@
+import{dq as t}from"./index-B52YIGC0.js";const r=t("im",{state:()=>({imPresence:1}),actions:{setImPresence(e){this.imPresence=e}},persist:{enabled:!0,strategies:[{storage:localStorage,paths:["im"]}]}});export{r as u};

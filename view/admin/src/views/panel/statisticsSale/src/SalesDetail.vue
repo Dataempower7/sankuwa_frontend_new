@@ -14,15 +14,26 @@
         <div class="main-panel">
             <ul>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">商品浏览量</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                    根据筛选时间，商城页面被浏览的次数。每打开一个页面或每刷新一次页面都记录1次 （按访问时间）
+                                </div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>商品浏览量</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.productView ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
                         <span>{{ filterState?.salesData?.productViewGrowthRate }} %</span>
                         <i
                             v-if="
-                                filterState?.salesData?.productViewGrowthRate.toString() !== '--' &&
-                                Number(filterState?.salesData?.productViewGrowthRate) > 0
+                                filterState?.salesData?.productViewGrowthRate.toString() !== '--' && Number(filterState?.salesData?.productViewGrowthRate) > 0
                             "
                             class="admin-iconfont red f12 up"
                             >&#xe61a;</i
@@ -32,7 +43,17 @@
                     </div>
                 </li>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">商品访客数</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">根据筛选时间，在商城中访问客户数量</div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>访客数</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.productVisitor ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
@@ -50,15 +71,23 @@
                     </div>
                 </li>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">下单件数</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">根据筛选时间，平台/店铺销售的商品件数</div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>下单件数</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.orderNum ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
                         <span>{{ filterState?.salesData?.orderNumGrowthRate }} %</span>
                         <i
-                            v-if="
-                                filterState?.salesData?.orderNumGrowthRate.toString() !== '--' && Number(filterState?.salesData?.orderNumGrowthRate) > 0
-                            "
+                            v-if="filterState?.salesData?.orderNumGrowthRate.toString() !== '--' && Number(filterState?.salesData?.orderNumGrowthRate) > 0"
                             class="admin-iconfont red f12 up"
                             >&#xe61a;</i
                         >
@@ -67,7 +96,19 @@
                     </div>
                 </li>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">支付金额</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                    根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                </div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>实付金额</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.paymentAmount ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
@@ -85,15 +126,26 @@
                     </div>
                 </li>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">退款金额</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                    根据筛选时间，平台/店铺售后金额（不含充值订单）
+                                </div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>退款金额</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.refundAmount ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
                         <span>{{ filterState?.salesData?.refundAmountGrowthRate }} %</span>
                         <i
                             v-if="
-                                filterState?.salesData?.refundAmountGrowthRate.toString() !== '--' &&
-                                Number(filterState?.salesData?.refundAmountGrowthRate) > 0
+                                filterState?.salesData?.refundAmountGrowthRate.toString() !== '--' && Number(filterState?.salesData?.refundAmountGrowthRate) > 0
                             "
                             class="admin-iconfont red f12 up"
                             >&#xe61a;</i
@@ -103,7 +155,19 @@
                     </div>
                 </li>
                 <li class="main-panel-item">
-                    <div class="main-panel-item-title">退款件数</div>
+                    <div class="main-panel-item-title">
+                        <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                            <template #content>
+                                <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                    根据筛选时间，平台/店铺售后商品件数（不含充值订单）
+                                </div>
+                            </template>
+                            <div class="flex flex-align-center">
+                                <div>退款件数</div>
+                                <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                            </div>
+                        </el-tooltip>
+                    </div>
                     <div class="main-panel-item-value">{{ filterState?.salesData?.refundQuantity ?? 0 }}</div>
                     <div class="main-panel-item-increase">
                         环比：
@@ -130,6 +194,7 @@
 </template>
 
 <script lang="ts" setup>
+import { QuestionFilled } from "@element-plus/icons-vue";
 import { ref, computed, reactive, onMounted, nextTick, onUnmounted } from "vue";
 import { SelectTimeInterval } from "@/components/select";
 import { getDays } from "@/utils/util";
@@ -149,16 +214,16 @@ let NumberProductViewsChart: echarts.ECharts;
 const SalesDetailOptions = ref<any>({
     title: {
         text: "金额明细",
-        left: "center",
+        left: "center"
     },
     tooltip: {
         trigger: "axis",
         axisPointer: {
             type: "cross",
             crossStyle: {
-                color: "#999",
-            },
-        },
+                color: "#999"
+            }
+        }
         // trigger: "axis",
         // axisPointer: {
         //     type: "shadow"
@@ -167,11 +232,11 @@ const SalesDetailOptions = ref<any>({
     legend: {
         data: ["支付金额", "退款金额"],
         left: "center",
-        bottom: "bottom",
+        bottom: "bottom"
     },
     xAxis: {
         type: "category",
-        data: [],
+        data: []
     },
     yAxis: [
         {
@@ -179,14 +244,14 @@ const SalesDetailOptions = ref<any>({
             name: "金额",
             nameTextStyle: {
                 // 设置名称样式，包括颜色
-                color: "#7cb5ec", // 名称颜色为红色
+                color: "#7cb5ec" // 名称颜色为红色
             },
             nameGap: 20, // 设置名称与轴线之间的距离，即位置
             axisLabel: {
                 color: "#7cb5ec",
-                formatter: "{value} 元",
-            },
-        },
+                formatter: "{value} 元"
+            }
+        }
     ],
     series: [
         {
@@ -195,16 +260,16 @@ const SalesDetailOptions = ref<any>({
             type: "line",
             smooth: true,
             lineStyle: {
-                color: "#64a9ff",
+                color: "#64a9ff"
             },
             color: "#5CA5FF",
             emphasis: {
-                scale: !1,
+                scale: !1
             },
             tooltip: {
                 valueFormatter: function (value: string) {
                     return value + "元";
-                },
+                }
             },
             areaStyle: {
                 color: {
@@ -217,16 +282,16 @@ const SalesDetailOptions = ref<any>({
                         // 渐变颜色
                         {
                             offset: 0,
-                            color: "rgba(92, 165, 255,0.50)",
+                            color: "rgba(92, 165, 255,0.50)"
                         },
                         {
                             offset: 1,
-                            color: "rgba(92, 165, 255,0.00)",
-                        },
+                            color: "rgba(92, 165, 255,0.00)"
+                        }
                     ],
-                    global: false,
-                },
-            },
+                    global: false
+                }
+            }
             // yAxisIndex: 2 // 指定使用哪个y轴
         },
         {
@@ -235,16 +300,16 @@ const SalesDetailOptions = ref<any>({
             type: "line",
             smooth: true,
             lineStyle: {
-                color: "rgba(0, 190, 189,0.50)",
+                color: "rgba(0, 190, 189,0.50)"
             },
             color: "rgba(0, 190, 189,0.50)",
             emphasis: {
-                scale: !1,
+                scale: !1
             },
             tooltip: {
                 valueFormatter: function (value: string) {
                     return value + "元";
-                },
+                }
             },
             areaStyle: {
                 color: {
@@ -257,39 +322,39 @@ const SalesDetailOptions = ref<any>({
                         // 渐变颜色
                         {
                             offset: 0,
-                            color: "rgba(0, 190, 189,0.50)",
+                            color: "rgba(0, 190, 189,0.50)"
                         },
                         {
                             offset: 1,
-                            color: "rgba(0, 190, 189,0.00)",
-                        },
+                            color: "rgba(0, 190, 189,0.00)"
+                        }
                     ],
-                    global: false,
-                },
-            },
+                    global: false
+                }
+            }
             // yAxisIndex: 2 // 指定使用哪个y轴
-        },
-    ],
+        }
+    ]
 });
 const NumberProductViewsOptions = ref<any>({
     title: {
         text: "商品明细",
-        left: "center",
+        left: "center"
     },
     tooltip: {
         trigger: "axis",
         axisPointer: {
-            type: "shadow",
-        },
+            type: "shadow"
+        }
     },
     legend: {
         data: ["商品浏览量"],
         left: "center",
-        bottom: "bottom",
+        bottom: "bottom"
     },
     xAxis: {
         type: "category",
-        data: [],
+        data: []
     },
     yAxis: [
         {
@@ -297,15 +362,15 @@ const NumberProductViewsOptions = ref<any>({
             name: "浏览量",
             nameTextStyle: {
                 // 设置名称样式，包括颜色
-                color: "#64a9ff", // 名称颜色为红色
+                color: "#64a9ff" // 名称颜色为红色
             },
             nameGap: 20, // 设置名称与轴线之间的距离，即位置
             axisLabel: {
                 color: "#64a9ff",
-                formatter: "{value} 次",
+                formatter: "{value} 次"
             },
-            min: "10",
-        },
+            min: "10"
+        }
     ],
     series: [
         {
@@ -314,7 +379,7 @@ const NumberProductViewsOptions = ref<any>({
             barWidth: "50%",
             showBackground: false,
             backgroundStyle: {
-                color: "rgba(0, 127, 255,0.1)",
+                color: "rgba(0, 127, 255,0.1)"
             },
             itemStyle: {
                 // borderRadius: [35, 35, 0, 0],
@@ -329,18 +394,18 @@ const NumberProductViewsOptions = ref<any>({
                         {
                             //第一节下面
                             offset: 0,
-                            color: "#007FFF",
+                            color: "#007FFF"
                         },
                         {
                             offset: 1,
-                            color: "#539FE5",
-                        },
-                    ],
-                },
+                            color: "#539FE5"
+                        }
+                    ]
+                }
             },
-            data: [],
-        },
-    ],
+            data: []
+        }
+    ]
 });
 
 const handleChartResize = () => {
@@ -357,22 +422,21 @@ const initChart = () => {
 
 const filterParams = reactive<statisticsSalesFilterParams>({
     startTime: formattedDate(getDays(30, "sub"), "YYYY-MM-DD"),
-    endTime: formattedDate(new Date(), "YYYY-MM-DD"),
+    endTime: formattedDate(new Date(), "YYYY-MM-DD")
 });
 const filterState = ref<statisticsSalesFilterState>();
 const getData = async () => {
     try {
         const result = await getSaleDetail(filterParams);
-            filterState.value = result;
-            const { horizontalAxis, longitudinalAxisPaymentAmount, longitudinalAxisProductView, longitudinalAxisRefundAmount } =
-                result.salesStatisticsData;
-            SalesDetailOptions.value.xAxis.data = horizontalAxis;
-            SalesDetailOptions.value.series[0].data = longitudinalAxisPaymentAmount;
-            SalesDetailOptions.value.series[1].data = longitudinalAxisRefundAmount;
-            SalesDetailRefChart?.setOption(SalesDetailOptions.value);
-            NumberProductViewsOptions.value.xAxis.data = horizontalAxis;
-            NumberProductViewsOptions.value.series[0].data = longitudinalAxisProductView;
-            NumberProductViewsChart?.setOption(NumberProductViewsOptions.value);
+        filterState.value = result;
+        const { horizontalAxis, longitudinalAxisPaymentAmount, longitudinalAxisProductView, longitudinalAxisRefundAmount } = result.salesStatisticsData;
+        SalesDetailOptions.value.xAxis.data = horizontalAxis;
+        SalesDetailOptions.value.series[0].data = longitudinalAxisPaymentAmount;
+        SalesDetailOptions.value.series[1].data = longitudinalAxisRefundAmount;
+        SalesDetailRefChart?.setOption(SalesDetailOptions.value);
+        NumberProductViewsOptions.value.xAxis.data = horizontalAxis;
+        NumberProductViewsOptions.value.series[0].data = longitudinalAxisProductView;
+        NumberProductViewsChart?.setOption(NumberProductViewsOptions.value);
     } catch (error: any) {
         message.error(error.message);
         console.error(error);

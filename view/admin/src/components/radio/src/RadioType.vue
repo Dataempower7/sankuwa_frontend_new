@@ -226,8 +226,6 @@ const checkRadio = (value: any) => {
             color: #323233;
             font-size: 18px;
             line-height: 22px;
-            // margin-bottom: 20px;
-            // margin-top: 30px;
         }
 
         .desc {
@@ -245,4 +243,5 @@ const checkRadio = (value: any) => {
         }
     }
 }
+
 </style>

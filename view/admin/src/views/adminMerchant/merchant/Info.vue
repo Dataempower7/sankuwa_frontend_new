@@ -7,20 +7,16 @@
                     <el-tab-pane v-if="formState.type == 2" :key="2" :label="'企业信息'" name="company"></el-tab-pane>
                     <el-tab-pane :key="3" :label="formState.type == 1 ? '个人信息' : '法人代表信息'" name="base"></el-tab-pane>
                     <el-tab-pane :key="4" label="商户信息" name="merchant"></el-tab-pane>
-                    <el-tab-pane :key="5" label="店铺信息" name="shop"></el-tab-pane>
+                    <el-tab-pane :key="5" :label="isStore() ? '门店信息' : '店铺信息'" name="shop"></el-tab-pane>
                 </el-tabs>
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
                     <template v-if="activeKey == 'sm'">
                         <el-form-item label="认证状态">
-                            <Switch
-                                @updateData="updateDataWithList"
-                                :switchingCode="[2, 1]"
-                                v-model:checked="formState.status"
-                                :requestApi="updateMerchantField"
-                                :params="{ id: formState.merchantId, field: 'status' }"
-                            />
+                            <Switch @updateData="updateDataWithList" :switchingCode="[2, 1]"
+                                v-model:checked="formState.status" :requestApi="updateMerchantField"
+                                :params="{ id: formState.merchantId, field: 'status' }" />
                         </el-form-item>
-                        <el-form-item label="预期店铺名称">
+                        <el-form-item :label="isStore() ? '预期门店名称' : '预期店铺名称'">
                             <div class="width100">{{ formState.shopData?.shopTitle }}</div>
                         </el-form-item>
                         <el-form-item label="入驻资质" prop="status">
@@ -49,7 +45,8 @@
                             <div class="width100">{{ formState.baseData.companyName }}</div>
                         </el-form-item>
                         <el-form-item label="注册地址">
-                            <div class="width100">{{ formState.baseData.licenseAddrProvinceName }} {{ formState.baseData.businessLicenseAddress }}</div>
+                            <div class="width100">{{ formState.baseData.licenseAddrProvinceName }} {{
+                                formState.baseData.businessLicenseAddress }}</div>
                         </el-form-item>
                         <el-form-item label="经营范围">
                             <div class="width100">{{ formState.baseData.businessScope }}</div>
@@ -60,7 +57,8 @@
                         <el-form-item label="营业期限">
                             <div class="width100">
                                 <template v-if="formState.baseData.operatingTermType == 1">
-                                    {{ formState.baseData.operatingTermTypeDate[0] + " ～  " + formState.baseData.operatingTermTypeDate[1] }}
+                                    {{ formState.baseData.operatingTermTypeDate[0] + " ～ " +
+                                        formState.baseData.operatingTermTypeDate[1] }}
                                 </template>
                                 <template v-else> {{ formState.baseData.operatingTermTypeEnd }} ～长期 </template>
                             </div>
@@ -72,7 +70,8 @@
                         </el-form-item>
                         <el-form-item label="证件类型">
                             <div class="width100">
-                                {{ documentTypeOptions.find((option) => option.value === formState.baseData.documentType)?.label || "" }}
+                                {{documentTypeOptions.find((option) => option.value ===
+                                    formState.baseData.documentType)?.label || ""}}
                             </div>
                         </el-form-item>
                         <el-form-item label="证件号码">
@@ -87,7 +86,8 @@
                         <el-form-item label="证件有效期">
                             <div class="width100" v-if="formState.baseData.certificateValidityPeriodDate">
                                 <template v-if="formState.baseData.certificateValidityPeriod == 1">
-                                    {{ formState.baseData.certificateValidityPeriodDate[0] + " ～ " + formState.baseData.certificateValidityPeriodDate[1] }}
+                                    {{ formState.baseData.certificateValidityPeriodDate[0] + " ～ " +
+                                        formState.baseData.certificateValidityPeriodDate[1] }}
                                 </template>
                                 <template v-else> {{ formState.baseData.certificateValidityPeriodEnd }} ～ 长期 </template>
                             </div>
@@ -95,36 +95,26 @@
                         <el-form-item label="证件照正面">
                             <div class="width100">
                                 <template v-if="!Array.isArray(formState.baseData?.frontOfPhoto[0])">
-                                    <el-image
-                                        :src="imageFormat(formState.baseData.frontOfPhoto[0].picUrl)"
-                                        class="image-size"
-                                        fit="cover"
-                                        @click="showImage(imageFormat(formState.baseData.frontOfPhoto[0].picUrl))"
-                                    ></el-image>
+                                    <el-image :src="imageFormat(formState.baseData.frontOfPhoto[0].picUrl)"
+                                        class="image-size" fit="cover"
+                                        @click="showImage(imageFormat(formState.baseData.frontOfPhoto[0].picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
                         <el-form-item label="证件照反面">
                             <div class="width100">
                                 <template v-if="!Array.isArray(formState.baseData?.backOfPhoto[0])">
-                                    <el-image
-                                        :src="imageFormat(formState.baseData.backOfPhoto[0].picUrl)"
-                                        class="image-size"
-                                        fit="cover"
-                                        @click="showImage(imageFormat(formState.baseData.frontOfPhoto[0].picUrl))"
-                                    ></el-image>
+                                    <el-image :src="imageFormat(formState.baseData.backOfPhoto[0].picUrl)"
+                                        class="image-size" fit="cover"
+                                        @click="showImage(imageFormat(formState.baseData.frontOfPhoto[0].picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
                         <el-form-item v-if="formState.baseData.supplementaryInformation.length > 0" label="补充信息">
                             <div class="width100">
                                 <template v-for="item in formState.baseData.supplementaryInformation">
-                                    <el-image
-                                        :src="imageFormat(item.picUrl)"
-                                        class="image-size"
-                                        fit="cover"
-                                        @click="showImage(imageFormat(item.picUrl))"
-                                    ></el-image>
+                                    <el-image :src="imageFormat(item.picUrl)" class="image-size" fit="cover"
+                                        @click="showImage(imageFormat(item.picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
@@ -137,10 +127,8 @@
                                     <template v-if="formState.merchantData.accountOpeningPermit?.length > 0">
                                         <el-image
                                             :src="imageFormat(formState.merchantData.accountOpeningPermit[0].picUrl)"
-                                            class="image-size"
-                                            fit="cover"
-                                            @click="showImage(imageFormat(formState.merchantData.accountOpeningPermit[0].picUrl))"
-                                        ></el-image>
+                                            class="image-size" fit="cover"
+                                            @click="showImage(imageFormat(formState.merchantData.accountOpeningPermit[0].picUrl))"></el-image>
                                     </template>
                                 </div>
                             </el-form-item>
@@ -149,17 +137,16 @@
                             <div class="width100">{{ formState.merchantData.merchantName }}</div>
                         </el-form-item>
                         <el-form-item label="经营地区">
-                            <div class="width100">{{ formState.merchantData.businessAddressName }}{{ formState.merchantData.detailedAddress }}</div>
+                            <div class="width100">{{ formState.merchantData.businessAddressName }}{{
+                                formState.merchantData.detailedAddress }}
+                            </div>
                         </el-form-item>
                         <el-form-item v-if="formState.type == 2" label="营业执照">
                             <div class="width100">
                                 <template v-if="formState.merchantData.businessLicenseImg?.length > 0">
-                                    <el-image
-                                        :src="imageFormat(formState.merchantData.businessLicenseImg[0].picUrl)"
-                                        class="image-size"
-                                        fit="cover"
-                                        @click="showImage(imageFormat(formState.merchantData.businessLicenseImg[0].picUrl))"
-                                    ></el-image>
+                                    <el-image :src="imageFormat(formState.merchantData.businessLicenseImg[0].picUrl)"
+                                        class="image-size" fit="cover"
+                                        @click="showImage(imageFormat(formState.merchantData.businessLicenseImg[0].picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
@@ -168,7 +155,7 @@
                         </el-form-item>
                     </template>
                     <template v-if="activeKey == 'shop'">
-                        <el-form-item label="店铺名称">
+                        <el-form-item :label="isStore() ? '门店名称' : '店铺名称'">
                             <div class="width100">{{ formState.shopData?.shopTitle }}</div>
                         </el-form-item>
                         <el-form-item label="联系电话">
@@ -176,19 +163,16 @@
                                 <MobileCard :mobile="formState?.shopData?.contactMobile"></MobileCard>
                             </div>
                         </el-form-item>
-                        <el-form-item label="店铺logo">
+                        <el-form-item :label="isStore() ? '门店logo' : '店铺logo'">
                             <div class="width100">
                                 <template v-if="formState.shopData?.shopLogo?.length > 0">
-                                    <el-image
-                                        :src="imageFormat(formState.shopData?.shopLogo[0].picUrl)"
-                                        class="image-size"
-                                        fit="cover"
-                                        @click="showImage(imageFormat(formState.shopData?.shopLogo[0].picUrl))"
-                                    ></el-image>
+                                    <el-image :src="imageFormat(formState.shopData?.shopLogo[0].picUrl)"
+                                        class="image-size" fit="cover"
+                                        @click="showImage(imageFormat(formState.shopData?.shopLogo[0].picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
-                        <el-form-item v-if="formState.shopData?.description" label="店铺简介">
+                        <el-form-item v-if="formState.shopData?.description" :label="isStore() ? '门店简介' : '店铺简介'">
                             <div class="width100">{{ formState.shopData?.description }}</div>
                         </el-form-item>
                     </template>
@@ -212,6 +196,7 @@ import { MerchantFormState } from "@/types/adminMerchant/merchant";
 import { getMerchant, updateMerchantField } from "@/api/adminMerchant/merchant";
 import { imageFormat } from "@/utils/format";
 import MobileCard from "@/components/list/src/MobileCard.vue";
+import { isStore } from "@/utils/version";
 // 父组件回调
 const emit = defineEmits(["submitCallback", "callback", "close"]);
 const activeKey = ref<string>("sm");
@@ -290,7 +275,7 @@ const showImage = (url: string) => {
     dialogVisible.value = true;
 };
 
-const authentication = () => {};
+const authentication = () => { };
 </script>
 <style lang="less" scoped>
 .width100 {

@@ -1,14 +1,25 @@
 <template>
     <div class="container">
         <a-spin :spinning="loading">
-            <el-form ref="formRef" :model="formState" label-width="150px" style="display: flex; gap: 12px; flex-direction: column">
+            <el-form ref="formRef" :model="formState" label-width="150px"
+                style="display: flex; gap: 12px; flex-direction: column">
                 <div class="content_wrapper">
                     <div class="title">商城信息</div>
                     <!-- isOverseas -->
                     <template v-if="!isOverseas()">
                         <el-form-item label="商城LOGO" prop="shopLogo">
                             <FormAddGallery v-model:photo="formState.shopLogo" style="width: 100%" />
-                            <div class="extra">请根据页面设置对应大小的LOGO，高清需要上传双倍大小</div>
+                            <div class="extra">
+                                请根据页面设置对应大小的LOGO，高清需要上传双倍大小
+                                <el-popover :width="400" placement="right-end" trigger="click">
+                                    <template #reference>
+                                        <a>查看示例</a>
+                                    </template>
+                                    <template #default>
+                                        <img src="@/style/images/shopLogo_demo.png" style="width: 380px" />
+                                    </template>
+                                </el-popover>
+                            </div>
                         </el-form-item>
                     </template>
                     <template v-else>
@@ -34,20 +45,13 @@
                                 <el-form ref="formRef" :model="formState">
                                     <el-form-item label="">
                                         <div class="flex flex-align-center" style="gap: 10px">
-                                            <TigInput
-                                                v-if="formState.shopCompany == 1"
-                                                v-model="formState.defaultCopyright"
-                                                classType="tig-form-input"
-                                                disabled
-                                            />
-                                            <TigInput v-if="formState.shopCompany == 0" v-model="formState.shopCompanyTxt" classType="tig-form-input" />
-                                            <el-button
-                                                v-if="formState.shopCompany == 0"
-                                                @click="changDefaultCopyright"
-                                                link
-                                                type="primary"
-                                                style="margin-top: 3px"
-                                            >
+                                            <TigInput v-if="formState.shopCompany == 1"
+                                                v-model="formState.defaultCopyright" classType="tig-form-input"
+                                                disabled />
+                                            <TigInput v-if="formState.shopCompany == 0"
+                                                v-model="formState.shopCompanyTxt" classType="tig-form-input" />
+                                            <el-button v-if="formState.shopCompany == 0" @click="changDefaultCopyright"
+                                                link type="primary" style="margin-top: 3px">
                                                 设为默认
                                             </el-button>
                                         </div>
@@ -77,13 +81,14 @@
                                 <el-form ref="formRef" :model="formState">
                                     <el-form-item label="">
                                         <div class="flex" style="gap: 10px">
-                                            <FormAddGallery v-if="formState.poweredBy == 0" v-model:photo="formState.poweredByLogo" style="width: 100%" />
-                                            <Image
-                                                v-if="formState.poweredBy == 1"
+                                            <FormAddGallery v-if="formState.poweredBy == 0"
+                                                v-model:photo="formState.poweredByLogo" style="width: 100%" />
+                                            <!-- /static/mini/images/common/default_tech_support.png -->
+                                            <Image v-if="formState.poweredBy == 1"
                                                 :src="defaultLogoFormat(formState.defaultTechSupport)"
-                                                style="max-width: 200px"
-                                            ></Image>
-                                            <el-button v-if="formState.poweredBy == 0" @click="changDefaultTechSupport" link type="primary">
+                                                style="max-width: 200px"></Image>
+                                            <el-button v-if="formState.poweredBy == 0 && formState.defaultTechSupport"
+                                                @click="changDefaultTechSupport" link type="primary">
                                                 设为默认
                                             </el-button>
                                         </div>
@@ -106,14 +111,16 @@
                     <el-form-item label="标题栏版权隐藏" prop="poweredByStatus">
                         <div>
                             <div>
-                                <el-radio-group v-model="formState.poweredByStatus" :disabled="licensedStore.licensedData.deCopyright == 0">
+                                <el-radio-group v-model="formState.poweredByStatus"
+                                    :disabled="licensedStore.licensedData.deCopyright == 0">
                                     <el-radio :value="1">是</el-radio>
                                     <el-radio :value="0">否</el-radio>
                                 </el-radio-group>
                             </div>
                             <div class="extra">
                                 <span v-if="licensedStore.licensedData.deCopyright == 0">购买去版权服务后可修改</span>
-                                <span v-if="licensedStore.licensedData.deCopyright == 1" class="extra">如果选是，则隐藏浏览器标题栏版权信息 </span>
+                                <span v-if="licensedStore.licensedData.deCopyright == 1"
+                                    class="extra">如果选是，则隐藏浏览器标题栏版权信息 </span>
                                 <el-popover :width="350" placement="right-end" trigger="click">
                                     <template #reference>
                                         <a>查看示例</a>
@@ -126,7 +133,8 @@
                         </div>
                     </el-form-item>
                     <el-form-item label="地址展示" prop="kefuAddress">
-                        <BusinessData v-model:modelValue="formState.kefuAddress" :dataId="6" :dataType="5"></BusinessData>
+                        <BusinessData v-model:modelValue="formState.kefuAddress" :dataId="6" :dataType="5">
+                        </BusinessData>
                         <div class="extra">企业地址会展示在商城PC端底部，为空则不显示</div>
                     </el-form-item>
                 </div>
@@ -136,17 +144,15 @@
                         <BusinessData v-model:modelValue="formState.shopIcpNo" :dataId="7" :dataType="5"></BusinessData>
                     </el-form-item>
                     <el-form-item label="ICP备案链接" prop="shopIcpNoUrl">
-                        <TigInput v-model="formState.shopIcpNoUrl" classType="tig-form-input" placeholder="不填则默认为：https://beian.miit.gov.cn" />
+                        <TigInput v-model="formState.shopIcpNoUrl" classType="tig-form-input"
+                            placeholder="不填则默认为：https://beian.miit.gov.cn" />
                     </el-form-item>
                     <el-form-item label="公安备案号" prop="shop110No">
                         <TigInput v-model="formState.shop110No" classType="tig-form-input" placeholder="不填则不显示" />
                     </el-form-item>
                     <el-form-item label="公安备案链接" prop="shop110Link">
-                        <TigInput
-                            v-model="formState.shop110Link"
-                            classType="tig-form-input"
-                            placeholder="不填则默认为：https://beian.mps.gov.cn/#/query/webSearch"
-                        />
+                        <TigInput v-model="formState.shop110Link" classType="tig-form-input"
+                            placeholder="不填则默认为：https://beian.mps.gov.cn/#/query/webSearch" />
                     </el-form-item>
                 </div>
                 <div class="content_wrapper">
@@ -166,9 +172,12 @@
                 </div>
             </el-form>
             <div style="height: 30px"></div>
-            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+            <div class="selected-action-warp selected-warp-left"
+                :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                 <div class="selected-action">
-                    <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交 </el-button>
+                    <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary"
+                        @click="onSubmit">提 交
+                    </el-button>
                 </div>
             </div>
         </a-spin>
@@ -196,7 +205,7 @@ const route = useRoute();
 import { useLicensedStore } from "@/store/licensed";
 
 const licensedStore = useLicensedStore();
-const origin = window.location.origin + "/";
+const origin = window.location.origin;
 const defaultLogoFormat = (path: string) => {
     return path.includes("http") ? path : origin + path;
 };
@@ -324,10 +333,12 @@ const onSubmit = async () => {
     background: #f5f7fa;
     width: 600px;
     padding: 20px;
+
     .extra {
         margin: 0px 0 0px 0;
     }
 }
+
 @media (max-width: 768px) {
     .wechat-config {
         width: 90% !important;

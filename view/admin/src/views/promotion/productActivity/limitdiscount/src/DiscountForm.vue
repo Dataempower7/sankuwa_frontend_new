@@ -11,7 +11,9 @@
             >
                 <el-button :disabled="max > 0 && skuList?.length >= max" type="primary">选择商品</el-button>
             </DialogForm>
-            <span v-if="skuList.length > 0" class="ml10">已选择 <b>{{ skuList?.length }}</b> 个商品</span>
+            <span v-if="skuList.length > 0" class="ml10"
+                >已选择 <b>{{ skuList?.length }}</b> 个商品</span
+            >
             <el-button v-if="skuList.length > 0" @click="clear">清空</el-button>
         </el-space>
         <div v-if="skuList.length > 0 && !loading" class="lyecs-product-selected-con">
@@ -26,38 +28,52 @@
                 </div>
                 <template v-for="(item, key) in skuList" :key="key">
                     <div class="product-selected-list-tr">
-                        <div class="col col1">{{ item.product.productSn }}</div>
+                        <div class="col col1">{{ item.product?.productSn }}</div>
                         <div class="col col4 product-info">
                             <div>
-                                <img :src="imageFormat(item.product.picThumb)" height="50" width="50" />
+                                <img :src="imageFormat(item.product?.picThumb)" height="50" width="50" />
                             </div>
                             <div>
-                                <div class="product-name">{{ item.product.productName }}</div>
-                                <div class="product-sku" v-if="item.product.productSku !== null && item.product.productSku.length > 0 && item.skuIds">
+                                <div class="product-name">{{ item.product?.productName }}</div>
+                                <div
+                                    class="product-sku"
+                                    v-if="
+                                        item.product &&
+                                        item.product.productSku &&
+                                        item.product.productSku !== null &&
+                                        item.product.productSku.length > 0 &&
+                                        item.skuIds
+                                    "
+                                >
                                     <el-button type="primary" link size="mini" @click="checkSku(item)">+ 已选{{ item.skuIds.length || 0 }}个规格</el-button>
                                 </div>
                             </div>
                         </div>
                         <div class="col col1">
-                            <div>{{ priceFormat(item.product.productPrice) }}</div>
+                            <div>{{ priceFormat(item.product?.productPrice) }}</div>
                         </div>
                         <div class="col col1" v-if="item.discountType">
-                            <el-select
-                            v-model="item.discountType"
-                            size="mini"
-                            >
-                                <el-option label="打折" :value="1"/>
-                                <el-option label="减钱" :value="2"/>
-                                <el-option label="促销" :value="3"/>
+                            <el-select v-model="item.discountType" size="mini">
+                                <el-option label="打折" :value="1" />
+                                <el-option label="减钱" :value="2" />
+                                <el-option label="促销" :value="3" />
                             </el-select>
                         </div>
                         <div class="col col2" v-if="item.discountType">
                             <div class="flex">
-                                <div style="margin-right: 5px;" v-if="item.discountType == 2">减</div>
+                                <div style="margin-right: 5px" v-if="item.discountType == 2">减</div>
                                 <TigInput type="decimal" v-if="item.discountType == 1" :min="0.1" :max="9.9" v-model="item.value" size="mini" width="70px" />
-                                <TigInput type="decimal" v-else :min="1" :max="Number(item.product.productPrice)" v-model="item.value" size="mini" width="70px" />
-                                <div style="margin-left: 5px;" v-if="item.discountType > 1">元</div>
-                                <div style="margin-left: 5px;" v-else>折</div>
+                                <TigInput
+                                    type="decimal"
+                                    v-else
+                                    :min="1"
+                                    :max="Number(item.product?.productPrice)"
+                                    v-model="item.value"
+                                    size="mini"
+                                    width="70px"
+                                />
+                                <div style="margin-left: 5px" v-if="item.discountType > 1">元</div>
+                                <div style="margin-left: 5px" v-else>折</div>
                             </div>
                         </div>
                         <div class="col col3">
@@ -66,7 +82,7 @@
                     </div>
                 </template>
             </div>
-            <div v-if="total > 0" class="pagination-con">
+            <!-- <div v-if="total > 0" class="pagination-con">
                 <Pagination
                     v-model:page="filterParams.page"
                     v-model:size="filterParams.size"
@@ -75,7 +91,7 @@
                     layout="slot ,prev, pager, next"
                     :background="false"
                 />
-            </div>
+            </div> -->
         </div>
     </div>
     <el-dialog v-model="skuVisible" title="选择规格" width="500" :before-close="closeSku" :close-on-click-modal="false">
@@ -89,7 +105,7 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { onMounted, reactive, ref, defineModel } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { DialogForm } from "@/components/dialog";
 import { imageFormat, priceFormat } from "@/utils/format";
 import { getProductList } from "@/api/product/product";
@@ -97,7 +113,7 @@ import { message } from "ant-design-vue";
 import { ProductFilterParams, type ProductFilterState } from "@/types/product/product";
 import { useConfigStore } from "@/store/config";
 import { Pagination } from "@/components/list";
-import SelectSku from "@/views/promotion/productGift/src/SelectSku.vue"
+import SelectSku from "@/views/promotion/productGift/src/SelectSku.vue";
 // 传值
 const props = defineProps({
     // 传入需要显示的商品list
@@ -113,34 +129,33 @@ const props = defineProps({
         default: false
     }
 });
-const skuVisible = ref<boolean>(false)
+const skuVisible = ref<boolean>(false);
 const ids = defineModel<number[]>("ids", { type: Array, default: [] });
-const skuIds = defineModel("skuIds", {type: Array, default: []});
-const skuList = ref<any[]>([])
+const skuIds = defineModel("skuIds", { type: Array, default: [] });
+const skuList = ref<any[]>([]);
 onMounted(async () => {
     if (ids.value && ids.value.length > 0) {
         await loadList(ids.value);
-    }else{
+    } else {
         ids.value = [];
     }
     if (skuIds.value && skuIds.value.length > 0) {
         skuList.value = skuIds.value;
-        skuIds.value.forEach((item:any) => {
-            ids.value.push(item.productId)
-        })
+        skuIds.value.forEach((item: any) => {
+            ids.value.push(item.productId);
+        });
         loading.value = false;
-    }else{
-        skuList.value = []
+    } else {
+        skuList.value = [];
     }
 });
 // 商品列表
 const total = ref(0);
-const rowInfo = ref<any>({})
+const rowInfo = ref<any>({});
 const config = useConfigStore();
 const loading = ref<boolean>(true);
 const filterParams = reactive<ProductFilterParams>({
     page: 1,
-    size: config.get("pageSize") as number,
     sortField: "",
     sortOrder: "",
     keyword: ""
@@ -148,14 +163,15 @@ const filterParams = reactive<ProductFilterParams>({
 const loadList = async (id: number[]) => {
     loading.value = true;
     try {
-        const result = await getProductList({ ids: id.join(','), ...filterParams });
+        const result = await getProductList({ ids: id.join(","), ...filterParams, size: id.length });
         result.records.forEach((item: any) => {
             skuList.value.forEach((sku: any) => {
-                if(sku.productId === item.productId){
-                    sku.product = item
+                if (sku.productId === item.productId) {
+                    sku.product = item;
                 }
-            })
+            });
         });
+        console.log(skuList.value);
         skuIds.value = skuList.value;
         total.value = result.total;
     } catch (error: any) {
@@ -169,15 +185,15 @@ const onOk = (e: any) => {
     if (props.isMultiple == false) {
         _list = [];
     }
-    if(props.isSku){
+    if (props.isSku) {
         for (let index in e) {
             _list.push(e[index].productId);
             e[index].discountType = 1;
-            e[index].value = ''
-            skuList.value.push(e[index])
+            e[index].value = "";
+            skuList.value.push(e[index]);
         }
     }
-    console.log(skuList.value)
+    console.log(skuList.value);
     ids.value = _list;
     loadList(_list);
 };
@@ -190,32 +206,32 @@ const clear = () => {
 const del = (key: number) => {
     let del_productId = skuList.value[key].productId;
     ids.value = ids.value.filter((num) => num !== del_productId);
-    skuList.value.splice(<any>key, 1);
-    skuIds.value.splice(<any>key, 1);
+    skuList.value = skuList.value.filter((item) => item.productId !== del_productId);
+    skuIds.value = skuIds.value.filter((id) => id !== del_productId);
 };
 const checkSku = (item: any) => {
     item.product.skuIds = item.skuIds;
     rowInfo.value = item.product;
     skuVisible.value = true;
-}
+};
 const closeSku = () => {
     rowInfo.value = "";
     skuVisible.value = false;
-}
+};
 const skuRef: any = ref();
 const submitSku = () => {
-    if(skuRef.value.skuIds.length > 0){
-        skuList.value.forEach((item:any) => {
+    if (skuRef.value.skuIds.length > 0) {
+        skuList.value.forEach((item: any) => {
             if (item.productId == rowInfo.value.productId) {
                 item.skuIds = skuRef.value.skuIds;
             }
-        })
+        });
         rowInfo.value = "";
         skuVisible.value = false;
-    }else{
-        message.error('请选择规格')
+    } else {
+        message.error("请选择规格");
     }
-}
+};
 defineExpose({
     ids,
     skuList
@@ -248,13 +264,13 @@ defineExpose({
 .lyecs-product-select-group {
     margin-bottom: 0;
     width: 100%;
-    :deep(.el-select__wrapper){
+    :deep(.el-select__wrapper) {
         width: 80px !important;
     }
 }
 
 .lyecs-product-select-group .lyecs-product-selected-con {
-    max-width: 710px;
+    max-width: 810px;
     position: relative;
     padding-top: 50px;
     margin-top: 10px;
@@ -309,7 +325,7 @@ defineExpose({
 }
 
 .lyecs-product-select-group .product-selected-list-tr .col1 {
-    width: 100px;
+    width: 150px;
 }
 
 .lyecs-product-select-group .product-selected-list-tr .col2 {

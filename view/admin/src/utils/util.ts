@@ -240,3 +240,39 @@ export function maskString(str: string, front: number = 2, end: number = 2, mask
     const maskedLen = len - front - end;
     return str.slice(0, front) + maskChar.repeat(maskedLen) + str.slice(len - end);
 }
+
+/**
+ * 防抖函数
+ * @param func 需要防抖的函数
+ * @param delay 延迟时间（毫秒）
+ * @param immediate 是否立即执行一次
+ * @returns 防抖后的函数
+ */
+export function debounce<T extends (...args: any[]) => any>(
+    func: T,
+    delay: number,
+    immediate: boolean = false
+): (...args: Parameters<T>) => void {
+    let timeoutId: NodeJS.Timeout | null = null;
+    let isInvoked = false;
+
+    return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+        const context = this;
+
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        if (immediate && !isInvoked) {
+            func.apply(context, args);
+            isInvoked = true;
+        }
+
+        timeoutId = setTimeout(() => {
+            if (!immediate) {
+                func.apply(context, args);
+            }
+            isInvoked = false;
+        }, delay);
+    };
+}

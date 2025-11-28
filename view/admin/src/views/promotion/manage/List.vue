@@ -6,12 +6,9 @@
                     <div>
                         <div class="tip">仅统计优惠券、满减/送、限时折扣、秒杀、多人拼团、赠品 活动</div>
                         <div class="tabs flex">
-                            <div
-                                v-for="item in promotionTypeList"
-                                :class="{ active: item.value == filterParams.timeType }"
-                                class="item"
-                                @click="changeTimeType(item.value)"
-                            >
+                            <div v-for="item in promotionTypeList"
+                                :class="{ active: item.value == filterParams.timeType }" class="item"
+                                @click="changeTimeType(item.value)">
                                 <div class="num">{{ item.num }}</div>
                                 <div class="txt">{{ item.label }}</div>
                             </div>
@@ -67,7 +64,7 @@
                                     </div>
                                 </div>
                             </el-col>
-                            
+
                             <el-col :lg="6" :md="8" :sm="12" :xs="12" class="app-wrapper-item" @click="toPage(6)">
                                 <div class="item">
                                     <div class="icon-col">
@@ -106,7 +103,7 @@
                                 </div>
                             </el-col>
                             <template v-if="adminType === 'admin'">
-                                <el-col :lg="6" :md="8" :sm="12" :xs="12" class="app-wrapper-item" @click="toPage(7)">
+                                <el-col :lg="6" :md="8" :sm="12" :xs="12" class="app-wrapper-item" @click="toPage(8)">
                                     <div class="item">
                                         <div class="icon-col">
                                             <p>充</p>
@@ -124,7 +121,8 @@
                 <div class="col">
                     <h2>活动记录</h2>
                     <el-tabs type="card" @tab-change="onTabChange">
-                        <el-tab-pane v-for="item in promotionStatusList" :label="item.label" :value="item.value"></el-tab-pane>
+                        <el-tab-pane v-for="item in promotionStatusList" :label="item.label"
+                            :value="item.value"></el-tab-pane>
                     </el-tabs>
                     <a-spin :spinning="loading">
                         <el-table :data="filterState" :loading="loading" :total="total" row-key="couponId">
@@ -141,48 +139,25 @@
                                 <template #default="{ row }">
                                     <a class="btn-link" @click="toPage(row.type)">查看</a>
                                     <el-divider direction="vertical" />
-                                    <DialogForm
-                                        v-if="row.type == 1"
-                                        :params="{ act: 'detail', id: row.relationId }"
-                                        isDrawer
-                                        path="promotion/seckill/Info"
-                                        title="编辑限时秒杀"
-                                        width="800px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm v-if="row.type == 1" :params="{ act: 'detail', id: row.relationId }"
+                                        isDrawer path="promotion/seckill/Info" title="编辑限时秒杀" width="800px"
+                                        @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
-                                    <DialogForm
-                                        v-if="row.type == 2"
-                                        :params="{ act: 'detail', id: row.relationId }"
-                                        isDrawer
-                                        path="promotion/coupon/Info"
-                                        title="编辑优惠券"
-                                        width="800px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm v-if="row.type == 2" :params="{ act: 'detail', id: row.relationId }"
+                                        isDrawer path="promotion/coupon/Info" title="编辑优惠券" width="800px"
+                                        @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
-                                    <DialogForm
-                                        v-if="row.type == 6"
-                                        :params="{ act: 'detail', id: row.relationId }"
-                                        isDrawer
-                                        path="promotion/productActivity/limitdiscount/Info"
-                                        title="编辑限时折扣"
-                                        width="900px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm v-if="row.type == 6" :params="{ act: 'detail', id: row.relationId }"
+                                        isDrawer path="promotion/productActivity/limitdiscount/Info" title="编辑限时折扣"
+                                        width="900px" @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
-                                    <DialogForm
-                                        v-if="row.type == 3 || row.type == 5 || row.type == 4"
+                                    <DialogForm v-if="row.type == 3 || row.type == 5 || row.type == 4"
                                         :params="{ act: 'detail', id: row.relationId, promotionType: row.type == 4 ? 2 : row.type == 3 ? 1 : 3 }"
-                                        isDrawer
-                                        path="promotion/productActivity/Info"
-                                        title="编辑优惠活动"
-                                        width="800px"
-                                        @okCallback="loadFilter"
-                                    >
+                                        isDrawer path="promotion/productActivity/Info" title="编辑优惠活动" width="800px"
+                                        @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
                                 </template>
@@ -195,7 +170,8 @@
                         </el-table>
                     </a-spin>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -306,6 +282,14 @@ const toPage = (type: number) => {
             router.push({ path: "/promotion/sign-in-setting/list" });
             break;
         case 7:
+            // 拼团
+            router.push({ path: "/promotion/groupon/list" });
+            break;
+        // case 7:
+        //     // 充值
+        //     router.push({ path: "/promotion/recharge-setting/list" });
+        //     break;
+        case 8:
             // 充值
             router.push({ path: "/promotion/recharge-setting/list" });
             break;
@@ -352,7 +336,8 @@ const toPage = (type: number) => {
                         padding: 20px;
                         width: 240px;
                         background-color: #f7f7f7;
-                        border-bottom: 3px solid #f7f7f7; /* 设置边框 */
+                        border-bottom: 3px solid #f7f7f7;
+                        /* 设置边框 */
                         display: flex;
                         flex-direction: column;
                         justify-content: flex-end;
@@ -376,7 +361,8 @@ const toPage = (type: number) => {
 
                     .active {
                         background: var(--tig-item-active-bg);
-                        border-bottom: 3px solid var(--tig-primary); /* 设置边框 */
+                        border-bottom: 3px solid var(--tig-primary);
+                        /* 设置边框 */
                     }
                 }
             }

@@ -20,7 +20,9 @@ const whiteList = [
     "/pages/user/bindMobilePhone/index",
     "/pages/salesman/salesmanCard",
     "/pages/reset/index",
-    "/pages/customPage/index"
+    "/pages/customPage/index",
+    "/pages/buyerShow/index",
+    "/pages/buyerShow/buyerShowDetail"
 ];
 
 function hasPermission(url: string): boolean {

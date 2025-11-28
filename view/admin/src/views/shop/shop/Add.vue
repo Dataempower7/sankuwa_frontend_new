@@ -82,6 +82,8 @@ import { FormAddGallery } from "@/components/gallery";
 import { ShopFormState } from "@/types/shop/shop.d";
 import { getMerchantList } from "@/api/adminMerchant/merchant";
 import { getShop, updateShop } from "@/api/shop/shop";
+import StatusDot from "@/components/form/src/StatusDot.vue";
+
 // 父组件回调
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 
@@ -104,6 +106,7 @@ const operation = action.value === 'add' ? 'create' : 'update';
 const formRef = shallowRef();
 const isSpecified = ref<boolean>(false)
 const formState = ref<ShopFormState>({
+    shopType: 1,
     merchantId: Number(query.id)
 });
 const fetchShopInfo = async () => {

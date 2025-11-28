@@ -12,7 +12,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, defineProps, defineEmits, defineModel, PropType } from "vue";
+import { ref, PropType } from "vue";
 const props = defineProps({
     tabs: {
         type: Array as PropType<Array<{ label: string; value: string; count: number; isShow: boolean }>>,

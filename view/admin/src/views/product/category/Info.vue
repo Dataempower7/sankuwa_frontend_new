@@ -4,13 +4,45 @@
             <div class="lyecs-form-table">
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
                     <el-form-item :rules="[{ required: true, message: '分类名称不能为空!' }]" label="分类名称" prop="categoryName">
-                        <BusinessData v-model:modelValue="formState.categoryName" placeholder="请输入分类名称" :dataType="3" :dataId="id"></BusinessData>
+                        <BusinessData v-model:modelValue="formState.categoryName" placeholder="请输入分类名称" :dataType="3"
+                            :dataId="id"></BusinessData>
+                    </el-form-item>
+                    <el-form-item class="inner-item" prop="seoIdentification" v-if="isOverseas()"
+                        :rules="[{ required: false, validator: validateSeoIdentification }]">
+                        <template #label>
+                            <div class="table-question">
+                                <el-tooltip class="box-item" effect="light" placement="bottom" show-after="300">
+                                    <template #content>
+                                        <div style="width: 300px; padding: 5px 10px">
+                                            SEO链接是分类页面的URL，用于搜索引擎优化，格式为：域名/category/[seo链接]
+                                        </div>
+                                    </template>
+                                    <div class="flex flex-align-center">
+                                        <div>SEO链接</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#999">
+                                            <QuestionFilled />
+                                        </el-icon>
+                                    </div>
+                                </el-tooltip>
+                            </div>
+                        </template>
+                        <div class="keywords">
+                            <TigInput classType="tig-form-input" class="InputBox"
+                                v-model="formState.seoIdentification" />
+                            <el-button @click="onGenerateSeoLink" style="margin-top: 2px" :loading="seoLoading"
+                                :disabled="!formState.categoryName">自动生成</el-button>
+                        </div>
+                        <div class="extra">{{
+                            `SEO链接预览：域名/category/${formState.seoIdentification ? formState.seoIdentification :
+                                formState.categoryName ? formState.categoryName : '[seo链接]'}`
+                        }}</div>
                     </el-form-item>
                     <el-form-item label="分类短名" prop="shortName">
                         <TigInput classType="tig-form-input" v-model="formState.shortName" />
                     </el-form-item>
                     <el-form-item label="上级分类" prop="parentId">
-                        <SelectCategory v-if="!loading" v-model:categoryId="formState.parentId" :multiple="false"></SelectCategory>
+                        <SelectCategory v-if="!loading" v-model:categoryId="formState.parentId" :multiple="false">
+                        </SelectCategory>
                     </el-form-item>
                     <el-form-item label="分类图片" prop="categoryPic">
                         <FormAddGallery v-model:photo="formState.categoryPic"></FormAddGallery>
@@ -34,7 +66,8 @@
                         <TigInput classType="tig-form-input" v-model="formState.keywords" />
                     </el-form-item>
                     <el-form-item label="分类描述" prop="categoryDesc">
-                        <TigInput classType="tig-form-input" v-model="formState.categoryDesc" :row="2" type="textarea" />
+                        <TigInput classType="tig-form-input" v-model="formState.categoryDesc" :row="2"
+                            type="textarea" />
                     </el-form-item>
                     <el-form-item label="排序" prop="sortOrder">
                         <TigInput classType="tig-form-input" type="integer" v-model="formState.sortOrder" />
@@ -52,7 +85,8 @@
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-show="!props.isDialog" :wrapper-col="{ offset: 4, span: 16 }">
-                        <el-button ref="submitBtn" class="form-submit-btn" type="primary" @click="onSubmit">提交 </el-button>
+                        <el-button ref="submitBtn" class="form-submit-btn" type="primary" @click="onSubmit">提交
+                        </el-button>
                     </el-form-item>
                 </el-form>
                 <a-spin :spinning="loading" style="width: 100%; margin-top: 100px" />
@@ -61,7 +95,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, shallowRef } from "vue";
+import { onMounted, ref, shallowRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 import { FormAddGallery } from "@/components/gallery";
@@ -72,6 +106,10 @@ import { getCategory, updateCategory } from "@/api/product/category";
 import { AnyObject } from "ant-design-vue/es/_util/type";
 import { useCategoryStore } from "@/store/category";
 import BusinessData from "@/components/multilingual/BusinessData.vue"
+import { isOverseas } from "@/utils/version";
+import { getTranslateToSeoIdentification } from "@/api/setting/seo";
+import { QuestionFilled } from "@element-plus/icons-vue";
+
 const appStore = useAppStore();
 // 父组件回调
 const emit = defineEmits([
@@ -94,6 +132,7 @@ const props = defineProps({
 });
 
 const loading = ref<boolean>(true);
+const seoLoading = ref<boolean>(false);
 const query = useRouter().currentRoute.value.query;
 const action = ref<string>(props.isDialog ? props.act : String(query.act));
 const id = ref<number>(props.isDialog ? props.id : Number(query.id));
@@ -133,7 +172,25 @@ onMounted(() => {
     }
 });
 
-// 表单通过验证后提交
+const onGenerateSeoLink = async () => {
+    try {
+        seoLoading.value = true;
+        const result = await getTranslateToSeoIdentification(formState.value.categoryName || "");
+        formState.value.seoIdentification = result;
+    } catch (error: any) {
+        message.error(error.message);
+    } finally {
+        seoLoading.value = false;
+    }
+};
+
+const validateSeoIdentification = (rule: any, value: any, callback: any) => {
+    if (!formState.value.categoryName && !value) {
+        callback(new Error("请先输入分类名称"));
+        return;
+    }
+    callback();
+};
 
 // 表单通过验证后提交
 const onSubmit = async () => {
@@ -156,5 +213,33 @@ const onFormSubmit = () => {
     onSubmit();
 };
 
+
+watch(() => formState.value.categoryName, (newVal: string | undefined) => {
+    if (newVal) {
+        formRef.value.validateField("seoIdentification");
+    }
+}, { immediate: true });
+
 defineExpose({ onFormSubmit });
 </script>
+
+<style lang="less" scoped>
+.keywords {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+}
+
+.table-question {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pre-wrap {
+    display: block;
+    max-width: 250px;
+    white-space: pre-wrap;
+}
+</style>

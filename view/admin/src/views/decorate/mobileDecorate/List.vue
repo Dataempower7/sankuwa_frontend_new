@@ -119,7 +119,7 @@
                                         <a class="btn-link" @click="setHome(row)">设为首页</a>
                                         <el-divider direction="vertical" />
                                         <el-dropdown trigger="hover" :hide-on-click="false">
-                                            <span class="iconfont-admin icon-gengduo1 btn-link"></span>
+                                            <el-icon class="btn-link" size="12"><MoreFilled /></el-icon>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
                                                     <el-dropdown-item>
@@ -164,6 +164,7 @@ import { DeleteRecord, Pagination } from "@/components/list";
 import { message } from "ant-design-vue";
 import { useConfigStore } from "@/store/config";
 import { useDecorateStore } from "@/store/decorate";
+import { MoreFilled } from "@element-plus/icons-vue";
 import { FilterState, FilterParams } from "@/types/decorate/mobileDecorate.d";
 import {
     getDecorateList,
@@ -176,6 +177,7 @@ import {
 } from "@/api/decorate/mobileDecorate";
 import { ElMessageBox } from "element-plus";
 import { copyDomText } from "@/utils/util";
+import { baseDirFormat } from "@/utils/format";
 import { useListRequest } from "@/hooks/useListRequest";
 const props = defineProps({ decorateType: { type: Number, default: 1 } });
 const config: any = useConfigStore();
@@ -211,6 +213,7 @@ const onBatchSubmit = async (action: string) => {
 // 初始化加载
 loadFilter();
 const onShare = async (id: number) => {
+    // const domain = config.get("pcDomain") ?? `${window.location.protocol}//${window.location.host.split(":")[0]}`;
     loading.value = true;
     try {
         const result = await decorateShare({ decorateId: id });
@@ -270,9 +273,9 @@ const toPage = (type: number, parentId: number, id: number, localeId: number, is
     setLocaleId(localeId);
     setIsDefault(isDefault);
     if (type === 1) {
-        window.open(`/${VITE_BASE_DIR}/decorate/index?id=${id}`, "_blank");
+        window.open(`${baseDirFormat(VITE_BASE_DIR)}/decorate/index?id=${id}`, "_blank");
     } else {
-        window.open(`/${VITE_BASE_DIR}/decorate/pc?id=${id}`, "_blank");
+        window.open(`${baseDirFormat(VITE_BASE_DIR)}/decorate/pc?id=${id}`, "_blank");
     }
 };
 </script>

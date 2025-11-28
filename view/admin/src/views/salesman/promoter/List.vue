@@ -118,7 +118,7 @@
                             </el-table-column>
                             <el-table-column label="手机号" :width="140" fixed="left">
                                 <template #default="{ row }">
-                                    {{ row.baseUserInfo?.mobile || "--" }}
+                                    <MobileCard :mobile="row.baseUserInfo?.mobile"></MobileCard>
                                 </template>
                             </el-table-column>
                             <el-table-column label="等级">
@@ -254,6 +254,7 @@
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import MobileCard from "@/components/list/src/MobileCard.vue";
 import { SelectTimeInterval } from "@/components/select";
 import { DialogForm } from "@/components/dialog";
 import { onMounted, reactive, ref } from "vue";

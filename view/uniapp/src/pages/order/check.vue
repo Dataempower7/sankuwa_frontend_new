@@ -34,7 +34,7 @@
                     <view v-if="showActivityDiscount" class="price-item">
                         <view class="price-label">活动优惠</view>
                         <view class="price-value_aaa activity-discount">
-                            共优惠：¥{{ (totalData?.pointsAmount || 0) + (totalData?.discountCouponAmount || 0) }}
+                            共优惠：¥{{ activityDiscountAmount.toFixed(2) }}
                         </view>
                     </view>
 
@@ -169,39 +169,54 @@
             </view>
             <!-- #endif -->
 
-            <!-- 其他平台支付方式 -->
+            <!-- H5/APP 支付方式 - 根据生态显示 -->
             <!-- #ifndef MP-WEIXIN -->
-            <!-- <template v-if="paymentTypeList.length > 0">
-                <view class="module-card module-margin">
-                    <view class="payment-section">
-                        <view class="section-title">支付方式</view>
-                        <view class="payment-methods">
-                            <view
-                                v-for="payment in paymentTypeList"
-                                :key="payment.typeId"
-                                class="payment-item"
-                                @click="selectPayment(payment.typeId)"
-                            >
-                                <view class="payment-left">
-                                    <image
-                                        :src="getPaymentIcon(payment.typeName)"
-                                        class="payment-icon"
-                                    />
-                                    <text class="payment-name">{{ payment.typeName }}</text>
-                                </view>
-                                <view class="payment-right">
-                                    <view
-                                        class="payment-radio"
-                                        :class="{ active: formState.payTypeId === payment.typeId }"
-                                    >
-                                        <view v-if="formState.payTypeId === payment.typeId" class="radio-dot"></view>
-                                    </view>
-                                </view>
+            <view class="module-card module-margin">
+                <view class="payment-section">
+                    <view class="section-title">支付方式</view>
+                    <view class="payment-methods">
+                        <!-- 微信支付 - 所有非小程序环境都显示 -->
+                        <view class="payment-item" @click="selectPaymentMethod('wechat')">
+                            <view class="payment-left">
+                                <image
+                                    src="/static/images/common/wechatpay.png"
+                                    class="payment-icon"
+                                />
+                                <text class="payment-name">微信支付</text>
+                            </view>
+                            <view class="payment-right">
+                                <!-- 所有环境都使用对勾图标 -->
+                                <image
+                                    v-if="selectedPaymentMethod === 'wechat'"
+                                    src="/static/images/common/check.png"
+                                    class="payment-check-icon"
+                                />
                             </view>
                         </view>
+                        
+                        <!-- 支付宝支付 - 仅非微信生态显示 -->
+                        <template v-if="!isWechatEcosystem">
+                            <view class="payment-item" @click="selectPaymentMethod('alipay')">
+                                <view class="payment-left">
+                                    <image
+                                        src="/static/images/common/alipay.png"
+                                        class="payment-icon"
+                                    />
+                                    <text class="payment-name">支付宝支付</text>
+                                </view>
+                                <view class="payment-right">
+                                    <!-- 所有环境都使用对勾图标 -->
+                                    <image
+                                        v-if="selectedPaymentMethod === 'alipay'"
+                                        src="/static/images/common/check.png"
+                                        class="payment-check-icon"
+                                    />
+                                </view>
+                            </view>
+                        </template>
                     </view>
                 </view>
-            </template> -->
+            </view>
             <!-- #endif -->
 
             <!-- 备注模块 -->
@@ -349,6 +364,26 @@ const getAddressListData = async () => {
 //     }
 // };
 
+// H5/APP 支付方式选择
+// #ifndef MP-WEIXIN
+const selectedPaymentMethod = ref<'wechat' | 'alipay'>('wechat');
+
+// 判断是否为微信生态（微信公众号H5）
+const isWechatEcosystem = computed(() => {
+    return configStore.XClientType === 'wechat';
+});
+
+const selectPaymentMethod = (method: 'wechat' | 'alipay') => {
+    // 微信生态只能选择微信支付
+    if (isWechatEcosystem.value && method === 'alipay') {
+        return;
+    }
+    selectedPaymentMethod.value = method;
+    // 设置 payTypeId，1 代表在线支付
+    formState.payTypeId = 1;
+};
+// #endif
+
 const shippingTypeData = ref<{ [key: string]: ShippingTypeItem[] }>({});
 const getShippingTypeData = async () => {
     try {
@@ -384,6 +419,7 @@ const getOrderInfo = async () => {
     try {
         const result = await getOrderCheckData({ flowType: flowType.value, ...formState });
         const { cartList, total, couponList, tmplIds, item, useCouponIds, selectUserCouponIds } = result;
+        
         Object.assign(formState, item);
         cartListData.value = cartList;
         totalData.value = total;
@@ -770,7 +806,7 @@ const createPayOrder = async (orderId: number) => {
     // #ifdef APP-PLUS || H5 || MP-QQ || MP-TOUTIAO || MP-BAIDU || MP-ALIPAY
     return await creatPay({
         id: orderId,
-        type: 'wechat' // 根据实际支付类型调整
+        type: selectedPaymentMethod.value // 使用用户选择的支付方式（wechat 或 alipay）
     });
     // #endif
 };
@@ -853,6 +889,12 @@ const initPageData = async () => {
         // #ifdef MP-WEIXIN
         // 微信小程序默认使用微信支付，设置默认支付方式ID
         formState.payTypeId = 1; // 假设微信支付的ID为1，根据实际情况调整
+        // #endif
+        
+        // #ifndef MP-WEIXIN
+        // H5/APP 默认使用在线支付，默认选择微信支付
+        formState.payTypeId = 1;
+        selectedPaymentMethod.value = 'wechat';
         // #endif
 
         // 微信小程序只用微信支付，不需要获取支付方式数据

@@ -124,7 +124,7 @@
 </template>
 <script lang="ts" setup>
 import { PicSelect } from "@/components/decorate";
-import { ref, defineComponent, defineModel } from 'vue';
+import { ref, defineComponent } from 'vue';
 import { SelectLink } from '@/components/select';
 import { BannerSearchContent } from "@/types/decorate/decorate.d";
 const searchContent = defineModel<BannerSearchContent>("modelValue", { default: () => ({}) });

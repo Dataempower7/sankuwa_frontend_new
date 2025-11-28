@@ -81,7 +81,7 @@
                 </div>
             </el-form>
             <div style="height: 20px"></div>
-            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                 <div class="selected-action">
                     <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交</el-button>
                 </div>
@@ -132,7 +132,7 @@ const fetchDecorateDiscrete = async () => {
             Object.assign(formState.value, convertNullsToEmptyStrings(result.data));
         } else {
             formState.value = {
-                state: 0,
+                state: 0
             };
         }
     } catch (error: any) {

@@ -76,9 +76,9 @@
                         </el-form-item>
                     </div>
 
-                    <el-form-item label="PC微信扫码登录" prop="openWechatRegister" class="WidthMax">
+                    <el-form-item label="PC微信扫码登录" prop="openWechatPcLogin" class="WidthMax">
                         <el-radio-group
-                            v-model="formState.openWechatRegister"
+                            v-model="formState.openWechatPcLogin"
                             class="itemWidth"
                             @change="changeWechatRegister"
                             :disabled="formState.openWechatOauth == 0"
@@ -86,13 +86,13 @@
                             <el-radio :value="1">是</el-radio>
                             <el-radio :value="0">否</el-radio>
                         </el-radio-group>
-                        <div class="extra">如果选是，PC端将显示微信扫码登录，小程序端将显示一键登录</div>
+                        <div class="extra">如果选是，PC端将显示微信扫码登录。</div>
                     </el-form-item>
                     <el-form-item label="是否需要绑定手机号" prop="wechatRegisterBindPhone" class="WidthMax">
                         <el-radio-group
                             v-model="formState.wechatRegisterBindPhone"
                             class="itemWidth"
-                            :disabled="formState.openWechatOauth == 0 || formState.openWechatRegister == 0"
+                            :disabled="formState.openWechatOauth == 0 || formState.openWechatPcLogin == 0"
                         >
                             <el-radio :value="1">是</el-radio>
                             <el-radio :value="0">否</el-radio>
@@ -101,8 +101,19 @@
                             如果选是在微信登录时需绑定手机号方可注册，便于全站统一账号；若选择否，则不需要绑定手机，直接注册但不利于账号管理
                         </div>
                     </el-form-item>
+                    <el-form-item label="微信小程序快捷登录" prop="openWechatRegister" class="WidthMax">
+                        <el-radio-group
+                            v-model="formState.openWechatRegister"
+                            class="itemWidth"
+                            :disabled="formState.openWechatOauth == 0"
+                        >
+                            <el-radio :value="1">是</el-radio>
+                            <el-radio :value="0">否</el-radio>
+                        </el-radio-group>
+                        <div class="extra">如果选是，小程序端将显示一键登录</div>
+                    </el-form-item>
                 </div>
-                <div class="content_wrapper">
+                <div class="content_wrapper" v-if="isOverseas()">
                     <div class="title">Facebook登录</div>
                     <el-form-item label="是否开启Facebook登录" prop="facebookLoginOn" class="WidthMax">
                         <el-radio-group v-model="formState.facebookLoginOn" class="itemWidth" :disabled="!isOverseas()">
@@ -144,7 +155,7 @@
                         </div>
                     </el-form-item>
                 </div>
-                <div class="content_wrapper">
+                <div class="content_wrapper"  v-if="isOverseas()">
                     <div class="title">Google登录</div>
                     <el-form-item label="是否开启Google登录" prop="googleLoginOn" class="WidthMax">
                         <el-radio-group v-model="formState.googleLoginOn" class="itemWidth" :disabled="!isOverseas()">
@@ -182,7 +193,7 @@
                         </div>
                     </el-form-item>
                 </div>
-                <div class="content_wrapper">
+                <div class="content_wrapper" v-if="isOverseas()">
                     <div class="title">邮箱登录</div>
                     <el-form-item label="是否开启邮箱注册" prop="openEmailRegister" class="WidthMax">
                         <el-radio-group v-model="formState.openEmailRegister" class="itemWidth">
@@ -210,7 +221,7 @@
                 </div>
             </el-form>
             <div style="height: 20px"></div>
-            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                 <div class="selected-action">
                     <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交</el-button>
                 </div>
@@ -241,6 +252,7 @@ const formState = ref<Partial<LoginConfig>>({
     isOpenMobileAreaCode: undefined,
     usernamePrefix: "",
     openWechatRegister: undefined,
+    openWechatPcLogin: undefined,
     wechatRegisterBindPhone: undefined,
     openWechatOauth: undefined,
     googleLoginOn: undefined,

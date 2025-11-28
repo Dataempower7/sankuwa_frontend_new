@@ -1,0 +1,1 @@
+import{dq as e}from"./index-B52YIGC0.js";const r=e("category",{state:()=>({categoryTree:null}),getters:{},actions:{clearCategory(){this.categoryTree=null}},persist:{enabled:!0,strategies:[{storage:sessionStorage,paths:[]}]}});export{r as u};

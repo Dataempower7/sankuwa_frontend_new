@@ -1,16 +1,11 @@
 <template>
     <div class="page-container">
         <Logo></Logo>
-        <!-- <div class="login-page-left">
-            <a class="top-bar-btn" target="_blank" href="https://www.tigshop.com" title="起始页" style="padding: 0 3px">
-                <img style="margin: 10px" height="40" src="~@/style/images/logo2.png" />
-            </a>
-        </div> -->
         <div class="login-page-right">
             <div class="login-box">
                 <h1 class="login-title">
-                    <span class="login-title-welcome">欢迎登录</span
-                    ><span class="login-title-intro">{{ landingType ? "森酷玩商城后台管理系统" : "森酷玩商家后台管理系统" }}</span>
+                    <span class="login-title-welcome">欢迎登录</span>
+                    <span class="login-title-intro">{{ "商城后台管理系统" }}</span>
                 </h1>
                 <div class="login-tabs-warp">
                     <Transition mode="out-in" name="slide-fade">
@@ -44,10 +39,47 @@
                                             登 录
                                         </el-button>
                                     </el-form-item>
-                                    <el-form-item prop="remember">
-                                        <div class="flex flex-justify-between" style="width: 100%">
-                                            <el-checkbox v-model:checked="formState.remember">记住登录状态</el-checkbox>
-                                            <!--                                            <a v-if="landingType" @click="switchLoginType">切换至商家登录</a>-->
+                                    <el-form-item
+                                        prop="agreement"
+                                        :rules="[{ required: true, validator: validateAgreement, trigger: 'change' }]"
+                                        class="agreement-item"
+                                    >
+                                        <div>
+                                            <div>
+                                                <el-checkbox v-model="formState.remember" class="mb10">
+                                                    <template #default>
+                                                        <div class="flex" style="width: 100%; flex-wrap: wrap; line-height: 22px">
+                                                            <span> 记住登录状态 </span>
+                                                        </div>
+                                                    </template>
+                                                </el-checkbox>
+                                            </div>
+                                            <div>
+                                                <el-checkbox
+                                                    v-model="formState.agreement"
+                                                    v-if="
+                                                        protocolState &&
+                                                        (protocolState.afterSalesServiceShow ||
+                                                            protocolState.privacyPolicyShow ||
+                                                            protocolState.termsOfServiceShow)
+                                                    "
+                                                >
+                                                    <template #default>
+                                                        <div class="flex" style="width: 100%; flex-wrap: wrap; line-height: 22px;">
+                                                            <span> 我已阅读并同意 </span>
+                                                            <template v-if="protocolState.termsOfServiceShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('termsOfService')"> 《用户服务协议》 </a>
+                                                            </template>
+                                                            <template v-if="protocolState.privacyPolicyShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('privacyPolicy')"> 《用户隐私协议》 </a>
+                                                            </template>
+                                                            <template v-if="protocolState.afterSalesServiceShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('afterSalesService')"> 《售后服务政策》 </a>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </el-checkbox>
+                                            </div>
                                         </div>
                                     </el-form-item>
                                 </el-form>
@@ -90,41 +122,94 @@
                                             登 录
                                         </el-button>
                                     </el-form-item>
-                                    <el-form-item prop="remember">
-                                        <el-checkbox v-model:checked="formState.remember">记住登录状态</el-checkbox>
+                                    <el-form-item
+                                        prop="agreement"
+                                        :rules="[{ required: true, validator: validateAgreement, trigger: 'change' }]"
+                                        class="agreement-item"
+                                    >
+                                        <div>
+                                            <div>
+                                                <el-checkbox v-model="formState.remember" class="mb10">
+                                                    <template #default>
+                                                        <div class="flex" style="width: 100%; flex-wrap: wrap; line-height: 22px">
+                                                            <span> 记住登录状态 </span>
+                                                        </div>
+                                                    </template>
+                                                </el-checkbox>
+                                            </div>
+                                            <div>
+                                                <el-checkbox
+                                                    v-model="formState.agreement"
+                                                    v-if="
+                                                        protocolState &&
+                                                        (protocolState.afterSalesServiceShow ||
+                                                            protocolState.privacyPolicyShow ||
+                                                            protocolState.termsOfServiceShow)
+                                                    "
+                                                >
+                                                    <template #default>
+                                                        <div class="flex" style="width: 100%; flex-wrap: wrap; line-height: 22px;">
+                                                            <span> 我已阅读并同意 </span>
+                                                            <template v-if="protocolState.termsOfServiceShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('termsOfService')"> 《用户服务协议》 </a>
+                                                            </template>
+                                                            <template v-if="protocolState.privacyPolicyShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('privacyPolicy')"> 《用户隐私协议》 </a>
+                                                            </template>
+                                                            <template v-if="protocolState.afterSalesServiceShow == 1">
+                                                                <a href="javascript:;" @click="onViewProtocolContent('afterSalesService')"> 《售后服务政策》 </a>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </el-checkbox>
+                                            </div>
+                                        </div>
                                     </el-form-item>
                                 </el-form>
                             </el-tab-pane>
                         </el-tabs>
                         <div v-else>
-                            <!-- <SelectShop :username="loginType == 'password' ? formState.username : formState.mobile"></SelectShop> -->
                             <SelectShop v-model:selectShopFlag="selectShopFlag"></SelectShop>
                         </div>
                     </Transition>
                 </div>
             </div>
         </div>
+        <div class="dialog">
+            <el-dialog :z-index="12" v-model="dialogVisible">
+                <template #header></template>
+                <div class="wrap">
+                    <div class="head-box flex flex-justify-between flex-align-center">
+                        <div class="close" @click="dialogVisible = false">
+                            <i class="iconfont icon-cha1"></i>
+                        </div>
+                    </div>      
+                    <div class="content-wrap" v-loading="contentLoading">
+                        <el-scrollbar height="400px">
+                            <div class="content" v-html="content"></div>
+                        </el-scrollbar>
+                    </div>
+                </div>
+            </el-dialog>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, reactive, toRaw, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import "@/style/css/login.less";
 import { notification } from "ant-design-vue";
 import { useRouter } from "vue-router";
 import { MobileCode } from "@/components/form";
-import type { FormInstance, FormRules } from "element-plus";
+import type { FormInstance } from "element-plus";
 import { adminSignin, sendMobileCode } from "@/api/authority/login";
+import { getCsrf } from "@/api/common/common";
 import Verify from "@/components/verifition/Verify.vue";
 import SelectShop from "@/components/merchant/SelectShop.vue";
 import Logo from "./src/Logo.vue";
+import { getLoginProtocol, getLoginProtocolContent } from "@/api/vendor/setting";
 const verify = ref();
 const landingType = ref(true);
 const selectShopFlag = ref(false);
-const switchLoginType = () => {
-    landingType.value = false;
-    formState.value.username = "";
-    formState.value.password = "";
-};
 const router = useRouter();
 const fullPath = router.currentRoute.value.fullPath;
 const merchantLogin = fullPath.includes("merchantLogin");
@@ -133,6 +218,9 @@ const errorMessage = ref("");
 const passwordErrorMessage = ref("");
 const mobileErrorMessage = ref("");
 const loading = ref(false);
+const dialogVisible = ref(false);
+const content = ref();
+const contentLoading = ref(true);
 // 表单参数初使化
 const passwordFormRef = ref<FormInstance>(); //表单Ref
 const mobileFormRef = ref<FormInstance>(); //表单Ref
@@ -140,53 +228,32 @@ let formState = ref<any>({
     username: merchantLogin ? import.meta.env.VITE_DEFAULT_STORE_NAME || "" : import.meta.env.VITE_DEFAULT_USER_NAME || "",
     password: merchantLogin ? import.meta.env.VITE_DEFAULT_STORE_PASSWORD || "" : import.meta.env.VITE_DEFAULT_USER_PASSWORD || "",
     remember: false,
+    agreement: true,
     verifyToken: null
 }); //表单数据
 const captchaUid = ref("");
-export interface SigninResult {
-    token?: string;
-    adminType?: string;
-}
 // 提交表单
 const formSubmit = async (e: FormInstance | null) => {
     if (!e) {
         return;
     }
+    await _getCsrf();
     await e.validate();
     loading.value = true;
     try {
-        const result = await (<SigninResult>adminSignin({
-            loginType: loginType.value,
-            captchaUid: captchaUid.value,
-            ...formState.value
-        }));
-        // const userStore = useUserStore() as any;
-        // const configStore = useConfigStore();
-        // const menusStore = useMenusStore();
+        const result = await adminSignin(
+            {
+                loginType: loginType.value,
+                captchaUid: captchaUid.value,
+                ...formState.value
+            },
+            csrfToken.value
+        );
         // 设置Token
         localStorage.setItem("accessToken", result.token ?? "");
         localStorage.setItem("adminType", result.adminType ?? "");
-        // if(result.adminType=='admin'){
-        //     // 更新后台设置项
-        //     userStore.updateUserInfo();
-        //     await configStore.updateConfig();
-        //     notification["success"]({
-        //         message: "登录成功",
-        //         placement: "top",
-        //         duration: 1.5,
-        //         description: "您好，欢迎回来"
-        //     });
-        //     passwordErrorMessage.value = "";
-        //     mobileErrorMessage.value = "";
-        //     let mainMenu = (await updateMenu()) as MainMenu[];
-        //     menusStore.mainMenu = mainMenu;
-        //     router.push("/" + (mainMenu ? mainMenu[0].routeLink : ""));
-        // }else{
-        //选择店铺
         selectShopFlag.value = true;
-        // }
     } catch (error: any) {
-        console.error(error);
         if (error.code == 1002) {
             verify.value.show();
         } else if (error.code > 0) {
@@ -219,7 +286,6 @@ const mobileErrorCallback = () => {
 };
 const disabled = computed(() => {
     return false;
-    //   return !(formState.username && formState.password);
 });
 const validateMobile = (rule: any, value: any, callback: any) => {
     if (!value) {
@@ -237,6 +303,13 @@ const validateMobile = (rule: any, value: any, callback: any) => {
         // return internationalRegex.test(phoneNumber);
     }
 };
+const validateAgreement = (rule: any, value: any, callback: any) => {
+    if (!value) {
+        callback(new Error("请阅读并同意用户服务协议、用户隐私协议及售后服务政策"));
+        return;
+    }
+    callback();
+};
 onMounted(() => {
     const accessToken = localStorage.getItem("accessToken");
     const shopId = localStorage.getItem("shopId");
@@ -246,20 +319,61 @@ onMounted(() => {
         });
     }
 });
+const csrfToken = ref("");
+const _getCsrf = async () => {
+    try {
+        const result = await getCsrf();
+        csrfToken.value = result;
+    } catch (error) {
+    } finally {
+    }
+};
+// _getCsrf();
+const protocolState = ref<any>();
+const _getLoginProtocol = async () => {
+    try {
+        const result = await getLoginProtocol();
+        protocolState.value = result;
+    } catch (error: any) {}
+};
+_getLoginProtocol();
+
+const onViewProtocolContent = (code: string) => {
+    dialogVisible.value = true;
+    _getLoginProtocolContent(code)
+}
+
+const _getLoginProtocolContent = async (code: string) => {
+    contentLoading.value = true;
+    try {
+        let result = await getLoginProtocolContent({ code });
+        content.value = result.content;
+    } catch (error: any) {
+
+    } finally {
+        contentLoading.value = false;
+    }
+}
 </script>
 
 <style lang="less" scoped>
 .page-container {
     display: flex;
     height: 100%;
+    :deep(.el-checkbox) {
+        align-items: flex-start;
+        .el-checkbox__input{
+            margin-top: 3px;
+        }
+    }
 }
 
 .login-page-left {
-    background: url("https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758784740QV9rL6si4I7FdVv0Tp.jpeg") center;
+    background: url("@/style/images/login-page-bg.png") center;
     background-size: cover;
     flex: 1.5;
     position: relative;
-    height: 150px;
+    height: 100%;
 }
 
 .login-page-right {
@@ -519,5 +633,46 @@ onMounted(() => {
 .slide-fade-leave-to {
     transform: translateX(20px);
     opacity: 0;
+}
+
+.agreement-item {
+    padding-bottom: 15px;
+    :deep(.el-form-item__error) {
+        padding-top: 20px;
+    }
+}
+
+.wrap {
+    padding: 0 20px;
+    .head-box {
+        padding: 10px 0 10px 0;
+        font-size: 16px;
+        .title {
+            color: #1f2026;
+            font-weight: 500;
+        }
+        .close {
+            margin-left: auto;
+            cursor: pointer;
+            &:hover {
+                color: var(--tig-primary);
+            }
+        }
+    }
+    .content-wrap {
+        min-height: 300px;
+        max-height: 700px;
+        overflow-y: auto;
+        .content {
+        }
+    }
+}
+.dialog {
+    :deep(.el-dialog__header) {
+        display: none;
+    }
+    :deep(.el-dialog) {
+        width: 760px;
+    }
 }
 </style>

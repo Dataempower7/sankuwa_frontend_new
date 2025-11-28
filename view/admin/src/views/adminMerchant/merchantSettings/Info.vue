@@ -4,28 +4,35 @@
             <a-spin :spinning="loading">
                 <el-form ref="formRef" :model="formState" label-width="160px">
                     <div class="title">基本设置</div>
-                        <el-form-item label="是否允许个人入驻" prop="personApplyEnabled">
-                            <el-radio-group v-model="formState.personApplyEnabled" class="itemWidth">
-                                <el-radio :value="1">是</el-radio>
-                                <el-radio :value="0">否</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="商户入驻是否需要审核" prop="merchantApplyNeedCheck">
-                            <el-radio-group v-model="formState.merchantApplyNeedCheck" class="itemWidth">
-                                <el-radio :value="1">是</el-radio>
-                                <el-radio :value="0">否</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="单个商户最大店铺数量" prop="maxShopCount">
-                            <TigInput type="integer"  v-model="formState.maxShopCount" />
-                        </el-form-item>
+                    <el-form-item label="是否允许个人入驻" prop="personApplyEnabled">
+                        <el-radio-group v-model="formState.personApplyEnabled" class="itemWidth">
+                            <el-radio :value="1">是</el-radio>
+                            <el-radio :value="0">否</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="商户入驻是否需要审核" prop="merchantApplyNeedCheck">
+                        <el-radio-group v-model="formState.merchantApplyNeedCheck" class="itemWidth">
+                            <el-radio :value="1">是</el-radio>
+                            <el-radio :value="0">否</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item prop="maxShopCount">
+                        <template #label>
+                            <span v-if="isStore()">单个商户最大门店数量</span>
+                            <span v-else>单个商户最大店铺数量</span>
+                        </template>
+                        <TigInput type="integer" v-model="formState.maxShopCount" />
+                    </el-form-item>
                     <div class="title">入驻协议内容</div>
                     <Editor v-model:html="formState.shopAgreement"></Editor>
                 </el-form>
                 <div style="height: 20px"></div>
-                <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+                <div class="selected-action-warp selected-warp-left"
+                    :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                     <div class="selected-action">
-                        <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交</el-button>
+                        <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary"
+                            @click="onSubmit">提
+                            交</el-button>
                     </div>
                 </div>
             </a-spin>
@@ -36,11 +43,13 @@
 <script lang="ts" setup>
 import "@/style/css/list.less";
 import { onMounted, ref, shallowRef } from "vue";
-import {Editor} from "@/components/editor/index"
+import { Editor } from "@/components/editor/index"
 import { message } from "ant-design-vue";
 import type { PaymentFormState, Regions } from "@/types/setting/config";
 import { getConfigMerchantSetting, saveConfigMerchantSetting } from "@/api/setting/config";
 import { useThemeStore } from "@/store/theme";
+import { isStore } from "@/utils/version";
+
 const { themeInfo } = useThemeStore();
 const formRef = shallowRef();
 // 基本参数定义
@@ -95,7 +104,8 @@ const onSubmit = async () => {
         font-weight: normal;
         font-size: 12px;
     }
-    :deep(.el-tabs--border-card > .el-tabs__content){
+
+    :deep(.el-tabs--border-card > .el-tabs__content) {
         padding: 0;
     }
 }
@@ -116,6 +126,7 @@ const onSubmit = async () => {
 .itemWidth {
     width: 100%;
 }
+
 .title {
     font-weight: bold;
     padding-top: 20px;

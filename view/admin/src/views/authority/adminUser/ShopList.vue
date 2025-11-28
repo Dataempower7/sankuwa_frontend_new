@@ -8,16 +8,11 @@
                             <div class="simple-form-field">
                                 <div class="form-group">
                                     <div class="control-container">
-                                        <TigInput
-                                            v-model="filterParams.keyword"
-                                            name="keyword"
-                                            placeholder="输入员工名称"
-                                            @keyup.enter="onSearchSubmit"
-                                            clearable
-                                            @clear="onSearchSubmit"
-                                        >
+                                        <TigInput v-model="filterParams.keyword" name="keyword" placeholder="输入员工名称"
+                                            @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit">
                                             <template #append>
-                                                <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span></el-button>
+                                                <el-button @click="onSearchSubmit"><span
+                                                        class="iconfont icon-chakan1"></span></el-button>
                                             </template>
                                         </TigInput>
                                     </div>
@@ -27,12 +22,8 @@
                                 <div class="form-group">
                                     <DialogForm
                                         :params="{ act: 'add', type: action ? action : '', suppliersId: id ? id : 0 }"
-                                        isDrawer
-                                        path="authority/adminUser/ShopInfo"
-                                        title="添加员工"
-                                        width="800px"
-                                        @okCallback="loadFilter"
-                                    >
+                                        isDrawer path="authority/adminUser/ShopInfo" title="添加员工" width="800px"
+                                        @okCallback="loadFilter">
                                         <el-button type="primary">添加员工</el-button>
                                     </DialogForm>
                                 </div>
@@ -56,14 +47,8 @@
                 </div>
                 <div class="table-container">
                     <a-spin :spinning="loading">
-                        <el-table
-                            :data="filterState"
-                            :loading="loading"
-                            :total="total"
-                            row-key="id"
-                            @selection-change="onSelectChange"
-                            @sort-change="onSortChange"
-                        >
+                        <el-table :data="filterState" :loading="loading" :total="total" row-key="id"
+                            @selection-change="onSelectChange" @sort-change="onSortChange">
                             <el-table-column type="selection" width="32" />
                             <el-table-column width="200" label="员工名称" prop="username">
                                 <template #default="{ row }">
@@ -80,7 +65,8 @@
                                         <div>
                                             <div>{{ row.username || "-" }}</div>
                                             <div v-if="row.isAdmin == 1">
-                                                <Tag :transparent="true" text="店铺管理员"></Tag>
+                                                <Tag :transparent="true" :text="getShopType() === 1 ? '店铺管理员' : '门店管理员'">
+                                                </Tag>
                                             </div>
                                         </div>
                                     </div>
@@ -88,7 +74,8 @@
                             </el-table-column>
                             <el-table-column label="权限组" prop="roleName">
                                 <template #default="{ row }">
-                                    <span v-if="row.role" :class="row.role.roleName ? 'green' : 'gray'">{{ row.role.roleName || "-" }}</span>
+                                    <span v-if="row.role" :class="row.role.roleName ? 'green' : 'gray'">{{
+                                        row.role.roleName || "-" }}</span>
                                     <span v-else class="gray">自定义权限</span>
                                 </template>
                             </el-table-column>
@@ -106,19 +93,14 @@
                             </el-table-column>
                             <el-table-column :width="150" fixed="right" label="操作">
                                 <template #default="{ row }">
-                                    <DialogForm
-                                        :params="{ act: 'detail', id: row.id }"
-                                        isDrawer
-                                        path="authority/adminUser/ShopInfo"
-                                        title="编辑员工"
-                                        width="800px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm :params="{ act: 'detail', id: row.id }" isDrawer
+                                        path="authority/adminUser/ShopInfo" title="编辑员工" width="800px"
+                                        @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
                                     <el-divider direction="vertical" v-if="row.adminId != 1" />
-                                    <DeleteRecord v-if="row.adminId != 1" :params="{ id: row.id }" :requestApi="delShopUser" @afterDelete="loadFilter"
-                                        >删除
+                                    <DeleteRecord v-if="row.adminId != 1" :params="{ id: row.id }"
+                                        :requestApi="delShopUser" @afterDelete="loadFilter">删除
                                     </DeleteRecord>
                                 </template>
                             </el-table-column>
@@ -130,7 +112,8 @@
                         </el-table>
                     </a-spin>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -154,6 +137,7 @@ import { returnAvatar } from "@/utils/avatar";
 import MobileCard from "@/components/list/src/MobileCard.vue";
 import { Tag } from "@/components/form";
 import { useListRequest } from "@/hooks/useListRequest";
+import { getShopType } from "@/utils/storage";
 const router = useRouter();
 const config: any = useConfigStore();
 const {

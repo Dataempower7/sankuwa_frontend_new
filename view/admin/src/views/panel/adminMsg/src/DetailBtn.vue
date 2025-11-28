@@ -43,6 +43,7 @@ const dialogConfigs = reactive<DialogConfig[]>([
     { type: 12, title: `订单详情 ${props.orderSn}`, idKey: 'relatedData.orderId', path: 'order/order/Info', width: '880px', showClose: false, showOnOk: false },
     { type: 13, title: `订单详情 ${props.orderSn}`, idKey: 'relatedData.orderId', path: 'order/order/Info', width: '880px', showClose: false, showOnOk: false },
     { type: 31, title: `订单详情 ${props.orderSn}`, idKey: 'relatedData.orderId', path: 'order/order/Info', width: '880px', showClose: false, showOnOk: false },
+    { type: 54, title: `订单详情 ${props.orderSn}`, idKey: 'relatedData.orderId', path: 'order/order/Info', width: '880px', showClose: false, showOnOk: false },
     { type: 21, title: '商品详情', idKey: 'relatedData.productId', path: 'product/product/Info', width: '800px' },
     { type: 22, title: '商品详情', idKey: 'relatedData.productId', path: 'product/product/Info', width: '800px' },
     { type: 23, title: '商品详情', idKey: 'relatedData.productId', path: 'product/product/Info', width: '800px' },

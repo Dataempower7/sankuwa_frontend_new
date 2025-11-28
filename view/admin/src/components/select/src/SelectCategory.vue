@@ -14,7 +14,7 @@
     />
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, defineModel, defineExpose, PropType } from "vue";
+import { onMounted, ref, PropType } from "vue";
 import { ElCascader } from "element-plus";
 import { message } from "ant-design-vue";
 import { getAllCategoryList } from "@/api/product/category";

@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { getLicensed } from "@/api/setting/licensed";
 import type { LicensedFormState } from "@/types/setting/licensed";
-
 interface State {
     licensedData: LicensedFormState;
 }
@@ -35,7 +34,7 @@ export const useLicensedStore = defineStore("licensed", {
         _getLicensed() {
             getLicensed().then(result => {
                 const configString = localStorage.getItem("config");
-                const config = configString ? JSON.parse(configString).config : {};
+                const config = configString ? JSON.parse(configString) : {};
                 this.licensedData = Object.assign(this.licensedData, result, config);
                 if (result.deCopyright == 1) {
                     this.licensedData.shopCompanyTxt = config.shopCompanyTxt;

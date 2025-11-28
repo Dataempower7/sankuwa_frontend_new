@@ -25,11 +25,11 @@ export const getSaleDetaillist = (data: SaleDetaillistFilterParams) => {
 };
 
 // 销售商品明细导出
-export const exportSaleDetaillis = (data: SaleDetaillistFilterParams) => {
+export const exportSaleDetaillis = (params: SaleDetaillistFilterParams) => {
     return request({
         url: "panel/salesStatistics/salesProductDetail",
         method: "get",
         responseType: 'arraybuffer',
-        data
+        params
     });
 };

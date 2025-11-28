@@ -3,7 +3,7 @@
         <div class="content_wrapper">
             <div class="tit-box">
                 <div class="tit">
-                    <span>所有店铺总余额: 截止时间: [{{ dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss") }}]</span>
+                    <span>所有{{shopTypeName}}总余额: 截止时间: [{{ dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss") }}]</span>
                 </div>
             </div>
             <div class="balance-box flex-wrap">
@@ -12,11 +12,11 @@
                         余额总结余(元)
                         <el-tooltip placement="bottom" effect="light">
                             <template #content>
-                                <div class="tooltip-width">可用店铺余额=店铺余额-不可用店铺余额</div>
+                                <div class="tooltip-width">可用{{shopTypeName}}余额={{shopTypeName}}余额-不可用{{shopTypeName}}余额</div>
                             </template>
                             <el-icon><QuestionFilled /></el-icon>
                         </el-tooltip>
-                        <router-link :to="{ path: '/shop/shop-account-raply/list' }">
+                        <router-link v-if="getAdminType() !== 'admin'" :to="{ path: '/shop/shop-account-raply/list' }">
                             <el-button type="primary" link>提现申请</el-button>
                         </router-link>
                     </div>
@@ -29,7 +29,7 @@
                         待结算总额(元)
                         <el-tooltip placement="bottom" effect="light">
                             <template #content>
-                                <div class="tooltip-width">交易未完成的订单总额，消费者确认收货后将自动转入店铺余额</div>
+                                <div class="tooltip-width">交易未完成的订单总额，消费者确认收货后将自动转入{{shopTypeName}}余额</div>
                             </template>
                             <el-icon><QuestionFilled /></el-icon>
                         </el-tooltip>
@@ -43,7 +43,7 @@
                         不可用余额(元)
                         <el-tooltip placement="bottom" effect="light">
                             <template #content>
-                                <div class="tooltip-width">提现中或者退款中的冻结店铺余额</div>
+                                <div class="tooltip-width">提现中或者退款中的冻结{{shopTypeName}}余额</div>
                             </template>
                             <el-icon><QuestionFilled /></el-icon>
                         </el-tooltip>
@@ -78,6 +78,9 @@ import { getShopList } from "@/api/shop/shop";
 import Ranking from "./src/Ranking.vue";
 import TransactionRecord from "./src/TransactionRecord.vue";
 import dayjs from "dayjs";
+import { getAdminType, getShopType } from "@/utils/storage";
+import { isMerchant, isStore } from "@/utils/version";
+const shopTypeName = isStore() ? '门店' : isMerchant() ? '店铺' : '店铺'
 const loading = ref<boolean>(true);
 const accountData = ref<AccountFormState>({
     shopMoney: 0

@@ -318,7 +318,7 @@ import { PicSelect } from "@/components/decorate";
 import { SelectColor } from "@/components/select";
 import CommonImageFillEdit from "../../src/commonImageFill/Edit.vue";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
 import { selectLabel } from "@/views/decorate/decorate/src/modules/editIndex";

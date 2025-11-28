@@ -7,7 +7,8 @@
                         <el-tab-pane :name="1" label="品牌管理"></el-tab-pane>
                         <el-tab-pane :name="2">
                             <template #label>
-                                <el-badge :value="count" color="#f33" :offset="[5, -3]" :hidden="count === 0"> 品牌审核 </el-badge>
+                                <el-badge :value="count" color="#f33" :offset="[5, -3]" :hidden="count === 0"> 品牌审核
+                                </el-badge>
                             </template>
                         </el-tab-pane>
                     </el-tabs>
@@ -24,16 +25,11 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>商品品牌：</span></label>
                                     <div class="control-container">
-                                        <TigInput
-                                            v-model="filterParams.keyword"
-                                            name="keyword"
-                                            placeholder="输入品牌名称"
-                                            @keyup.enter="onSearchSubmit"
-                                            clearable
-                                            @clear="onSearchSubmit"
-                                        >
+                                        <TigInput v-model="filterParams.keyword" name="keyword" placeholder="输入品牌名称"
+                                            @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit">
                                             <template #append>
-                                                <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span> </el-button>
+                                                <el-button @click="onSearchSubmit"><span
+                                                        class="iconfont icon-chakan1"></span> </el-button>
                                             </template>
                                         </TigInput>
                                     </div>
@@ -43,7 +39,8 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>店铺：</span></label>
                                     <div class="control-container">
-                                        <SelectShop v-model:shopId="filterParams.shopId" @onChange="onSearchSubmit"></SelectShop>
+                                        <SelectShop v-model:shopId="filterParams.shopId" @onChange="onSearchSubmit">
+                                        </SelectShop>
                                     </div>
                                 </div>
                             </div>
@@ -88,7 +85,8 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>首字母：</span></label>
                                     <div class="control-container">
-                                        <TigInput v-model="filterParams.firstWord" @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit" />
+                                        <TigInput v-model="filterParams.firstWord" @keyup.enter="onSearchSubmit"
+                                            clearable @clear="onSearchSubmit" />
                                     </div>
                                 </div>
                             </div>
@@ -107,21 +105,12 @@
                 <div class="list-table-tool-row">
                     <div class="list-table-tool-col">
                         <el-space>
-                            <DialogForm
-                                v-if="activeKey === 1"
-                                :params="{ act: 'add' }"
-                                isDrawer
-                                path="product/brand/Info"
-                                title="添加品牌"
-                                width="600px"
-                                @okCallback="loadFilter"
-                            >
+                            <DialogForm v-if="activeKey === 1" :params="{ act: 'add' }" isDrawer
+                                path="product/brand/Info" title="添加品牌" width="600px" @okCallback="loadFilter">
                                 <el-button type="primary">添加品牌</el-button>
                             </DialogForm>
-                            <router-link
-                                v-if="activeKey === 1 && isOverseas() && adminType === 'admin'"
-                                :to="{ path: '/setting/translationContent/list', query: { type: 'brand' } }"
-                            >
+                            <router-link v-if="activeKey === 1 && isOverseas() && adminType === 'admin'"
+                                :to="{ path: '/setting/translationContent/list', query: { type: 'brand' } }">
                                 <el-button>批量翻译品牌名称</el-button>
                             </router-link>
                             <el-popconfirm title="您确认要批量删除所选数据吗？" @confirm="onBatchSubmit('del')">
@@ -129,7 +118,9 @@
                                     <el-button :disabled="selectedIds.length === 0">批量删除</el-button>
                                 </template>
                             </el-popconfirm>
-                            <el-button :loading="false" :disabled="selectedIds.length === 0" @click="onUpdateFirstWorld">批量更新品牌首字母 </el-button>
+                            <el-button :loading="false" :disabled="selectedIds.length === 0"
+                                @click="onUpdateFirstWorld">批量更新品牌首字母
+                            </el-button>
                             <span v-if="selectedIds.length > 0">
                                 已选择：<b>{{ selectedIds.length }}</b> 项
                             </span>
@@ -138,65 +129,49 @@
                 </div>
                 <div class="table-container">
                     <a-spin :spinning="loading">
-                        <el-table
-                            :data="filterState"
-                            :loading="loading"
-                            :total="total"
-                            row-key="brandId"
-                            show-overflow-tooltip
-                            @selection-change="onSelectChange"
-                            @sort-change="onSortChange"
-                        >
+                        <el-table :data="filterState" :loading="loading" :total="total" row-key="brandId"
+                            show-overflow-tooltip @selection-change="onSelectChange" @sort-change="onSortChange">
                             <el-table-column type="selection" width="32" />
                             <el-table-column :width="200" label="品牌名称" prop="brandId" sortable="custom">
                                 <template #default="{ row }">
-                                    <PopForm
-                                        v-model:org-value="row.brandName"
-                                        :max="30"
-                                        :params="{ id: row.brandId, field: 'brandName' }"
-                                        :requestApi="updateBrandField"
-                                        label="品牌名称"
-                                        type="textarea"
-                                    >
+                                    <PopForm v-model:org-value="row.brandName" :max="30"
+                                        :params="{ id: row.brandId, field: 'brandName' }" :requestApi="updateBrandField"
+                                        label="品牌名称" type="textarea">
                                         {{ row.brandName }}
                                     </PopForm>
                                     <p v-if="row.shop" class="span-product-brand">
-                                        <span class="span-tit">店铺：</span><span class="span-con green">{{ row.shop.shopTitle }}</span>
+                                        <span class="span-tit">{{ getShopType() === 2 ? "门店" : "店铺" }}：</span><span
+                                            class="span-con green">{{ row.shop.shopTitle }}</span>
                                     </p>
                                 </template>
                             </el-table-column>
                             <el-table-column label="品牌缩略图" width="100">
                                 <template #default="{ row }">
-                                    <Image v-if="row.brandLogo" :src="imageFormat(row.brandLogo)" fit="contain" style="height: 25px; width: 60px" />
+                                    <Image v-if="row.brandLogo" :src="imageFormat(row.brandLogo)" fit="contain"
+                                        style="height: 25px; width: 60px" />
                                     <span v-else>暂无图片</span>
                                 </template>
                             </el-table-column>
                             <el-table-column label="首字母">
                                 <template #default="{ row }">
-                                    <PopForm
-                                        v-model:org-value="row.firstWord"
-                                        :len="1"
-                                        :params="{ id: row.brandId, field: 'firstWord' }"
-                                        :requestApi="updateBrandField"
-                                        label="首字母"
-                                        type="input"
-                                    >
+                                    <PopForm v-model:org-value="row.firstWord" :len="1"
+                                        :params="{ id: row.brandId, field: 'firstWord' }" :requestApi="updateBrandField"
+                                        label="首字母" type="input">
                                         <div>{{ row.firstWord || "-" }}</div>
                                     </PopForm>
                                 </template>
                             </el-table-column>
                             <el-table-column label="是否热销" v-if="adminType === 'admin' && activeKey === 1">
                                 <template #default="{ row }">
-                                    <Switch
-                                        v-model:checked="row.brandIsHot"
+                                    <Switch v-model:checked="row.brandIsHot"
                                         :params="{ id: row.brandId, field: 'brandIsHot' }"
-                                        :requestApi="updateBrandField"
-                                    />
+                                        :requestApi="updateBrandField" />
                                 </template>
                             </el-table-column>
                             <el-table-column label="是否显示" prop="isShow" sortable="custom">
                                 <template #default="{ row }">
-                                    <Switch v-model:checked="row.isShow" :params="{ id: row.brandId, field: 'isShow' }" :requestApi="updateBrandField" />
+                                    <Switch v-model:checked="row.isShow" :params="{ id: row.brandId, field: 'isShow' }"
+                                        :requestApi="updateBrandField" />
                                 </template>
                             </el-table-column>
                             <el-table-column label="审核状态" prop="status" v-if="adminType === 'shop' || activeKey === 2">
@@ -204,81 +179,54 @@
                                     {{ row.statusText }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="审核备注" prop="rejectRemark" v-if="adminType === 'shop' || activeKey === 2">
+                            <el-table-column label="审核备注" prop="rejectRemark"
+                                v-if="adminType === 'shop' || activeKey === 2">
                                 <template #default="{ row }">
                                     {{ row.rejectRemark || "-" }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="排序" prop="sortOrder" sortable="custom" v-if="adminType === 'admin' && activeKey === 1">
+                            <el-table-column label="排序" prop="sortOrder" sortable="custom"
+                                v-if="adminType === 'admin' && activeKey === 1">
                                 <template #default="{ row }">
-                                    <PopForm
-                                        v-model:org-value="row.sortOrder"
-                                        :params="{ id: row.brandId, field: 'sortOrder' }"
-                                        :requestApi="updateBrandField"
-                                        extra="默认值为50，数值越小，排序越靠前"
-                                        label="排序"
-                                        type="integer"
-                                    >
+                                    <PopForm v-model:org-value="row.sortOrder"
+                                        :params="{ id: row.brandId, field: 'sortOrder' }" :requestApi="updateBrandField"
+                                        extra="默认值为50，数值越小，排序越靠前" label="排序" type="integer">
                                         <div>{{ row.sortOrder }}</div>
                                     </PopForm>
                                 </template>
                             </el-table-column>
                             <el-table-column :width="150" fixed="right" label="操作">
                                 <template #default="{ row }">
-                                    <DialogForm
-                                        v-if="activeKey === 1 && row.status != 0"
-                                        :params="{ act: 'detail', id: row.brandId }"
-                                        isDrawer
-                                        path="product/brand/Info"
-                                        title="编辑品牌"
-                                        width="600px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm v-if="activeKey === 1 && row.status != 0"
+                                        :params="{ act: 'detail', id: row.brandId }" isDrawer path="product/brand/Info"
+                                        title="编辑品牌" width="600px" @okCallback="loadFilter">
                                         <a class="btn-link">编辑</a>
                                     </DialogForm>
                                     <el-divider v-if="activeKey === 1 && row.status != 0" direction="vertical" />
-                                    <DialogForm
-                                        v-if="adminType === 'shop' && activeKey === 1 && row.status === 0"
-                                        :params="{ act: 'detail', id: row.brandId, examine: 1 }"
-                                        isDrawer
-                                        :showClose="false"
-                                        :showOnOk="false"
-                                        path="product/brand/Info"
-                                        title="品牌详情"
-                                        width="600px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <DialogForm v-if="adminType === 'shop' && activeKey === 1 && row.status === 0"
+                                        :params="{ act: 'detail', id: row.brandId, examine: 1 }" isDrawer
+                                        :showClose="false" :showOnOk="false" path="product/brand/Info" title="品牌详情"
+                                        width="600px" @okCallback="loadFilter">
                                         <a class="btn-link">详情</a>
                                     </DialogForm>
-                                    <el-divider v-if="adminType === 'shop' && activeKey === 1 && row.status === 0" direction="vertical" />
-                                    <DialogForm
-                                        v-if="activeKey === 2 && row.status != 0"
-                                        :params="{ act: 'detail', id: row.brandId, examine: 1 }"
-                                        isDrawer
-                                        :showClose="false"
-                                        :showOnOk="false"
-                                        path="product/brand/Info"
-                                        title="品牌详情"
-                                        width="600px"
-                                        @okCallback="loadFilter"
-                                    >
+                                    <el-divider v-if="adminType === 'shop' && activeKey === 1 && row.status === 0"
+                                        direction="vertical" />
+                                    <DialogForm v-if="activeKey === 2 && row.status != 0"
+                                        :params="{ act: 'detail', id: row.brandId, examine: 1 }" isDrawer
+                                        :showClose="false" :showOnOk="false" path="product/brand/Info" title="品牌详情"
+                                        width="600px" @okCallback="loadFilter">
                                         <a class="btn-link">详情</a>
                                     </DialogForm>
                                     <el-divider v-if="activeKey === 2 && row.status != 0" direction="vertical" />
-                                    <DialogForm
-                                        v-if="activeKey === 2 && row.status === 0"
-                                        dialogClass="noPadding"
-                                        :params="{ act: 'detail', id: row.brandId }"
-                                        isDrawer
-                                        path="product/brand/Examine"
-                                        title="品牌审核"
-                                        width="600px"
-                                        @okCallback="_getBrandAuditWaitNum"
-                                    >
+                                    <DialogForm v-if="activeKey === 2 && row.status === 0" dialogClass="noPadding"
+                                        :params="{ act: 'detail', id: row.brandId }" isDrawer
+                                        path="product/brand/Examine" title="品牌审核" width="600px"
+                                        @okCallback="_getBrandAuditWaitNum">
                                         <a class="btn-link">去处理</a>
                                     </DialogForm>
                                     <el-divider v-if="activeKey === 2 && row.status === 0" direction="vertical" />
-                                    <DeleteRecord :params="{ id: row.brandId }" :requestApi="delBrand" @afterDelete="loadFilter">删除 </DeleteRecord>
+                                    <DeleteRecord :params="{ id: row.brandId }" :requestApi="delBrand"
+                                        @afterDelete="loadFilter">删除 </DeleteRecord>
                                 </template>
                             </el-table-column>
                             <template #empty>
@@ -289,7 +237,8 @@
                         </el-table>
                     </a-spin>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -312,7 +261,7 @@ import { BrandFilterParams, BrandFilterState } from "@/types/product/brand";
 import { batchSubmit, delBrand, getBrandList, updateBrandField, updateFirstWorld, getAuditBrandList, getBrandAuditWaitNum } from "@/api/product/brand";
 import { useListRequest } from "@/hooks/useListRequest";
 import { isOverseas, isMerchant } from "@/utils/version";
-import { getAdminType } from "@/utils/storage";
+import { getAdminType, getShopType } from "@/utils/storage";
 const adminType = getAdminType();
 const config: any = useConfigStore();
 const activeKey = ref<1 | 2>(1);

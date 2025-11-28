@@ -33,7 +33,7 @@
                     <el-form-item label="用户头像" prop="avatar">
                         <UploadAvatar v-model:avatar="formState.avatar" :avatarType="avatarType" :loading="loading"></UploadAvatar>
                     </el-form-item>
-                    <el-form-item label="邮箱" prop="email" v-if="adminType != 'shop'">
+                    <el-form-item label="邮箱" prop="email" v-if="getAdminType() != 'shop'">
                         <TigInput classType="tig-form-input" v-model="formState.email" />
                     </el-form-item>
                     <el-form-item>
@@ -56,7 +56,7 @@ import { useUserStore } from "@/store/user";
 import { getAdminInfo, adminInfoSubmit } from "@/api/authority/accountEditing";
 import { extractContent } from "@/utils/util";
 import MobileCard from "@/components/list/src/MobileCard.vue";
-const adminType = ref(localStorage.getItem("adminType"));
+import { getAdminType } from "@/utils/storage";
 // 基本参数定义
 const confirmLoading = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -77,18 +77,18 @@ const loadFilter = async () => {
         const result = await getAdminInfo({
             id: userInfo.adminId
         });
-        formState.value.mobile = String(adminType.value != "shop" ? result.mobile : result.adminUser?.mobile || "");
-        formState.value.username = String(adminType.value != "shop" ? result.username : result.adminUser?.username || "");
+        formState.value.mobile = String(getAdminType() != "shop" ? result.mobile : result.adminUser?.mobile || "");
+        formState.value.username = String(getAdminType() != "shop" ? result.username : result.adminUser?.username || "");
         formState.value.email = String(result.email);
         formState.value.id = String(result.id);
-        formState.value.avatar = adminType.value != "shop" ? userInfo.avatar : result.avatar;
+        formState.value.avatar = getAdminType() != "shop" ? userInfo.avatar : result.avatar;
         let temp = extractContent(String(formState.value.avatar));
         if (temp == "one") {
             avatarType.value = true;
         } else if (temp == "def") {
             avatarType.value = false;
         }
-        userStore.setUserInfo(adminType.value != "shop" ? result : result.adminUser || result);
+        userStore.setUserInfo(getAdminType() != "shop" ? result : result.adminUser || result);
     } catch (error: any) {
         message.error(error.message);
     } finally {

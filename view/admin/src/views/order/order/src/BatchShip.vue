@@ -49,7 +49,7 @@
                             </el-table-column>
                             <el-table-column label="属性" prop="productAttr">
                                 <template #default="{ row }">
-                                    {{ row.skuValue || "无属性" }}
+                                    {{ row.skuValue || "-" }}
                                 </template>
                             </el-table-column>
                             <el-table-column label="附加规格" prop="extraSkuData">
@@ -62,7 +62,7 @@
                                     >
                                         {{ item.attrName + item.attrValue + priceFormat(item.totalAttrPrice) }}
                                     </div>
-                                    <div v-else>无附加规格</div>
+                                    <div v-else>-</div>
                                 </template>
                             </el-table-column>
                             <el-table-column label="商品信息" prop="productSn" />

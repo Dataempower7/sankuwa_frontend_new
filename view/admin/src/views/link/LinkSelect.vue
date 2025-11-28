@@ -1,44 +1,38 @@
 <template>
     <div class="link-style">
         <div class="left box">
-            <div v-for="(item, index) in title" :key="index" :class="{ 'active': selectedIndex === index }" class="list-title" @click="selectItem(index)">
-                <div>{{ item }}</div>
+            <div v-for="(item, index) in title" :key="index" :class="{ 'active': selectedIndex === item.value }" class="list-title" @click="selectItem(item.value)">
+                <div>{{ item.label }}</div>
                 <div class="right-ico"><em class="main_pel_m iconfont">&#xe630;</em></div>
             </div>
         </div>
 
         <div class="right box" :validate-event="false">
-            <template v-if="selectedIndex === 0">
+            <template v-if="selectedIndex === 1">
                 <SelectProduct v-model:linkSelectData="selectData" :isMultiple="false"></SelectProduct>
             </template>
-            <template v-if="selectedIndex === 1">
+            <template v-if="selectedIndex === 2">
                 <LinkCategory v-model:linkSelectData="selectData" :slide="false"></LinkCategory>
             </template>
-            <!-- <template v-if="selectedIndex === 2">
-                <LinkCategory v-model:linkSelectData="selectData" :slide="true"></LinkCategory>
-            </template> -->
-            <template v-if="selectedIndex === 2">
+            <template v-if="selectedIndex === 3">
                 <SelectBrand v-model:linkSelectData="selectData" :isMultiple="false"></SelectBrand>
             </template>
-            <!-- <template v-if="selectedIndex === 4">
-
-            </template> -->
-            <template v-if="selectedIndex === 3">
+            <template v-if="selectedIndex === 4">
                 <SelectCoupon v-model:linkSelectData="selectData" :isMultiple="false"></SelectCoupon>
             </template>
-            <template v-if="selectedIndex === 7 && adminType === 'admin'">
-                <SelectShop v-model:linkSelectData="selectData" :isMultiple="false"></SelectShop>
-            </template>
-            <template v-if="selectedIndex === 4">
+            <template v-if="selectedIndex === 5">
                 <SelectArticle v-model:linkSelectData="selectData" :isMultiple="false"></SelectArticle>
             </template>
-            <template v-if="selectedIndex === 5">
+            <template v-if="selectedIndex === 6">
                 <LinkCustom v-model:linkSelectData="selectData"></LinkCustom>
             </template>
-            <template v-if="selectedIndex === 6" class="div0">
+            <template v-if="selectedIndex === 7" class="div0">
                 <LinkBase v-model:linkSelectData="selectData"></LinkBase>
             </template>
-            <template v-if="selectedIndex === 8 && type === 'mobile'">
+            <template v-if="selectedIndex === 8 && adminType === 'admin' && isMerchant()">
+                <SelectShop v-model:linkSelectData="selectData" :isMultiple="false"></SelectShop>
+            </template>
+            <template v-if="selectedIndex === 9 && type === 'mobile'">
                 <LinkDecorate v-model:linkSelectData="selectData" :isMultiple="false"></LinkDecorate>
             </template>
         </div>
@@ -65,19 +59,51 @@ const props = defineProps({
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close", "okType"]);
 emit("okType", false);
 const selectData = ref(<LinkType>{})
-
 const title = ref([
-    '商品详情页', '分类搜索', '品牌搜索', '优惠券', '文章资讯', '自定义链接', '其它页面'
+    {
+        label: '商品详情页',
+        value: 1
+    },
+    {
+        label: '分类搜索',
+        value: 2
+    },
+    {
+        label: '品牌搜索',
+        value: 3
+    },
+    {
+        label: '优惠券',
+        value: 4
+    },
+    {
+        label: '文章资讯',
+        value: 5
+    },
+    {
+        label: '自定义链接',
+        value: 6
+    },
+    {
+        label: '其它页面',
+        value: 7
+    }
 ])
 onMounted(() => {
     if (props.type === "mobile") {
-        title.value.splice(8, 0, '装修页面')
+        title.value.splice(8, 0, {
+            label: '装修页面',
+            value: 9
+        })
     }
     if(adminType.value === 'admin' && isMerchant()){
-        title.value.splice(7, 0, '店铺搜索')
+        title.value.splice(7, 0, {
+            label: '店铺搜索',
+            value: 8
+        })
     }
 })
-const selectedIndex = ref<number>(0);
+const selectedIndex = ref<number>(1);
 const selectItem = (index:number) => {
     if (selectedIndex.value !== index) {
         selectData.value = {}

@@ -31,7 +31,7 @@
                     <el-button @click="onPublish()" type="primary" :disabled="decorateDisabled">保存并发布</el-button>
                     <el-dropdown v-if="isOverseas()" :disabled="decorateDisabled">
                         <div class="lang-btn">
-                            <span class="iconfont-admin icon-gengduo1"></span>
+                            <SvgIcon name="decorate-more" width="20" height="20" />
                         </div>
                         <template #dropdown>
                             <el-dropdown-menu>
@@ -96,6 +96,9 @@
                                 draggable="false"
                                 @click="onEditComponent(index)"
                             >
+                                <div class="module-mask" v-if="!element.isShow">
+                                    <i class="ico-decorate icon-dec-mimayincang" style="font-size: 25px"></i>
+                                </div>
                                 <Modules
                                     v-if="element.type"
                                     v-model:module="element.module"
@@ -169,7 +172,7 @@ import draggable from "vuedraggable";
 import { message, Alert, Modal } from "ant-design-vue";
 import { cloneDeep, set } from "lodash";
 import { toCamelCase } from "@/utils/util";
-import { urlWapFormat, urlFormat } from "@/utils/format";
+import { urlWapFormat, urlFormat, baseDirFormat } from "@/utils/format";
 import { ModulesType, EditResult } from "@/types/decorate/decorate.d";
 import { ModuleTypeList } from "@/views/decorate/decorate/src/modules/editIndex";
 import { getLocalesList } from "@/api/multilingual/languagesList";
@@ -178,6 +181,7 @@ import { isOverseas } from "@/utils/version";
 import "@/views/decorate/decorate/src/css/decorate.less";
 import "@/views/decorate/decorate/src/css/module.less";
 import { useDecorateStore } from "@/store/decorate";
+import { getAdminType } from "@/utils/storage";
 const { decorateInfo, setLocaleId, setIsDefault } = useDecorateStore();
 const props = defineProps({
     decorateType: {
@@ -448,10 +452,14 @@ const onPreview = async () => {
 };
 const { VITE_BASE_DIR } = import.meta.env;
 const onLogout = () => {
-    if (props.decorateType == 1) {
-        window.location.href = `/${VITE_BASE_DIR ?? ""}/decorate-info/mobile-decorate/list/`;
+    if (getAdminType() === "admin") {
+        if (props.decorateType == 1) {
+            window.location.href = `${baseDirFormat(VITE_BASE_DIR) ?? ""}/decorate-info/mobile-decorate/list/`;
+        } else {
+            window.location.href = `${baseDirFormat(VITE_BASE_DIR) ?? ""}/decorate-info/pc-decorate/list/`;
+        }
     } else {
-        window.location.href = `/${VITE_BASE_DIR ?? ""}/decorate-info/pc-decorate/list/`;
+        window.location.href = `${baseDirFormat(VITE_BASE_DIR) ?? ""}/setting/mobile-shop-decorate/`;
     }
 };
 const localesList = ref<any[]>([]);
@@ -486,9 +494,9 @@ const changeLanguage = (localeId: any, isDefault: number) => {
 const navigateToNewWindow = (id?: number, title?: string) => {
     let fullPath = "";
     if (props.decorateType === 1) {
-        fullPath = `${window.location.origin}/${VITE_BASE_DIR ?? ""}/decorate/index?id=${id}&title=${title || ""}`;
+        fullPath = `${window.location.origin}${baseDirFormat(VITE_BASE_DIR) ?? ""}/decorate/index?id=${id}&title=${title || ""}`;
     } else if (props.decorateType === 2) {
-        fullPath = `${window.location.origin}/${VITE_BASE_DIR ?? ""}/decorate/pc?id=${id}&title=${title || ""}`;
+        fullPath = `${window.location.origin}${baseDirFormat(VITE_BASE_DIR) ?? ""}/decorate/pc?id=${id}&title=${title || ""}`;
     }
     window.location.href = fullPath;
 };

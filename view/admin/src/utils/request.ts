@@ -2,17 +2,28 @@ import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
 import { useUserStore } from "@/store/user";
 import { message } from "ant-design-vue";
 import { formatArguments } from "@/utils/util";
+import { isS2b2c, isStore, isMerchant } from "@/utils/version";
 const { VITE_BASE_URL, VITE_REQUEST_URL_PREFIX } = import.meta.env;
 
-// 接口加密密钥--请自行修改
 const requestUrl = {
     prefix: VITE_BASE_URL + VITE_REQUEST_URL_PREFIX, // 所有的请求地址前缀部分
     headers: () => {
-        return {
-            "Authorization": 'Bearer ' + localStorage.getItem("accessToken"),
-            "X-Shop-Id": localStorage.getItem("shopId"),
-            "X-Client-Type": "admin"
+        const accessToken = localStorage.getItem("accessToken");
+        const headers: any = {
+            "X-ADMIN-TYPE": localStorage.getItem("adminType") || 'admin',
+            "X-ClIENT-TYPE": 'admin'
+        };
+        if (accessToken) {
+            headers["Authorization"] = 'Bearer ' + accessToken;
         }
+        if (isS2b2c()) {
+            headers["X-Vendor-Id"] = localStorage.getItem("vendorId") || 0;
+        }
+        if (isStore() || isMerchant()) {
+            headers["X-Shop-Id"] = localStorage.getItem("shopId") || 0;
+        }
+
+        return headers;
     }
 };
 
@@ -33,10 +44,18 @@ const createAxiosInstance = (baseURL: string) => {
 const setupInterceptors = (instance: any) => {
     instance.interceptors.request.use(
         (config: AxiosRequestConfig) => {
-            // 在发送请求之前做些什么
-            config.headers!["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
-            config.headers!["X-Shop-Id"] = localStorage.getItem("shopId");
-            config.headers!["X-Client-Type"] = "admin";
+            const accessToken = localStorage.getItem("accessToken");
+            if (accessToken) {
+                config.headers!["Authorization"] = `Bearer ${accessToken}`;
+            }
+            if (isS2b2c()) {
+                config.headers!["X-Vendor-Id"] = localStorage.getItem("vendorId") || 0;
+            }
+            if (isStore() || isMerchant()) {
+                config.headers!["X-Shop-Id"] = localStorage.getItem("shopId") || 0;
+            }
+            config.headers!["X-ADMIN-TYPE"] = localStorage.getItem("adminType") || 'admin';
+            config.headers!["X-ClIENT-TYPE"] = 'admin';
             config.params = formatArguments(config.params);
             return config;
         },
@@ -55,10 +74,14 @@ const setupInterceptors = (instance: any) => {
                 const status = error.response.status;
                 if (status === 403 || status === 401) {
                     // 禁止访问、无效Token
-                    message.error("登录已过期，请重新登录");
-                    setTimeout(() => {
-                        store.logout();
-                    }, 200);
+                    // 只有在确实有登录状态的情况下才提示并登出
+                    const accessToken = localStorage.getItem("accessToken");
+                    if (accessToken) {
+                        message.error("登录已过期，请重新登录");
+                        setTimeout(() => {
+                            store.logout();
+                        }, 200);
+                    }
                 } else if (data.msg) {
                     if (!error.config.noErrorTip) {
                         message.error(data.msg);
@@ -90,10 +113,14 @@ export function request<T>(config: CustomAxiosRequestConfig): Promise<ApiRespons
             return apiResponse;
         } else {
             if (apiResponse.code === 401) {
-                message.error("登录已过期，请重新登录");
-                setTimeout(() => {
-                    store.logout();
-                }, 200);
+                // 只有在确实有登录状态的情况下才提示并登出
+                const accessToken = localStorage.getItem("accessToken");
+                if (accessToken) {
+                    message.error("登录已过期，请重新登录");
+                    setTimeout(() => {
+                        store.logout();
+                    }, 200);
+                }
             } else if (apiResponse.code > 0 && apiResponse.code != 401) {
                 return Promise.reject(apiResponse);
             } else {

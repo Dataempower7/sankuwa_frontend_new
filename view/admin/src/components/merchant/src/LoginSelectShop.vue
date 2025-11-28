@@ -9,46 +9,74 @@
             </div>
             <div class="sub-title-name" v-if="userinfo && userinfo?.username">
                 <span>{{ encryptPhoneNumber(userinfo?.username) }}</span>
-                已绑定了以下店铺，您可以进入以下任一店铺
+                已绑定了以下{{ isStore() ? "门店" : "店铺" }}，您可以进入以下任一{{ isStore() ? "门店" : "店铺" }}
             </div>
             <a-spin :spinning="loading" style="width: 100%; margin-top: 100px; height: 200px" />
-            <div v-if="!loading && adminType === 'admin'" class="shop-list">
-                <div @click="toIndex(0)" class="shop-item" style="border-color: #ffeac7; background-color: #fff4e6; color: #4e4e4e">
-                    <div class="left-item">
-                        <img class="left-image" src="@/assets/logo/shop_logo_b.png" alt="" />
-                        <div class="left-info">
-                            <div class="left-title">
-                                管理后台 <span v-if="userinfo && userinfo.username && userinfo.username !== ''">（{{ encryptPhoneNumber(userinfo?.username) }}）</span>
+            <div class="shop-list-warp">
+                <div v-if="!loading && adminType === 'admin'" class="shop-list">
+                    <div @click="toIndex(0, 'admin')" class="shop-item"
+                        style="border-color: #ffeac7; background-color: #fff4e6; color: #4e4e4e">
+                        <div class="left-item">
+                            <img class="left-image" src="@/assets/logo/shop_logo_b.png" alt="" />
+                            <div class="left-info">
+                                <div class="left-title">
+                                    管理后台
+                                    <span v-if="userinfo && userinfo.username && userinfo.username !== ''">（{{
+                                        encryptPhoneNumber(userinfo?.username) }}）</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="right-item">
-                        <span class="iconfont-admin icon-login-youjiantou"></span>
-                    </div>
-                </div>
-            </div>
-            <div v-if="myShopList.length > 0" class="shop-list shop-list-min-height">
-                <div v-if="!loading" @click="toIndex(item.shopId)" v-for="item in myShopList" class="shop-item">
-                    <div class="left-item">
-                        <el-image class="left-image" :src="shopLogo"></el-image>
-                        <div class="left-info">
-                            <div class="left-title">{{ item.shopTitle }}</div>
+                        <div class="right-item">
+                            <span class="iconfont-admin icon-login-youjiantou"></span>
                         </div>
                     </div>
-                    <div class="right-item">
-                        <span class="iconfont-admin icon-login-youjiantou"></span>
+                </div>
+                <div v-if="myShopList.length > 0" class="shop-list"
+                    :class="{ 'shop-list-min-height': vendorList.length == 0 }">
+                    <div v-if="!loading" @click="toIndex(item.shopId, 'shop')" v-for="item in myShopList"
+                        class="shop-item">
+                        <div class="left-item">
+                            <el-image v-if="item.shopType !== 3" class="left-image" :src="shopLogo"></el-image>
+                            <el-image v-if="item.shopType === 3" class="left-image" :src="ztdLogo"></el-image>
+                            <div class="left-info">
+                                <div class="left-title">{{ item.shopTitle }}</div>
+                            </div>
+                        </div>
+                        <div class="right-item">
+                            <span class="iconfont-admin icon-login-youjiantou"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div v-if="!loading && myShopList.length == 0 && adminType != 'admin'" class="shop-list shop-list-min-height">
-                <el-empty description="您还没有已绑定的店铺哦～" />
+                <div v-if="vendorList.length > 0" class="shop-list shop-list-min-height"
+                    :class="{ top: myShopList.length > 0 }">
+                    <div v-if="!loading" @click="toIndex(item.vendorId, 'vendor')" v-for="item in vendorList"
+                        class="shop-item">
+                        <div class="left-item">
+                            <el-image class="left-image" :src="gysLogo"></el-image>
+                            <div class="left-info">
+                                <div class="left-title">{{ item.vendorName }}</div>
+                            </div>
+                        </div>
+                        <div class="right-item">
+                            <span class="iconfont-admin icon-login-youjiantou"></span>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="!loading && myShopList.length == 0 && vendorList.length == 0 && adminType != 'admin'"
+                    class="shop-list shop-list-min-height">
+                    <el-empty description="您还没有已绑定的店铺哦～" />
+                </div>
             </div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
 import shopLogo from "@/assets/logo/shop_logo.png";
+import gysLogo from "@/assets/logo/gys.png";
+import ztdLogo from "@/assets/logo/ztd.png";
 import { useUserStore } from "@/store/user";
+import { isStore } from "@/utils/version";
+
 const props = defineProps({
     selectShopFlag: {
         type: Boolean,
@@ -58,13 +86,17 @@ const props = defineProps({
         type: Array as () => any[],
         default: () => []
     },
+    vendorList: {
+        type: Array as () => any[],
+        default: () => []
+    },
     loading: {
         type: Boolean,
         default: false
     },
     userinfo: {
         type: Object,
-        default: () => {}
+        default: () => { }
     },
     adminType: {
         type: String,
@@ -72,8 +104,8 @@ const props = defineProps({
     }
 });
 const emit = defineEmits(["closePopup", "update:selectShopFlag", "callBack"]);
-const toIndex = async (shopId: number) => {
-    emit("callBack", shopId);
+const toIndex = async (id: number, type: string) => {
+    emit("callBack", { id, type });
 };
 const { logout } = useUserStore();
 const back = () => {
@@ -104,10 +136,12 @@ const encryptPhoneNumber = (username: string): string => {
         display: flex;
         flex-direction: column;
         gap: 16px;
+
         .back-btn {
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
+
             .bark {
                 display: flex;
                 align-items: center;
@@ -115,6 +149,7 @@ const encryptPhoneNumber = (username: string): string => {
                 font-weight: 600;
                 gap: 2px;
                 cursor: pointer;
+
                 i {
                     font-size: 14px;
                     padding-right: 5px;
@@ -125,6 +160,7 @@ const encryptPhoneNumber = (username: string): string => {
         .title-name {
             display: flex;
             justify-content: space-between;
+
             .bark {
                 display: flex;
                 align-items: center;
@@ -148,8 +184,17 @@ const encryptPhoneNumber = (username: string): string => {
             font-size: 14px;
             line-height: 1.5;
 
-            & > span {
+            &>span {
                 font-weight: bold;
+            }
+        }
+
+        .shop-list-warp {
+            max-height: 500px;
+            overflow: auto;
+
+            &::-webkit-scrollbar {
+                display: none;
             }
         }
 
@@ -157,6 +202,8 @@ const encryptPhoneNumber = (username: string): string => {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            margin-bottom: 8px;
+
             .shop-item {
                 cursor: pointer;
                 border: 0.6px solid #e0e0e0;
@@ -206,7 +253,12 @@ const encryptPhoneNumber = (username: string): string => {
                     justify-content: center;
                 }
             }
+
+            &.top {
+                margin-top: -8px;
+            }
         }
+
         .shop-list-min-height {
             min-height: 200px;
         }
@@ -215,6 +267,7 @@ const encryptPhoneNumber = (username: string): string => {
             display: flex;
             flex-direction: column;
             gap: 8px;
+
             .shop-item {
                 cursor: pointer;
                 border: 0.6px solid #e0e0e0;

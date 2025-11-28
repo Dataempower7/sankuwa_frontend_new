@@ -98,6 +98,25 @@
                                             {{ row.status == 1 ? "已发布" : "未发布" }}
                                         </template>
                                     </el-table-column>
+                                    <el-table-column label="页面语言" prop="children" :width="200" v-if="isOverseas()">
+                                        <template #default="{ row }">
+                                            <div class="flex flex-wrap" style="gap: 10px; cursor: pointer">
+                                                <div>
+                                                    <el-tag type="primary" effect="plain" @click="toPage(props.decorateType, 0, row.decorateId, 0, true)"
+                                                        >默认语言</el-tag
+                                                    >
+                                                </div>
+                                                <div v-for="item in row.children" :key="item.decorateId">
+                                                    <el-tag
+                                                        type="primary"
+                                                        effect="plain"
+                                                        @click="toPage(props.decorateType, row.decorateId, item.decorateId, item.localeId, false)"
+                                                        >{{ item.language }}</el-tag
+                                                    >
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column label="更新时间" prop="updateTime" sortable="custom">
                                         <template #default="{ row }">
                                             {{ row.updateTime }}
@@ -105,20 +124,7 @@
                                     </el-table-column>
                                     <el-table-column label="操作" fixed="right" :width="220">
                                         <template #default="{ row }">
-                                            <router-link
-                                                v-if="props.decorateType === 1"
-                                                :to="{ path: '/decorate/index', query: { id: row.decorateId } }"
-                                                target="_blank"
-                                                class="btn-link"
-                                                >编辑</router-link
-                                            >
-                                            <router-link
-                                                v-if="props.decorateType === 2"
-                                                :to="{ path: '/decorate/pc', query: { id: row.decorateId } }"
-                                                target="_blank"
-                                                class="btn-link"
-                                                >编辑</router-link
-                                            >
+                                            <a class="btn-link" @click="toPage(props.decorateType, 0, row.decorateId, 0, true)">编辑</a>
                                             <el-divider direction="vertical" />
                                             <template v-if="row.isHome == 0 && row.status == 1">
                                                 <a class="btn-link" @click="setHome(row)">设为首页</a>
@@ -179,6 +185,10 @@ import { Tag } from "@/components/form";
 import OtherPage from "@/views/merchant/setting/mobileShopDecorate/OtherPage.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { copyDomText } from "@/utils/util";
+import { isOverseas } from "@/utils/version";
+import { baseDirFormat } from "@/utils/format";
+import { useDecorateStore } from "@/store/decorate";
+const { setDecorateId, setLocaleId, setIsDefault, resetDecorateInfo } = useDecorateStore();
 const props = defineProps({
     decorateType: {
         type: Number,
@@ -298,6 +308,19 @@ const onCopy = async (row: FilterState) => {
     } catch (error: any) {
         message.error(error.message);
     } finally {
+    }
+};
+
+const { VITE_BASE_DIR } = import.meta.env;
+const toPage = (type: number, parentId: number, id: number, localeId: number, isDefault: boolean) => {
+    resetDecorateInfo();
+    setDecorateId(parentId || id || 0);
+    setLocaleId(localeId);
+    setIsDefault(isDefault);
+    if (type === 1) {
+        window.open(`${baseDirFormat(VITE_BASE_DIR)}/decorate/index?id=${id}`, "_blank");
+    } else {
+        window.open(`${baseDirFormat(VITE_BASE_DIR)}/decorate/pc?id=${id}`, "_blank");
     }
 };
 </script>

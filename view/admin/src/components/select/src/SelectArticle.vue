@@ -33,7 +33,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import {onMounted, reactive, ref, defineModel} from "vue"
+import {onMounted, reactive, ref} from "vue"
 import {DialogForm} from '@/components/dialog'
 import {getArticleList} from "@/api/content/article";
 import {message} from "ant-design-vue";

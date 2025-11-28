@@ -1,10 +1,10 @@
 import type { AdminInfoFormState, UserInfo } from "@/types/authority/accountEditing.d";
 import request from "@/utils/request";
-const adminType = localStorage.getItem("adminType");
+import { getAdminType } from "@/utils/storage";
 
 export const getAdminInfo = (params: Object) => {
     return request<AdminInfoFormState>({
-        url: adminType=='shop' ? "merchant/adminUserShop/info" : "authority/adminUser/detail",
+        url: getAdminType() == 'shop' ? "merchant/adminUserShop/info" : "authority/adminUser/detail",
         method: "get",
         params
     });
@@ -29,7 +29,7 @@ export const LogOut = () => {
 };
 export const adminInfoSubmit = (data: object) => {
     return request({
-        url: adminType=='shop' ? "merchant/adminUserShop/modifyUser" : "authority/adminUser/modifyManageAccounts",
+        url: getAdminType() == 'shop' ? "merchant/adminUserShop/modifyUser" : "authority/adminUser/modifyManageAccounts",
         method: "post",
         data
     });

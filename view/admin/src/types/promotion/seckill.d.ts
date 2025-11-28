@@ -53,6 +53,7 @@ export interface SeckillProductState {
     skuStock: number
     skuTsn: string
     skuPrice: string
+    purchasePrice?: string | number
     secondsSeckill: number;
     seckillPrice: string;
     productPrice: string;

@@ -18,6 +18,7 @@
         :footer-style="{ textAlign: 'right' }"
         v-bind="bindParams"
         :bodyStyle="bodyStyle"
+        :centered="centered"
         @close="close"
     >
         <a-config-provider :locale="zhCN">
@@ -79,6 +80,10 @@ const props = defineProps({
         type: String,
         default: ""
     },
+    centered: {
+        type: Boolean,
+        default: false
+    },
     isDrawer: {
         type: Boolean,
         default: false
@@ -122,6 +127,10 @@ const props = defineProps({
         // 点击蒙层是否允许关闭
         type: Boolean,
         default: true
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     },
     type: String //类型  空:普通表单   gallery:相册
 });
@@ -173,6 +182,7 @@ if (props.type == "galleryVideo") {
 }
 
 const show = (e: any) => {
+    if (props.disabled) return;
     if (loaded.value == false) {
         loadComponent();
     }
@@ -226,9 +236,12 @@ async function loadComponent() {
 
 onMounted(() => {});
 
-const submitCallback = (result: any) => {
+const submitCallback = (result: any, isClose: boolean = true) => {
     // 如果返回结果无报错，关闭弹窗
-    visible.value = false;
+    if(isClose) {
+        visible.value = false;
+    }
+    // visible.value = false;
     confirmLoading.value = false;
     // 执行父组件传来的确认回调，如刷新列表
     emit("okCallback", result, props.data);

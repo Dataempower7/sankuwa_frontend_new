@@ -62,6 +62,13 @@
                                     </el-space>
                                 </template>
                             </el-table-column>
+                            <el-table-column :width="120" label="分类图片">
+                                <template #default="{ row }">
+                                    <div v-if="row.categoryPic">
+                                        <el-image :src="imageFormat(row.categoryPic)" fit="contain" style="height: 30px; width: 30px" />
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column key="isShow" :sorter="true" label="是否显示">
                                 <template #default="{ row }">
                                     <Switch

@@ -28,7 +28,7 @@
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { PicSelect } from '@/components/decorate'
 import { ModuleType } from "@/types/decorate/decorate.d";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 const module = defineModel<ModuleType>("module", { default: () => ({}) });
 const selectLabel = ref<any>({
     lineType: {

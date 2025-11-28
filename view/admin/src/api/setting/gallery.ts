@@ -136,3 +136,13 @@ export const getGalleryVideoDetail = (params:Object) => {
         params,
     });
 }
+
+
+// 获取视频相册下拉列表
+export const getAllCategory = (params?:Object) => {
+    return request<any>({
+        url: "setting/galleryVideo/getAllCategory",
+        method: "get",
+        params,
+    });
+}

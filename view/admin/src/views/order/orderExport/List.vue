@@ -15,7 +15,7 @@
                                     <div class="form-group">
                                         <label class="control-label"><span>订单信息：</span></label>
                                         <div class="control-container">
-                                            <TigInput v-model="filterParams.keyword" name="keyword" placeholder="订单号/收货人姓名/订单"> </TigInput>
+                                            <TigInput v-model="filterParams.keyword" name="keyword" placeholder="订单号/收货人姓名/商品名称"> </TigInput>
                                         </div>
                                     </div>
                                 </div>

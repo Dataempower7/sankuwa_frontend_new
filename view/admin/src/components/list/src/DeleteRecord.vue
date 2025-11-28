@@ -9,7 +9,7 @@ import { message, Modal } from "ant-design-vue";
 const props = defineProps({
     requestApi: {
         type: Function,
-        default: () => {}
+        default: () => { }
     },
     params: {
         type: Object,
@@ -21,7 +21,7 @@ const props = defineProps({
     },
     message: {
         type: String,
-        default: "删除成功"
+        default: "操作成功"
     },
     disabled: {
         type: Boolean,
@@ -41,7 +41,7 @@ const delRecord = () => {
             await props
                 .requestApi(props.params)
                 .then((result: any) => {
-                    message.success(result && result !== 'success' ? result : props.message);
+                    message.success(props.message);
                     emit("afterDelete", true);
                 })
                 .catch((error: any) => {

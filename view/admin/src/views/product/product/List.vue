@@ -11,26 +11,34 @@
                                     <div class="form-group">
                                         <label class="control-label"><span>商品名称：</span></label>
                                         <div class="control-container">
-                                            <TigInput
-                                                v-model="filterParams.keyword"
-                                                name="keyword"
-                                                placeholder="输入商品名称/货号"
-                                                @keyup.enter="onSearchSubmit"
-                                                clearable
-                                                @clear="onSearchSubmit"
-                                            >
+                                            <TigInput v-model="filterParams.keyword" name="keyword"
+                                                placeholder="输入商品名称/货号" @keyup.enter="onSearchSubmit" clearable
+                                                @clear="onSearchSubmit">
                                                 <template #append>
-                                                    <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span></el-button>
+                                                    <el-button @click="onSearchSubmit"><span
+                                                            class="iconfont icon-chakan1"></span></el-button>
                                                 </template>
                                             </TigInput>
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="activeKey !== 2 && adminType != 'shop' && isMerchant()" class="simple-form-field">
+                                <div v-if="activeKey !== 2 && getAdminType() != 'shop' && isMerchant()"
+                                    class="simple-form-field">
                                     <div class="form-group">
                                         <label class="control-label"><span>店铺：</span></label>
                                         <div class="control-container">
-                                            <SelectShop v-model:shopId="filterParams.shopId" @onChange="SelectShopChange"></SelectShop>
+                                            <SelectShop v-model:shopId="filterParams.shopId"
+                                                @onChange="SelectShopChange"></SelectShop>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="activeKey !== 2 && getAdminType() != 'shop' && isStore()"
+                                    class="simple-form-field">
+                                    <div class="form-group">
+                                        <label class="control-label"><span>门店：</span></label>
+                                        <div class="control-container">
+                                            <SelectShop v-model:shopId="filterParams.shopId" :type="2"
+                                                placeholder="请输入门店名称" @onChange="SelectShopChange"></SelectShop>
                                         </div>
                                     </div>
                                 </div>
@@ -38,7 +46,8 @@
                                     <div class="form-group">
                                         <label class="control-label"><span>分类：</span></label>
                                         <div class="control-container">
-                                            <SelectCategory ref="selectCategoryRef" v-model:categoryId="filterParams.categoryId"></SelectCategory>
+                                            <SelectCategory ref="selectCategoryRef"
+                                                v-model:categoryId="filterParams.categoryId"></SelectCategory>
                                         </div>
                                     </div>
                                 </div>
@@ -46,7 +55,8 @@
                                     <div class="form-group">
                                         <label class="control-label"><span>品牌：</span></label>
                                         <div class="control-container">
-                                            <SelectBrand v-model:brandId="filterParams.brandId" @onChange="onSearchSubmit"></SelectBrand>
+                                            <SelectBrand v-model:brandId="filterParams.brandId"
+                                                @onChange="onSearchSubmit"></SelectBrand>
                                         </div>
                                     </div>
                                 </div>
@@ -54,7 +64,8 @@
                                     <div class="form-group">
                                         <label class="control-label"><span>类型 ：</span></label>
                                         <div class="control-container">
-                                            <el-select v-model="filterParams.introType" clearable @change="onSearchSubmit">
+                                            <el-select v-model="filterParams.introType" clearable
+                                                @change="onSearchSubmit">
                                                 <el-option label="精品" value="isBest" />
                                                 <el-option label="热销" value="isHot" />
                                                 <el-option label="新品" value="isNew" />
@@ -76,59 +87,77 @@
                         <div class="list-table-tool-row">
                             <div class="list-table-tool-col">
                                 <el-space>
+                                    <!--o2o 门店端添加商品按钮  -->
                                     <DialogForm
-                                        :params="{ act: 'add' }"
-                                        isDrawer
-                                        path="product/product/Info"
-                                        title="添加商品"
-                                        width="950px"
-                                        @okCallback="loadFilter"
-                                    >
+                                        v-if="getAdminType() === 'shop' && storeSettingInfo.storeIndependentGoods == 1 && getShopType() > 1"
+                                        :params="{ act: 'add' }" isDrawer path="product/product/Info" title="添加商品"
+                                        width="950px" @okCallback="loadFilter">
                                         <el-button type="primary">添加商品</el-button>
                                     </DialogForm>
-                                    <router-link
-                                        v-if="isOverseas() && adminType === 'admin'"
-                                        :to="{ path: '/setting/translationContent/list', query: { type: 'product' } }"
+                                    <!--平台端&p店铺端添加商品按钮  -->
+                                    <DialogForm
+                                        v-if="(getAdminType() === 'shop' && getShopType() == 1) || getAdminType() === 'admin'"
+                                        :params="{ act: 'add' }" isDrawer path="product/product/Info" title="添加商品"
+                                        width="950px" @okCallback="loadFilter">
+                                        <el-button type="primary">添加商品</el-button>
+                                    </DialogForm>
+                                    <!--o2o 门店端导入供应商商品按钮  -->
+                                    <DialogForm
+                                        v-if="(isS2b2c() && getAdminType() === 'shop') || (isS2b2c() && getAdminType() === 'admin')"
+                                        :params="{ act: 'add' }" isDrawer path="product/product/vendor/ProductList"
+                                        title="导入供应商商品" width="1100px" :show-footer="false" @callback="loadFilter">
+                                        <el-button type="primary">导入供应商商品</el-button>
+                                    </DialogForm>
+                                    <!--平台端&p店铺端导入供应商商品按钮  -->
+                                    <!-- <DialogForm
+                                        v-if="isS2b2c() && getAdminType() === 'shop' && storeSettingInfo.storeIndependentGoods == 1 && getShopType() > 1"
+                                        :params="{ act: 'add' }"
+                                        isDrawer
+                                        path="product/product/vendor/ProductList"
+                                        title="导入供应商商品"
+                                        width="1100px"
+                                        :show-footer="false"
+                                        @callback="loadFilter"
                                     >
+                                        <el-button type="primary">导入供应商商品</el-button>
+                                    </DialogForm> -->
+                                    <router-link v-if="isOverseas() && getAdminType() === 'admin'"
+                                        :to="{ path: '/setting/translationContent/list', query: { type: 'product' } }">
                                         <el-button>批量翻译商品</el-button>
                                     </router-link>
-                                    <!-- <router-link
-                                        v-if="isOverseas() && adminType === 'shop'"
-                                        :to="{ path: '/merchant_setting/shop_multilingual/shop_translationContent/list', query: { type: 'product' } }"
-                                    >
-                                        <el-button>批量翻译商品</el-button>
-                                    </router-link> -->
-                                    <el-popconfirm
-                                        v-if="activeKey == 4 || activeKey == 1"
-                                        title="您确认要批量移入回收站吗？"
-                                        @confirm="onBatchSubmit('recycle')"
-                                    >
+                                    <el-popconfirm v-if="activeKey == 4 || activeKey == 1" title="您确认要批量移入回收站吗？"
+                                        @confirm="onBatchSubmit('recycle')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量移入回收站</el-button>
                                         </template>
                                     </el-popconfirm>
-                                    <el-popconfirm v-if="activeKey == 7" title="您确认要批量还原吗？" @confirm="onBatchSubmit('restore')">
+                                    <el-popconfirm v-if="activeKey == 7" title="您确认要批量还原吗？"
+                                        @confirm="onBatchSubmit('restore')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量还原</el-button>
                                         </template>
                                     </el-popconfirm>
-                                    <el-popconfirm v-if="activeKey == 7" title="您确认要批量删除吗？" @confirm="onBatchSubmit('del')">
+                                    <el-popconfirm v-if="activeKey == 7" title="您确认要批量删除吗？"
+                                        @confirm="onBatchSubmit('del')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量删除</el-button>
                                         </template>
                                     </el-popconfirm>
-                                    <el-popconfirm v-if="activeKey == 4" title="您确认要批量上架吗？" @confirm="onBatchSubmit('up')">
+                                    <el-popconfirm v-if="activeKey == 4" title="您确认要批量上架吗？"
+                                        @confirm="onBatchSubmit('up')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量上架</el-button>
                                         </template>
                                     </el-popconfirm>
 
-                                    <el-popconfirm v-if="activeKey == 1" title="您确认要批量下架吗？" @confirm="onBatchSubmit('down')">
+                                    <el-popconfirm v-if="activeKey == 1" title="您确认要批量下架吗？"
+                                        @confirm="onBatchSubmit('down')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量下架</el-button>
                                         </template>
                                     </el-popconfirm>
-                                    <el-popconfirm v-if="activeKey == 5" title="您确认要批量通过审核吗？" @confirm="onBatchSubmit('audit')">
+                                    <el-popconfirm v-if="activeKey == 5" title="您确认要批量通过审核吗？"
+                                        @confirm="onBatchSubmit('audit')">
                                         <template #reference>
                                             <el-button :disabled="selectedIds.length === 0">批量通过审核</el-button>
                                         </template>
@@ -143,40 +172,51 @@
                 </div>
                 <div class="table-container">
                     <a-spin :spinning="loading">
-                        <el-table :data="filterState" :total="total" row-key="productId" @selection-change="onSelectChange" @sort-change="onSortChange">
+                        <el-table :data="filterState" :total="total" row-key="productId"
+                            @selection-change="onSelectChange" @sort-change="onSortChange">
                             <el-table-column type="selection" width="32" />
                             <el-table-column label="商品名称" prop="productId" sortable="custom" :min-width="320">
                                 <template #default="{ row }">
                                     <div class="flex">
                                         <div v-if="row.picThumb" class="span-pic">
-                                            <a :href="urlFormat({ path: 'product', sn: row.productSn })" target="_blank"
-                                                ><img :src="imageFormat(row.picThumb)" height="68" width="68" alt=""
-                                            /></a>
+                                            <a :href="urlFormat({ path: 'product', sn: row.productSn, id: row.productId })"
+                                                target="_blank"><img :src="imageFormat(row.picThumb)" height="68"
+                                                    width="68" alt="" /></a>
                                         </div>
                                         <div class="span-product-con">
                                             <div class="span-product-name" style="word-break: break-all">
-                                                <PopForm
-                                                    :max="100"
-                                                    v-model:org-value="row.productName"
+                                                <PopForm v-if="
+                                                    (getAdminType() === 'vendor' && row.vendorProductId == null) ||
+                                                    row.vendorProductId < 0 ||
+                                                    (getShopType() === 2 && (storeSettingInfo.storeAssignProductName === 1 || row.shopId)) ||
+                                                    getShopType() === 1 ||
+                                                    getAdminType() === 'admin'
+                                                " :max="100" v-model:org-value="row.productName"
                                                     :params="{ id: row.productId, field: 'productName' }"
-                                                    :requestApi="updateProductFiled"
-                                                    label="商品名称"
-                                                    type="textarea"
-                                                >
+                                                    :requestApi="updateProductFiled" label="商品名称" type="textarea">
                                                     <div>{{ row.productName }}</div>
                                                 </PopForm>
+                                                <div v-else>{{ row.productName }}</div>
                                             </div>
                                             <p v-if="row.brandName" class="span-product-brand">
-                                                <span class="span-tit">商品：</span><span class="span-con">{{ row.brandName }}</span>
+                                                <span class="span-tit">商品：</span><span class="span-con">{{ row.brandName
+                                                }}</span>
                                             </p>
-                                            <p v-if="row.shopSimple" class="span-product-brand">
-                                                <span class="span-tit">店铺：</span><span class="span-con green">{{ row.shopSimple.shopTitle }}</span>
+                                            <p v-if="row.shopSimple && isMerchant()" class="span-product-brand">
+                                                <span class="span-tit">店铺：</span><span class="span-con green">{{
+                                                    row.shopSimple.shopTitle }}</span>
                                             </p>
-                                            <p v-if="row.shop" class="span-product-brand">
-                                                <span class="span-tit">店铺：</span><span class="span-con green">{{ row.shop.shopTitle }}</span>
+                                            <p v-if="row.shop && isMerchant()" class="span-product-brand">
+                                                <span class="span-tit">店铺：</span><span class="span-con green">{{
+                                                    row.shop.shopTitle }}</span>
                                             </p>
-                                            <p v-if="row.suppliersName" class="span-product-brand">
-                                                <span class="span-tit">供应商：</span><span class="span-con green">{{ row.suppliersName }}</span>
+                                            <p v-if="row.shop && isStore()" class="span-product-brand">
+                                                <span class="span-tit">门店：</span><span class="span-con green">{{
+                                                    row.shop.shopTitle }}</span>
+                                            </p>
+                                            <p v-if="row.suppliersName && isS2b2c()" class="span-product-brand">
+                                                <span class="span-tit">供应商：</span><span class="span-con green">{{
+                                                    row.suppliersName }}</span>
                                             </p>
                                             <p v-if="row.type === 2"><span class="span-con green">【虚拟商品】</span></p>
                                         </div>
@@ -189,55 +229,58 @@
                                         <div>
                                             <span class="span-tit">编码：</span>
                                             <div class="span-con">
-                                                <PopForm
-                                                    v-model:org-value="row.productSn"
+                                                <PopForm v-if="
+                                                    (getAdminType() === 'vendor' && row.vendorProductId == null) ||
+                                                    row.vendorProductId < 0 ||
+                                                    (getShopType() === 2 && row.shopId) ||
+                                                    getShopType() === 1 ||
+                                                    getAdminType() === 'admin'
+                                                " v-model:org-value="row.productSn"
                                                     :params="{ id: row.productId, field: 'productSn' }"
-                                                    :requestApi="updateProductFiled"
-                                                    label="货号"
-                                                    :max="20"
-                                                >
+                                                    :requestApi="updateProductFiled" label="货号" :max="20">
                                                     <div>{{ row.productSn || "--" }}</div>
                                                 </PopForm>
+                                                <div v-else>{{ row.productSn || "--" }}</div>
                                             </div>
                                         </div>
                                         <div>
                                             <span class="span-tit">售价：</span>
                                             <div class="span-con">
-                                                <PopForm
-                                                    extra="请输入商品价格"
-                                                    isPrice
-                                                    v-model:org-value="row.productPrice"
+                                                <PopForm v-if="
+                                                    (getAdminType() === 'vendor' && row.vendorProductId == null) ||
+                                                    row.vendorProductId < 0 ||
+                                                    (getShopType() === 2 && (storeSettingInfo.storeAssignProductPrice === 1 || row.shopId)) ||
+                                                    getShopType() === 1 ||
+                                                    getAdminType() === 'admin'
+                                                " extra="请输入商品价格" isPrice v-model:org-value="row.productPrice"
                                                     :params="{ id: row.productId, field: 'productPrice' }"
-                                                    :requestApi="updateProductFiled"
-                                                    label="售价"
-                                                    type="decimal"
-                                                >
+                                                    :requestApi="updateProductFiled" label="售价" type="decimal">
                                                     <div>{{ row.productPrice || 0.0 }}</div>
                                                 </PopForm>
+                                                <div v-else>{{ row.productPrice || 0.0 }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="activeKey != 7 && activeKey != 5 && activeKey != 6" :width="100" label="是否上架">
+                            <el-table-column v-if="activeKey != 7 && activeKey != 5 && activeKey != 6" :width="100"
+                                label="是否上架">
                                 <template #default="{ row }">
                                     <div class="status-switch">
                                         <div v-if="row.checkStatus == 1">
-                                            <Switch
-                                                v-model:checked="row.productStatus"
+                                            <Switch v-model:checked="row.productStatus"
                                                 :params="{ id: row.productId, field: 'productStatus' }"
-                                                :requestApi="updateProductFiled"
-                                            />
+                                                :requestApi="updateProductFiled" />
                                         </div>
                                     </div>
                                 </template>
                             </el-table-column>
                             <el-table-column v-if="activeKey === 5 || activeKey === 6" :width="100" label="审核状态">
                                 <template #default="{ row }">
-                                    <span v-if="row.checkStatus === 2" class="red tips-hover" :title="row.checkReason"
-                                        >审核失败 <i class="ico-font">&#xe611;</i></span
-                                    >
-                                    <span v-if="row.checkStatus === 0" class="tips-hover gray" :title="row.checkReason">审核中</span><br />
+                                    <span v-if="row.checkStatus === 2" class="red tips-hover"
+                                        :title="row.checkReason">审核失败 <i class="ico-font">&#xe611;</i></span>
+                                    <span v-if="row.checkStatus === 0" class="tips-hover gray"
+                                        :title="row.checkReason">审核中</span><br />
                                 </template>
                             </el-table-column>
                             <el-table-column v-if="activeKey === 6" :width="120" label="失败原因" show-overflow-tooltip>
@@ -245,22 +288,28 @@
                                     {{ row.checkReason }}
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="activeKey != 7" :width="100" label="库存" prop="productStock" sortable="custom">
+                            <el-table-column v-if="activeKey != 7" :width="100" label="库存" prop="productStock"
+                                sortable="custom">
                                 <template #default="{ row }">
-                                    <a v-if="row.productExist">{{ row.productStock }}</a>
+                                    <el-button type="primary" link v-if="row.productType === 5 || row.productType === 6"
+                                        @click="goSetStock(row)">去设置</el-button>
                                     <div v-else>
-                                        <ProductStockPop
-                                            v-if="!loading"
-                                            :params="{ id: row.productId, productInfo: row }"
-                                            :requestApi="updateProductFiled"
-                                            @callback="loadFilter"
-                                        >
+                                        <ProductStockPop v-if="
+                                            (getAdminType() === 'vendor' && row.vendorProductId == null) ||
+                                            row.vendorProductId < 0 ||
+                                            (getShopType() === 2 && (storeSettingInfo.storeUseSoloProductStock === 1 || row.shopId)) ||
+                                            getShopType() === 1 ||
+                                            getAdminType() === 'admin'
+                                        " :params="{ id: row.productId, productInfo: row }"
+                                            :requestApi="updateProductFiled" @callback="loadFilter">
                                             <div>{{ row.productStock }}</div>
                                         </ProductStockPop>
+                                        <div v-else>{{ row.productStock }}</div>
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="activeKey != 7" :width="110" label="排序" prop="sortOrder" sortable="custom">
+                            <el-table-column v-if="activeKey != 7" :width="110" label="排序" prop="sortOrder"
+                                sortable="custom">
                                 <template #header>
                                     <el-tooltip class="box-item" effect="light" placement="top" show-after="300">
                                         <template #content>
@@ -268,128 +317,149 @@
                                         </template>
                                         <div class="flex flex-align-center">
                                             <div>排序</div>
-                                            <el-icon style="margin-left: 5px" size="14" color="#999"><QuestionFilled /></el-icon>
+                                            <el-icon style="margin-left: 5px" size="14" color="#999">
+                                                <QuestionFilled />
+                                            </el-icon>
                                         </div>
                                     </el-tooltip>
                                 </template>
                                 <template #default="{ row }">
-                                    <PopForm
-                                        v-model:org-value="row.sortOrder"
+                                    <PopForm v-if="
+                                        (getAdminType() === 'vendor' && row.vendorProductId == null) ||
+                                        row.vendorProductId < 0 ||
+                                        (getShopType() === 2 && row.shopId) ||
+                                        getShopType() === 1 ||
+                                        getAdminType() === 'admin'
+                                    " v-model:org-value="row.sortOrder"
                                         :params="{ id: row.productId, field: 'sortOrder' }"
-                                        :requestApi="updateProductFiled"
-                                        label="排序"
-                                        type="integer"
-                                    >
+                                        :requestApi="updateProductFiled" label="排序" type="integer">
                                         <div>{{ row.sortOrder }}</div>
                                     </PopForm>
+                                    <div v-else>{{ row.sortOrder }}</div>
                                 </template>
                             </el-table-column>
-                            <el-table-column :width="150" fixed="right" label="操作">
+                            <el-table-column :width="isStore() && getAdminType() === 'admin' ? 200 : 180" fixed="right"
+                                label="操作">
                                 <template #default="{ row }">
                                     <el-space :size="0">
-                                        <DialogForm
-                                            :maskClose="false"
-                                            v-if="activeKey == 5 && row.checkStatus === 0"
+                                        <DialogForm :maskClose="false" v-if="activeKey == 5 && row.checkStatus === 0"
                                             :params="{ act: 'detail', id: row.productId, examine: 1 }"
-                                            :showClose="false"
-                                            :showOnOk="false"
-                                            isDrawer
-                                            path="product/product/Info"
-                                            title="商品详情"
-                                            width="900px"
-                                            @okCallback="loadFilter"
-                                        >
+                                            :showClose="false" :showOnOk="false" isDrawer path="product/product/Info"
+                                            title="商品详情" width="900px" @okCallback="loadFilter">
                                             <a class="btn-link">详情</a>
                                         </DialogForm>
-                                        <el-divider v-if="activeKey == 5 && row.checkStatus === 0" direction="vertical" />
-                                        <DialogForm
-                                            :maskClose="false"
-                                            v-if="activeKey == 6 && row.checkStatus === 2"
-                                            :params="{ act: 'again', id: row.productId }"
-                                            dialogClass="noPadding"
-                                            isDrawer
-                                            path="product/product/Info"
-                                            title="修改商品（重新审核）"
-                                            width="600px"
-                                            @okCallback="loadFilter"
-                                        >
+                                        <el-divider v-if="activeKey == 5 && row.checkStatus === 0"
+                                            direction="vertical" />
+                                        <DialogForm :maskClose="false" v-if="activeKey == 6 && row.checkStatus === 2"
+                                            :params="{ act: 'again', id: row.productId }" dialogClass="noPadding"
+                                            isDrawer path="product/product/Info" title="修改商品（重新审核）" width="600px"
+                                            @okCallback="loadFilter">
                                             <a class="btn-link">重新审核</a>
                                         </DialogForm>
-                                        <DialogForm
-                                            :maskClose="false"
-                                            v-if="activeKey == 5 && row.checkStatus === 0"
-                                            :params="{ act: 'detail', id: row.productId }"
-                                            dialogClass="noPadding"
-                                            isDrawer
-                                            path="product/product/Examine"
-                                            title="商品审核"
-                                            width="600px"
-                                            @okCallback="loadFilter"
-                                        >
+                                        <DialogForm :maskClose="false" v-if="activeKey == 5 && row.checkStatus === 0"
+                                            :params="{ act: 'detail', id: row.productId }" dialogClass="noPadding"
+                                            isDrawer path="product/product/Examine" title="商品审核" width="600px"
+                                            @okCallback="loadFilter">
                                             <a class="btn-link">去处理</a>
                                         </DialogForm>
-                                        <DialogForm
-                                            :maskClose="false"
-                                            v-if="activeKey != 7 && activeKey != 5 && activeKey != 6"
-                                            :params="{ act: 'detail', id: row.productId, shopId: row.shopId || 0 }"
-                                            isDrawer
-                                            path="product/product/Info"
-                                            title="编辑商品"
-                                            width="950px"
-                                            @okCallback="loadFilter"
-                                        >
+                                        <DialogForm :maskClose="false"
+                                            v-if="activeKey != 7 && activeKey != 5 && activeKey != 6" :params="{
+                                                act: 'detail',
+                                                id: row.productId,
+                                                shopId: row.shopId || 0,
+                                                examine: getShopType() == 2 && !row.shopId ? 1 : 0,
+                                                storeSettingInfo: storeSettingInfo
+                                            }" isDrawer path="product/product/Info" title="编辑商品" width="950px"
+                                            @okCallback="loadFilter">
                                             <a class="btn-link">编辑</a>
                                         </DialogForm>
                                         <el-divider v-if="activeKey != 7" direction="vertical" />
-                                        <a
-                                            v-if="activeKey != 7 && activeKey != 5 && activeKey != 6"
-                                            class="btn-link"
-                                            :href="urlFormat({ path: 'product', sn: row.productSn })"
-                                            target="_blank"
-                                            >查看</a
-                                        >
-                                        <el-divider v-if="activeKey != 7 && activeKey != 5 && activeKey != 6" direction="vertical" />
-                                        <DeleteRecord
-                                            v-if="activeKey === 7"
+                                        <a v-if="activeKey != 7 && activeKey != 5 && activeKey != 6" class="btn-link"
+                                            :href="urlFormat({ path: 'product', sn: row.productSn, id: row.productId })"
+                                            target="_blank">查看</a>
+                                        <el-divider v-if="activeKey != 7 && activeKey != 5 && activeKey != 6"
+                                            direction="vertical" />
+                                        <DeleteRecord v-if="activeKey === 7"
                                             :params="{ id: row.productId, field: 'isDelete', val: 0 }"
-                                            :requestApi="updateProductFiled"
-                                            title="确定还原该商品吗？"
-                                            @afterDelete="loadFilter"
-                                        >
+                                            :requestApi="updateProductFiled" title="确定还原该商品吗？"
+                                            @afterDelete="loadFilter">
                                             还原
                                         </DeleteRecord>
                                         <el-divider v-if="activeKey === 7" direction="vertical" />
-                                        <DeleteRecord
-                                            v-if="activeKey === 7"
+                                        <DeleteRecord v-if="activeKey === 7"
                                             :params="{ id: row.productId, field: 'del', val: 0 }"
-                                            :requestApi="updateProductFiled"
-                                            title="确定彻底删除该商品吗？"
-                                            @afterDelete="loadFilter"
-                                        >
+                                            :requestApi="updateProductFiled" title="确定彻底删除该商品吗？"
+                                            @afterDelete="loadFilter">
                                             删除
                                         </DeleteRecord>
-                                        <el-dropdown trigger="hover" v-if="activeKey != 7" :hide-on-click="false">
-                                            <span class="iconfont-admin icon-gengduo1 btn-link"></span>
+                                        <el-dropdown trigger="hover"
+                                            v-if="isStore() && getAdminType() === 'admin' && activeKey != 5 && activeKey != 7 && activeKey != 3 && !row.shopId"
+                                            :hide-on-click="false">
+                                            <a class="btn-link">分配组织</a>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <DeleteRecord
-                                                        :params="{ id: row.productId, isDelete: 1 }"
-                                                        :requestApi="recycleProduct"
-                                                        title="确定把该商品移入回收站吗？"
-                                                        @afterDelete="loadFilter"
-                                                    >
+                                                    <el-dropdown-item>
+                                                        <DialogForm :maskClose="false" :params="{
+                                                            id: row.productId,
+                                                            type: 'ALL',
+                                                            storePostAllocationStatus: storeSettingInfo.storePostAllocationStatus
+                                                        }" path="product/product/store/ConfirmPop" width="500px"
+                                                            @okCallback="loadFilter">
+                                                            <el-button style="width: 100%" link
+                                                                type="primary">分配给全部门店</el-button>
+                                                        </DialogForm>
+                                                    </el-dropdown-item>
+
+                                                    <el-dropdown-item>
+                                                        <DialogForm :maskClose="false" :params="{
+                                                            id: row.productId,
+                                                            type: 'AREA',
+                                                            storePostAllocationStatus: storeSettingInfo.storePostAllocationStatus
+                                                        }" path="product/product/store/ConfirmPop" width="500px"
+                                                            @okCallback="loadFilter">
+                                                            <el-button style="width: 100%" link
+                                                                type="primary">分配给全部区域</el-button>
+                                                        </DialogForm>
+                                                    </el-dropdown-item>
+
+                                                    <DialogForm dialogClass="noPadding" :maskClose="false"
+                                                        :params="{ productId: row.productId, type: 'SHOPS' }" isDrawer
+                                                        path="product/product/store/OrganizePop" title="分配组织"
+                                                        width="1100px" @okCallback="loadFilter">
+                                                        <div
+                                                            style="width: 100%; padding: 5px 0; border-top: 1px solid #dcdfe6">
+                                                            <el-dropdown-item>
+                                                                <el-button style="width: 100%" link
+                                                                    type="primary">分配给指定组织</el-button>
+                                                            </el-dropdown-item>
+                                                        </div>
+                                                    </DialogForm>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                        <el-divider
+                                            v-if="isStore() && getAdminType() === 'admin' && activeKey != 5 && activeKey != 7 && activeKey != 3 && !row.shopId"
+                                            direction="vertical" />
+                                        <el-dropdown trigger="hover" v-if="activeKey != 7" :hide-on-click="false">
+                                            <el-icon class="btn-link" size="12">
+                                                <MoreFilled />
+                                            </el-icon>
+                                            <template #dropdown>
+                                                <el-dropdown-menu>
+                                                    <DeleteRecord :params="{ id: row.productId, isDelete: 1 }"
+                                                        :requestApi="recycleProduct" title="确定把该商品移入回收站吗？"
+                                                        @afterDelete="loadFilter">
                                                         <el-dropdown-item>
-                                                            <el-button style="width: 100%" link type="primary">移入回收站</el-button>
+                                                            <el-button style="width: 100%" link
+                                                                type="primary">移入回收站</el-button>
                                                         </el-dropdown-item>
                                                     </DeleteRecord>
-                                                    <DeleteRecord
-                                                        :params="{ productId: row.productId }"
-                                                        :requestApi="copyProduct"
-                                                        title="确定复制该商品吗？"
-                                                        @afterDelete="loadFilter"
-                                                    >
+                                                    <DeleteRecord :params="{ productId: row.productId }"
+                                                        :requestApi="copyProduct" title="确定复制该商品吗？"
+                                                        @afterDelete="loadFilter">
                                                         <el-dropdown-item>
-                                                            <el-button style="width: 100%" link type="primary">复制</el-button>
+                                                            <el-button style="width: 100%" link
+                                                                type="primary">复制</el-button>
                                                         </el-dropdown-item>
                                                     </DeleteRecord>
                                                 </el-dropdown-menu>
@@ -406,7 +476,8 @@
                         </el-table>
                     </a-spin>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -416,6 +487,7 @@
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import { MoreFilled } from "@element-plus/icons-vue";
 import { DialogForm } from "@/components/dialog";
 import { PopForm } from "@/components/pop-form";
 import { ref } from "vue";
@@ -436,11 +508,15 @@ import {
 import { SelectBrand, SelectCategory, SelectShop } from "@/components/select";
 import { imageFormat, urlFormat } from "@/utils/format";
 import ProductStockPop from "./src/ProductStockPop.vue";
-import { isMerchant, isOverseas } from "@/utils/version";
+import { isB2b, isMerchant, isOverseas, isS2b2c, isStore } from "@/utils/version";
+import { getShopType, getAdminType } from "@/utils/storage";
 import { useListRequest } from "@/hooks/useListRequest";
+import { storeSettings } from "@/api/store/setting";
+import type { Response } from "@/types/store/setting";
+import { useRouter } from "vue-router";
+const router = useRouter();
 const config: any = useConfigStore();
 const waitingCheckedCount = ref<number>(0);
-const adminType = ref(localStorage.getItem("adminType"));
 const activeKey = ref<number>(1);
 const {
     listData: filterState,
@@ -452,8 +528,7 @@ const {
     onSearchSubmit,
     onSortChange,
     onSelectChange,
-    onBatchAction,
-    resetParams
+    onBatchAction
 } = useListRequest<ProductFilterState, ProductFilterParams>({
     apiFunction: getProductList,
     idKey: "productId",
@@ -470,7 +545,8 @@ const {
         categoryId: "",
         brandId: "",
         productStatus: 1,
-        checkStatus: 1
+        checkStatus: 1,
+        type: 1
     }
 });
 
@@ -483,11 +559,30 @@ const onTabChange = (val: number) => {
     filterParams.shopId = val === 2 ? 0 : val === 3 ? "" : "";
     filterParams.isDelete = val === 7 ? 1 : 0;
     filterParams.searchShop = val === 3 ? 1 : 0;
+    filterParams.type = val == 1 ? 1 : val == 5 ? 2 : null;
     filterParams.page = 1;
+    if (val === 5 || val === 6) {
+        delete filterParams.productStatus;
+    }
     Object.keys(filterParams).forEach((key) => {
         if ((filterParams as any)[key] === undefined) delete (filterParams as any)[key];
     });
     loadFilter();
+};
+
+const resetParams = () => {
+    filterParams.sortField = "";
+    filterParams.sortOrder = "";
+    filterParams.keyword = "";
+    filterParams.introType = "";
+    filterParams.isDelete = 0;
+    filterParams.searchShop = 0;
+    filterParams.shopId = "";
+    filterParams.categoryId = "";
+    filterParams.brandId = "";
+    filterParams.productStatus = 1;
+    filterParams.checkStatus = 1;
+    onTabChange(activeKey.value);
 };
 const confirmEvent = async (act: string, id: string) => {
     try {
@@ -507,12 +602,17 @@ const productStatusList = ref([
     {
         label: "自营商品",
         value: 2,
-        isShow: adminType.value === "admin" && isMerchant()
+        isShow: getAdminType() === "admin" && (isMerchant() || isStore() || isS2b2c())
     },
     {
         label: "店铺商品",
         value: 3,
-        isShow: adminType.value === "admin" && isMerchant()
+        isShow: getAdminType() === "admin" && isMerchant()
+    },
+    {
+        label: "门店商品",
+        value: 3,
+        isShow: getAdminType() === "admin" && isStore()
     },
     {
         label: "已下架商品",
@@ -528,19 +628,36 @@ const productStatusList = ref([
         label: "待审核商品",
         value: 5,
         count: 0,
-        isShow: adminType.value === "admin" && isMerchant()
+        isShow: getAdminType() === "admin" && (isMerchant() || isStore() || isS2b2c())
     },
     {
         label: "审核失败商品",
         value: 6,
-        isShow: adminType.value === "shop"
+        isShow: getAdminType() === "shop"
     }
 ]);
 const selectCategoryRef = ref();
+const goSetStock = (row: any) => {
+    //判断是门店还是自营
+
+    if (isStore() && getShopType() == 2) {
+        router.push({
+            path: "/inventory-calendar/list",
+            query: { productName: row.productName }
+        });
+    } else {
+        router.push({
+            path: "/product/inventory-calendar/list",
+            query: { productName: row.productName }
+        });
+    };
+}
+
 const SelectShopChange = (val: number) => {
     selectCategoryRef.value.SelectShopChange(val);
     onSearchSubmit();
 };
+
 // 获取列表的查询结果
 const _getProductWaitingCheckedCount = async () => {
     try {
@@ -559,6 +676,22 @@ const _getProductWaitingCheckedCount = async () => {
 };
 _getProductWaitingCheckedCount();
 
+const storeSettingInfo = ref<Response>({});
+const _storeSettings = async () => {
+    try {
+        const result = await storeSettings();
+        storeSettingInfo.value = result;
+    } catch (error: any) {
+        message.error(error.message);
+    } finally {
+        loading.value = false;
+    }
+};
+
+if (isStore()) {
+    _storeSettings();
+}
+
 // 批量操作
 const onBatchSubmit = async (action: string) => {
     await onBatchAction(action, batchSubmit);
@@ -568,13 +701,16 @@ const onBatchSubmit = async (action: string) => {
 :deep(.el-popper) {
     z-index: 2000 !important;
 }
+
 :deep(.el-table .cell) {
     display: flex;
     align-items: center;
 }
+
 :deep(.el-table .caret-wrapper) {
     margin-top: 5px;
 }
+
 .status-switch {
     display: flex;
     flex-wrap: wrap;
@@ -582,7 +718,7 @@ const onBatchSubmit = async (action: string) => {
     width: 150px;
 }
 
-.status-switch > div {
+.status-switch>div {
     word-break: keep-all;
     display: flex;
     flex-wrap: nowrap;

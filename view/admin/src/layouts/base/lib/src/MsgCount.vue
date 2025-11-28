@@ -8,28 +8,30 @@
                 :showFooter="false"
                 width="1000px"
                 :bodyStyle="{ padding: 0 }"
-                @callback="fetchMessage"
+                @callback="refreshMessageUI"
             >
                 <a class="top-bar-btn lyecs-dialogPage" :class="themeInfo.navTheme">
-                    <i class="admin-iconfont icon-tongzhi"></i>
+                    <i class="iconfont-admin icon-tongzhi-L"></i>
                     <span v-if="themeInfo.layout !== 'topMenu'">消息</span>
-                    <span class="admin_msg-order_count" v-if="message?.orderCount > 0 && themeInfo.layout !== 'topMenu'">新订单 {{ message.orderCount }}</span>
+                    <span class="admin_msg-order_count"
+                        v-if="message?.orderCount > 0 && themeInfo.layout !== 'topMenu'">新订单 {{ message.orderCount
+                        }}</span>
                     <em class="admin_msg-count" v-if="useStore.messageCount > 0">{{ useStore.messageCount }}</em>
                 </a>
             </DialogForm>
         </div>
-        <div class="top-bar-item top-admin_msg" v-if="isMerchant() || isPro()" :class="themeInfo.layout">
+        <div class="top-bar-item top-admin_msg" v-if="(isMerchant() || isPro()) && adminType !== 'vendor'"
+            :class="themeInfo.layout">
             <router-link :to="{ path: '/im/index' }" target="_blank">
                 <p class="top-bar-btn" :class="themeInfo.navTheme">
-                    <i class="iconfont-admin icon-xiaoxi"></i><span v-if="themeInfo.layout !== 'topMenu'">客服</span
-                    ><em class="admin_msg-count" v-if="message?.imMsgCount > 0">{{ message.imMsgCount }}</em>
+                    <i class="iconfont-admin icon-xiaoxi"></i><span v-if="themeInfo.layout !== 'topMenu'">客服</span><em
+                        class="admin_msg-count" v-if="message?.imMsgCount > 0">{{ message.imMsgCount }}</em>
                 </p>
             </router-link>
         </div>
         <div class="top-bar-item" :class="themeInfo.layout">
-            <a class="top-bar-btn" :class="themeInfo.navTheme" :href="urlFormat('/')" target="_blank"
-                ><i class="iconfont icon-guanli"></i><span v-if="themeInfo.layout !== 'topMenu'">查看店铺</span></a
-            >
+            <a class="top-bar-btn" :class="themeInfo.navTheme" :href="urlFormat('/')" target="_blank"><i
+                    class="iconfont icon-guanli"></i><span v-if="themeInfo.layout !== 'topMenu'">查看门店</span></a>
         </div>
         <div class="top-bar-item top-bar-user" id="dropdown-memu" :class="themeInfo.layout">
             <a-dropdown :trigger="['click']">
@@ -44,7 +46,9 @@
                             </template>
                         </span>
                         <div class="admin-user-name" v-if="themeInfo.layout !== 'topMenu'">
-                            {{ /^1[3-9]\d{9}$/.test(userInfo.username) ? userInfo.username.replace(/(\d{3})\d{4}/, "$1****") : userInfo.username }}
+                            {{ /^1[3-9]\d{9}$/.test(userInfo.username) ? userInfo.username.replace(/(\d{3})\d{4}/,
+                                "$1****") : userInfo.username
+                            }}
                         </div>
                         <div class="admin-user-name" v-if="adminType == 'shop'">
                             {{ shopInfo.shopTitle }}
@@ -58,11 +62,16 @@
                 <template #overlay>
                     <div class="dropdown-memu top-bar-memu">
                         <div class="entrance-list">
-                            <p class="entrance lyecs-openPage" v-if="isMerchant()" @click="switchShop">
+                            <p class="entrance lyecs-openPage" v-if="isMerchant() || isS2b2c() || isStore()"
+                                @click="switchShop">
                                 <i class="iconfont-tig icon-shanghu"></i>
-                                <span>切换店铺</span>
+                                <span>切换组织</span>
                             </p>
-                            <router-link :to="{ path: adminType == 'shop' ? '/setting/account-editing/index' : '/authority/account-editing/index' }">
+                            <router-link
+                                :to="{
+                                    path: adminType == 'shop' || adminType == 'vendor' ? '/setting/account-editing/index' : '/authority/account-editing/index'
+                                }"
+                            >
                                 <p class="entrance lyecs-openPage">
                                     <!-- <i class="iconfont icon-gerenshezhi"></i> -->
                                     <i class="iconfont-tig icon-guanlizhanghao"></i>
@@ -85,7 +94,8 @@
     </div>
     <div class="dialog-box">
         <el-dialog :z-index="12" v-model="dialogVisible">
-            <SelectShop v-if="dialogVisible" @closePopup="closePopup" :isIndex="true" :username="userInfo.username"></SelectShop>
+            <SelectShop v-if="dialogVisible" @closePopup="closePopup" :isIndex="true" :username="userInfo.username">
+            </SelectShop>
         </el-dialog>
     </div>
 </template>
@@ -99,7 +109,7 @@ import { getAdminMsgCount } from "@/api/common/common";
 import { DialogForm } from "@/components/dialog";
 import { useConfigStore } from "@/store/config";
 import { useMenusStore } from "@/store/menu";
-import { isMerchant, isPro } from "@/utils/version";
+import { isMerchant, isPro, isS2b2c, isStore } from "@/utils/version";
 import { useThemeStore } from "@/store/theme";
 import { useUserStore } from "@/store/user";
 import { urlFormat, imageFormat } from "@/utils/format";
@@ -107,6 +117,7 @@ import { cleanUp } from "@/api/common/common";
 import { notification } from "ant-design-vue";
 import { updateMenu } from "@/utils/menus";
 import type { MainMenu } from "@/types/common/common.d";
+import { requestUrl } from "@/utils/request";
 const { themeInfo } = useThemeStore();
 const adminType = ref(localStorage.getItem("adminType"));
 const useStore = useUserStore();
@@ -117,10 +128,24 @@ const shopInfo = computed(() => useUserStore().shopInfo);
 import dayjs from "dayjs";
 const config: any = useConfigStore();
 const message = ref<any>(null);
-let pollingInterval: any = null;
+// 删除轮询相关变量
+// let pollingInterval: any = null;
+
+// 添加SSE相关变量
+let eventSource: EventSource | null = null;
+
+const refreshMessageUI = () => {
+    // 只更新UI，不发送网络请求
+    // 依赖SSE提供的实时数据
+    if (message.value) {
+        // 强制更新界面显示
+        message.value = { ...message.value };
+    }
+};
+
 const fetchMessage = async () => {
     try {
-        const response = await getAdminMsgCount({ startTime: localStorage.getItem("lastOpenTime") }); // 替换为你的API端点
+        const response = await getAdminMsgCount({ startTime: localStorage.getItem("lastOpenTime") });
         message.value = response;
         useStore.messageCount = response.unreadMsgCount;
     } catch (error) {
@@ -128,20 +153,125 @@ const fetchMessage = async () => {
     }
 };
 
-const markAsRead = () => {
-    message.value.orderCount = 0;
-    localStorage.setItem("lastOpenTime", String(dayjs().unix()));
-};
-const startPolling = () => {
-    pollingInterval = setInterval(fetchMessage, 30000); // 每15秒请求一次
+// 初始化SSE连接
+const initSSE = () => {
+    // 关闭已有的连接
+    if (eventSource) {
+        eventSource.close();
+    }
+    fetchSSEPolyfill();
 };
 
-const stopPolling = () => {
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
+// 使用Fetch API实现的SSE Polyfill
+const fetchSSEPolyfill = () => {
+    const headers = requestUrl.headers();
+    const startTime = localStorage.getItem("lastOpenTime") || "";
+    // 使用fetch流式API模拟SSE
+    fetch(`${requestUrl.prefix}/msg/adminMsg/msgCount?startTime=${startTime}`, {
+        headers: headers
+    })
+        .then((response) => {
+            // 检查响应是否成功
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            function read() {
+                reader
+                    ?.read()
+                    .then(({ done, value }) => {
+                        if (done) {
+                            setTimeout(() => initSSE(), 5000);
+                            return;
+                        }
+                        const text = decoder.decode(value);
+                        try {
+                            const data = JSON.parse(text);
+                            if (data.code === 0) {
+                                message.value = data.data;
+                                useStore.messageCount = data.data.unreadMsgCount;
+                            }
+                        } catch (parseError) {
+                            const lines = text.split("\n");
+                            lines.forEach((line) => {
+                                if (line.startsWith("data:")) {
+                                    try {
+                                        const jsonData = line.substring(5).trim();
+
+                                        const start = jsonData.indexOf("{");
+                                        const end = jsonData.lastIndexOf("}");
+
+                                        if (start !== -1 && end !== -1 && end > start) {
+                                            const jsonString = jsonData.substring(start, end + 1);
+                                            const data = JSON.parse(jsonString);
+                                            if (data.code === 0) {
+                                                message.value = data.data;
+                                                useStore.messageCount = data.data.unreadMsgCount;
+                                            }
+                                        } else {
+                                            console.error("未能找到有效的JSON结构");
+                                        }
+                                    } catch (error) {
+                                        console.error("解析SSE消息失败:", error);
+                                        console.log("原始行数据:", line);
+                                    }
+                                } else if (line.trim() !== "") {
+                                    console.log("收到其他类型的数据:", line);
+                                }
+                            });
+                        }
+
+                        read();
+                    })
+                    .catch((error) => {
+                        console.error("SSE读取错误:", error);
+                        // 出错后重新连接
+                        setTimeout(() => initSSE(), 5000);
+                    });
+            }
+
+            read();
+        })
+        .catch((error) => {
+            console.error("SSE连接失败:", error);
+            // 连接失败后重新连接
+            setTimeout(() => initSSE(), 5000);
+        });
+};
+
+// 关闭SSE连接
+const closeSSE = () => {
+    if (eventSource) {
+        eventSource.close();
+        eventSource = null;
     }
 };
+
+const markAsRead = () => {
+    if (message.value) {
+        message.value.orderCount = 0;
+        message.value.imMsgCount = 0;
+        message.value.unreadMsgCount = 0;
+    }
+    useStore.messageCount = 0;
+    localStorage.setItem("lastOpenTime", String(dayjs().unix()));
+};
+
+// 删除轮询相关函数
+// const startPolling = () => {
+//     pollingInterval = setInterval(fetchMessage, 30000); // 每15秒请求一次
+// };
+
+// const stopPolling = () => {
+//     if (pollingInterval) {
+//         clearInterval(pollingInterval);
+//         pollingInterval = null;
+//     }
+// };
+
 // 清除缓存
 const clearCache = async () => {
     try {
@@ -154,7 +284,7 @@ const clearCache = async () => {
             message: "缓存已清除",
             description: "缓存清除后可刷新页面更新效果"
         });
-    } catch (error: any) {}
+    } catch (error: any) { }
 };
 const onLogout = async () => {
     logout();
@@ -173,12 +303,14 @@ const handleResize = () => {
 onMounted(() => {
     updateUserInfo();
     fetchMessage(); // 组件挂载时立即请求一次
-    startPolling(); // 开始轮询
+    initSSE(); // 初始化SSE连接
+    // startPolling(); // 开始轮询 - 删除这行
     window.addEventListener("resize", handleResize);
 });
 
 onUnmounted(() => {
-    stopPolling(); // 组件卸载时停止轮询
+    // stopPolling(); // 组件卸载时停止轮询 - 删除这行
+    closeSSE(); // 组件卸载时关闭SSE连接
 });
 
 onBeforeUnmount(() => {
@@ -191,12 +323,14 @@ onBeforeUnmount(() => {
     gap: 10px;
     margin-right: 10px;
 }
+
 /* 你的组件样式 */
 .top-bar-item {
     position: relative;
     display: flex;
     align-items: center;
 }
+
 .default {
     .top-bar-btn {
         display: block;
@@ -219,6 +353,7 @@ onBeforeUnmount(() => {
         }
     }
 }
+
 .topMenu {
     .top-bar-btn {
         display: block;
@@ -237,12 +372,15 @@ onBeforeUnmount(() => {
         position: relative;
         color: var(--tig-menu-text-color);
     }
+
     .top-bar-btn:hover {
         background: #9c9c9c2e !important;
     }
+
     .light {
         color: #788d9b;
     }
+
     .light:hover {
         background: #f7f7f7 !important;
     }
@@ -282,6 +420,7 @@ onBeforeUnmount(() => {
     padding: 0 5px;
     border-radius: 8px;
 }
+
 .admin_msg-order_count {
     font-size: 10px;
     color: #fff;
@@ -301,9 +440,9 @@ onBeforeUnmount(() => {
     font-size: 12px;
     border-radius: 9px;
     overflow: hidden;
+    width: 130px !important;
 
     .entrance-list {
-        width: 160px;
         display: flex;
         flex-direction: column;
 
@@ -365,6 +504,7 @@ onBeforeUnmount(() => {
     :deep(.el-dialog__header) {
         display: none;
     }
+
     :deep(.el-dialog) {
         width: 760px;
     }

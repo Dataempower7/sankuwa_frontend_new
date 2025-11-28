@@ -450,7 +450,7 @@
 import { SelectColor, SelectLink } from "@/components/select";
 import { ProductInfoSelect, PicSelect } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel, watch } from "vue";
+import { ref, watch } from "vue";
 import CommonImageFillEdit from "../../src/commonImageFill/Edit.vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";

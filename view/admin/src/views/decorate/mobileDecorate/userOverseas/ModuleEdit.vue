@@ -13,7 +13,7 @@ const props = defineProps({
 });
 const Component = shallowRef();
 const loaded = ref(false);
-const _import = (path: string) => defineAsyncComponent(() => import(`@/views/decorate/mobileDecorate/user/src/${path}Edit.vue`));
+const _import = (path: string) => defineAsyncComponent(() => import(`@/views/decorate/mobileDecorate/userOverseas/src/${path}Edit.vue`));
 onMounted(async () => {
     Component.value = _import(toPascalCase(props.moduleType));
     loaded.value = true;

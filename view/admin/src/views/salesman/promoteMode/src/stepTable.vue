@@ -1,4 +1,5 @@
-p<template>
+p
+<template>
     <div class="lyecs-form-table">
         <el-form ref="formRef" :rules="rules" :model="form" label-width="auto">
             <el-form-item prop="typeData">
@@ -30,27 +31,37 @@ p<template>
                         <template #default="{ row, $index }">
                             <div class="condition">
                                 <el-form-item :prop="'typeData.' + $index + '.condition'" :rules="rules.condition">
-                                    <div v-if="$index === 0">
-                                        <p>初始等级， 无需设置</p>
+                                    <div class="flex flex-align-center">
+                                        <div style="min-width: 110px">
+                                            <div v-if="$index === 0">
+                                                <p>初始等级， 无需设置</p>
+                                            </div>
+                                            <div style="min-width: 110px" v-if="$index > 0 && row.condition">
+                                                <p v-if="row.condition.selfBuyAmount?.checked && row.condition.selfBuyAmount?.value > 0">
+                                                    自购金额满{{ row.condition.selfBuyAmount?.value }}元
+                                                </p>
+                                                <p v-if="row.condition.salesAmount?.checked && row.condition.salesAmount?.value > 0">
+                                                    推广金额满{{ row.condition.salesAmount?.value }}元
+                                                </p>
+                                                <p v-if="row.condition.salesInviteUsers?.checked && row.condition.salesInviteUsers?.value > 0">
+                                                    发展客户数满{{ row.condition.salesInviteUsers?.value }}人
+                                                </p>
+                                                <!-- <p v-if="row.condition.inviteSales?.checked">邀请分销员满{{ row.condition.inviteSales?.value }}人</p> -->
+                                            </div>
+                                            <div style="min-width: 110px" v-if="$index > 0 && !row.condition">
+                                                <p class="gray">未设置</p>
+                                            </div>
+                                        </div>
+                                        <popover
+                                            :index="$index"
+                                            :conditionsData="row.condition"
+                                            :superiorData="$index > 1 ? form.typeData[$index - 1].condition : null"
+                                            @submitCallback="popoverCallback"
+                                        >
+                                            <el-icon v-if="$index > 0" size="15" color="#333"><Edit /></el-icon>
+                                            <span v-else></span>
+                                        </popover>
                                     </div>
-                                    <div style="min-width: 110px" v-if="$index > 0 && row.condition">
-                                        <p v-if="row.condition.selfBuyAmount?.checked && row.condition.selfBuyAmount?.value > 0">自购金额满{{ row.condition.selfBuyAmount?.value }}元</p>
-                                        <p v-if="row.condition.salesAmount?.checked && row.condition.salesAmount?.value > 0">推广金额满{{ row.condition.salesAmount?.value }}元</p>
-                                        <p v-if="row.condition.salesInviteUsers?.checked && row.condition.salesInviteUsers?.value > 0">发展客户数满{{ row.condition.salesInviteUsers?.value }}人</p>
-                                        <!-- <p v-if="row.condition.inviteSales?.checked">邀请分销员满{{ row.condition.inviteSales?.value }}人</p> -->
-                                    </div>
-                                    <div style="min-width: 110px" v-if="$index > 0 && !row.condition">
-                                        <p class="gray">未设置</p>
-                                    </div>
-                                    <popover
-                                        :index="$index"
-                                        :conditionsData="row.condition"
-                                        :superiorData="$index > 1 ? form.typeData[$index - 1].condition : null"
-                                        @submitCallback="popoverCallback"
-                                    >
-                                        <el-icon v-if="$index > 0" size="15" color="#333"><Edit /></el-icon>
-                                        <span v-else></span>
-                                    </popover>
                                 </el-form-item>
                             </div>
                         </template>
@@ -78,31 +89,33 @@ p<template>
                             </div>
                         </template>
                         <template #default="{ row, $index }">
-                            <el-form-item class="rate" :prop="'typeData.' + $index + '.rate'" :rules="rules.rate">
-                                <div class="rate-item">
-                                    <div class="tit">商品佣金</div>
-                                    <div class="inp">
-                                        <TigInput type="decimal" v-model="row.rate" style="width: 120px" :min="0">
-                                            <template #append>%</template>
-                                        </TigInput>
+                            <div>
+                                <el-form-item class="rate" :prop="'typeData.' + $index + '.rate'" :rules="rules.rate">
+                                    <div class="rate-item">
+                                        <div class="tit">商品佣金</div>
+                                        <div class="inp">
+                                            <TigInput type="decimal" v-model="row.rate" style="width: 120px" :min="0">
+                                                <template #append>%</template>
+                                            </TigInput>
+                                        </div>
                                     </div>
-                                </div>
-                            </el-form-item>
-                            <el-form-item
-                                v-if="distributionLevel == 2"
-                                class="down_salesman_rate"
-                                :prop="'typeData.' + $index + '.downSalesmanRate'"
-                                :rules="rules.downSalesmanRate"
-                            >
-                                <div class="rate-item mt20">
-                                    <div class="tit">下级分销员邀请奖励</div>
-                                    <div class="inp">
-                                        <TigInput type="decimal" v-model="row.downSalesmanRate" style="width: 120px" :min="0">
-                                            <template #append>%</template>
-                                        </TigInput>
+                                </el-form-item>
+                                <el-form-item
+                                    v-if="distributionLevel == 2"
+                                    class="down_salesman_rate"
+                                    :prop="'typeData.' + $index + '.downSalesmanRate'"
+                                    :rules="rules.downSalesmanRate"
+                                >
+                                    <div class="rate-item mt20">
+                                        <div class="tit">下级分销员邀请奖励</div>
+                                        <div class="inp">
+                                            <TigInput type="decimal" v-model="row.downSalesmanRate" style="width: 120px" :min="0">
+                                                <template #append>%</template>
+                                            </TigInput>
+                                        </div>
                                     </div>
-                                </div>
-                            </el-form-item>
+                                </el-form-item>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" fixed="right" width="100" align="center">
@@ -176,18 +189,21 @@ interface RuleForm {
     downSalesmanRate: number;
 }
 const rules = reactive<FormRules<RuleForm>>({
-    name: [{ required: true, message: "请输入等级名", trigger: "blur" },{
-        validator: (rule: any, value: string, callback: any) => {
-            const currentIndex = form.typeData.findIndex(item => item.name === value);
-            const isDuplicate = form.typeData.some((item, index) => item.name === value && index !== currentIndex);
-            if (isDuplicate) {
-                callback(new Error("等级名不能重复"));
-            } else {
-                callback();
-            }
-        },
-        trigger: "blur"
-    }],
+    name: [
+        { required: true, message: "请输入等级名", trigger: "blur" },
+        {
+            validator: (rule: any, value: string, callback: any) => {
+                const currentIndex = form.typeData.findIndex((item) => item.name === value);
+                const isDuplicate = form.typeData.some((item, index) => item.name === value && index !== currentIndex);
+                if (isDuplicate) {
+                    callback(new Error("等级名不能重复"));
+                } else {
+                    callback();
+                }
+            },
+            trigger: "blur"
+        }
+    ],
     condition: [
         {
             required: true,
@@ -274,7 +290,7 @@ defineExpose({ formRef, form });
     }
 }
 @media (max-width: 1000px) {
-    .lyecs-form-table{
+    .lyecs-form-table {
         width: 100%;
     }
 }

@@ -6,7 +6,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, defineModel } from 'vue';
+import { ref } from 'vue';
 import { ModuleType, PcCustomAd2Type } from '@/types/decorate/decorate.d';
 import { mergeDefaultModule } from '@/views/decorate/decorate/src/modules/'
 const defaultModule = ref({

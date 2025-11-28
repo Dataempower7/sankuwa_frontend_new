@@ -1,0 +1,1 @@
+import{b8 as t,aL as r}from"./BjkHNVA8.js";const n=o=>r({url:"promotion/groupon/itemList",method:"get",params:o}),i=o=>t({url:"promotion/groupon/record/details",method:"get",params:o}),s=o=>r({url:"promotion/groupon/record/list",method:"get",params:o}),u=o=>t({url:"promotion/groupon/getGrouponInfo",method:"get",params:o});export{s as a,u as b,i as c,n as g};

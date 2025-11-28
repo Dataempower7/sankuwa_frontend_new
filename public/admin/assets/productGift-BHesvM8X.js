@@ -1,0 +1,1 @@
+import{a6 as o}from"./index-B52YIGC0.js";const e=t=>o({url:"promotion/productGift/list",method:"get",params:t}),d=t=>o({url:"promotion/productGift/del",method:"post",data:t}),i=(t,r)=>o({url:"promotion/productGift/"+t,method:"get",params:r}),s=(t,r)=>o({url:"promotion/productGift/"+t,method:"post",data:r});export{i as a,d,e as g,s as u};

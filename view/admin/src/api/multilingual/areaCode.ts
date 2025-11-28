@@ -73,10 +73,10 @@ export const updateCreateTranslation = (data: object) => {
     });
 };
 // 业务翻译数据
-export const getCreateTranslation = (params: object) => {
+export const getCreateTranslation = (data: object) => {
     return request<any>({
         url: "lang/translations/getTranslations",
-        method: "get",
-        params
+        method: "post",
+        data
     });
 };

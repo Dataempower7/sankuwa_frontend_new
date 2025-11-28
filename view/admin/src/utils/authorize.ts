@@ -1,4 +1,3 @@
-const accessToken: any = localStorage.getItem("accessToken");
 import { useLicensedStore } from "@/store/licensed"
 import pinia from '@/store/store'
 const licensed = useLicensedStore(pinia);
@@ -14,7 +13,7 @@ export function isAuthorized() {
 const poweredBytxt = " - powered by tigshop"
 // 修改路由标题 是否授权  - powered by tigshop
 export function processRoutes(routes: any[]) {
-    if (!accessToken) {
+    if (!localStorage.getItem("accessToken")) {
         return
     }
     routes.forEach(route => {
@@ -50,26 +49,26 @@ export function removeSuffix(title: string): string {
 }
 import no_licensed from '@/style/images/no_licensed.png';
 import business_authorization from '@/style/images/business_authorization.png';
-import business_authorization_pro from '@/style/images/business_authorization_pro.png';
+// import business_authorization_pro from '@/style/images/business_authorization_pro.png';
 import enterprise_authorization from '@/style/images/enterprise_authorization.png';
-import enterprise_authorization_pro from '@/style/images/enterprise_authorization_pro.png';
+// import enterprise_authorization_pro from '@/style/images/enterprise_authorization_pro.png';
 // 授权判断, 后台头像授权是否显示
 export function isShowAvatar() {
    // 授权判断 未授权 0  商业授权 1 商业授权pro 2  企业授权 3 企业授权pro 4
     let url = no_licensed;
     if (licensedData.isEnterprise == 0) {
-        if (licensedData.versionType.includes('pro')) {
-            url = business_authorization_pro;
-        } else {
+        // if (licensedData.versionType.includes('pro')) {
+        //     url = business_authorization_pro;
+        // } else {
             url = business_authorization;
-        }
+        // }
     }
     if (licensedData.isEnterprise == 1) {
-        if (licensedData.versionType.includes('pro')) {
-            url = enterprise_authorization_pro;
-        } else {
+        // if (licensedData.versionType.includes('pro')) {
+        //     url = enterprise_authorization_pro;
+        // } else {
             url = enterprise_authorization;
-        }
+        // }
     }
     return url;
 }

@@ -9,15 +9,15 @@
             <el-table :data="filterState" :loading="loading" :total="total" row-key="logId" v-loading="loading">
                 <el-table-column label="供应商名称">
                     <template #default="{ row }">
-                        {{ row.shopTitle || "--" }}
+                        {{ row.vendorName || "--" }}
                     </template>
                 </el-table-column>
                 <el-table-column label="供应商LOGO">
                     <template #default="{ row }">
-                        <Image :src="row.shopLogo" fit="contain" style="height: 25px; width: 60px" />
+                        <Image :src="row.vendorLogo" fit="contain" style="height: 25px; width: 60px" />
                     </template>
                 </el-table-column>
-                <el-table-column label="商户名称" :width="200">
+                <!-- <el-table-column label="商户名称" :width="200">
                     <template #default="{ row }">
                         <div v-if="row.merchant">
                             <span>{{ row.merchant.corporateName || "--" }}</span>
@@ -36,22 +36,22 @@
                             </DialogForm>
                         </div>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="供应商余额(元)">
                     <template #default="{ row }">
-                        {{ priceFormat(row.shopMoney) || 0.0 }}
+                        {{ priceFormat(row.vendorMoney) || 0.0 }}
                     </template>
                 </el-table-column>
                 <el-table-column label="供应商状态" sortable="custom">
                     <template #default="{ row }">
-                        <template v-if="row.status == 10">
+                        <template v-if="row.status == 2">
                             <StatusDot color="red" :flicker="true"></StatusDot>
                         </template>
                         <template v-if="row.status == 1">
                             <StatusDot color="green" :flicker="true"></StatusDot>
                         </template>
-                        <span v-if="row.status === 10" style="color: red">{{ row.statusText }}</span>
-                        <span v-else-if="row.status === 1" style="color: green">{{ row.statusText }}</span>
+                        <span v-if="row.status === 2" style="color: red">断供</span>
+                        <span v-else-if="row.status === 1" style="color: green">在供</span>
                     </template>
                 </el-table-column>
                 <template #empty>
@@ -76,7 +76,9 @@ import { Image } from "@/components/image";
 import { DialogForm } from "@/components/dialog";
 import { priceFormat } from "@/utils/format";
 import { OrderFilterParams } from "@/types/order/order.d";
-import { getShopList } from "@/api/shop/shop";
+import { getAdminVendorListFund } from "@/api/vendor/capitalfund/dashboard";
+import StatusDot from "@/components/form/src/StatusDot.vue";
+
 const config: any = useConfigStore();
 import { useListRequest } from '@/hooks/useListRequest';
 const {
@@ -87,10 +89,10 @@ const {
   filterParams,
   loadData: loadFilter,
 } = useListRequest<any, OrderFilterParams>({
-  apiFunction: getShopList,
+  apiFunction: getAdminVendorListFund,
   idKey: 'logId',
   defaultParams: {
-      sortField: 'shopMoney',
+      sortField: 'vendorMoney',
       sortOrder: 'desc',
       page: 1,
       size: config.get("pageSize"),

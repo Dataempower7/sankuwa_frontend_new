@@ -19,7 +19,6 @@
     </perfect-scrollbar>
 </template>
 <script lang="ts" setup>
-import { ref, defineModel } from 'vue';
 import { ModuleType, PcRecommendProduct } from '@/types/decorate/decorate.d';
 import CommonProductEdit from '../../src/commonProduct/Edit.vue'
 const module = defineModel<ModuleType & PcRecommendProduct>('module', {default: () => ({})});

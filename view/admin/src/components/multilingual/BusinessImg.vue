@@ -18,7 +18,7 @@
 </template>
 <script lang="ts" setup>
 import { DialogForm } from "@/components/dialog";
-import { ref, defineModel, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { message } from "ant-design-vue";
 import { getCreateTranslation, updateCreateTranslation } from "@/api/multilingual/currencyManagement";
 import { isOverseas } from "@/utils/version";
@@ -108,13 +108,16 @@ const onDelete = (index: number) => {
 };
 // 监听modelValue变化
 watch(modelValue, (newVal: string) => {
+    if (newVal && isOverseas()) {
+        _getCreateTranslation();
+    }
     if (newVal != translationName.value) {
         isTranslation.value = true;
     } else {
         isTranslation.value = false;
     }
 });
-if (modelValue.value) {
+if (modelValue.value && isOverseas()) {
     _getCreateTranslation();
 }
 </script>
@@ -134,7 +137,7 @@ if (modelValue.value) {
     }
     .multilingual-icon {
         position: absolute;
-        top: -7px;
+        top: -5px;
         right: -7px;
         width: 25px;
         height: 25px;
@@ -145,6 +148,7 @@ if (modelValue.value) {
         background: #fff;
         border-radius: 3px;
         border: 1px solid #cbcbcb;
+        z-index: 222;
     }
     .change-image {
         position: absolute;

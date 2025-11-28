@@ -1,3 +1,4 @@
+import { getShopType } from "@/utils/storage";
 export default {
     path: "/setting",
     name: "setting",
@@ -7,19 +8,19 @@ export default {
         {
             path: "",
             name: "merchantSetting",
-            meta: { title: "店铺设置" },
+            meta: { title: getShopType() === 1 ? "店铺设置" : "门店设置" },
             redirect: "/setting/shop-info",
             children: [
                 {
                     path: "shop-info",
                     name: "ShopInfoManage",
-                    meta: { title: "店铺信息" },
+                    meta: { title: getShopType() === 1 ? "店铺信息" : "门店信息" },
                     component: () => import("@/views/merchant/setting/shopInfo/Index.vue")
                 },
                 {
                     path: "shop-team",
                     name: "ShopTeamManage",
-                    meta: { title: "店铺设置" },
+                    meta: { title: getShopType() === 1 ? "店铺设置" : "门店设置" },
                     component: () => import("@/views/merchant/setting/team/Index.vue")
                 },
                 {
@@ -33,7 +34,7 @@ export default {
                     name: "shopBaseReceiptManage",
                     meta: { title: "小票打印" },
                     component: () => import("@/views/setting/config/receiptPrintSetting/List.vue")
-                },
+                }
             ]
         },
         {
@@ -53,6 +54,24 @@ export default {
                     name: "shopShippingTplManage",
                     meta: { title: "运费模板" },
                     component: () => import("@/views/setting/shippingTpl/List.vue")
+                },
+                {
+                    path: "pickup-setting",
+                    name: "storePickupSettingManage",
+                    meta: { title: "自提设置" },
+                    component: () => import("@/views/setting/pickupSetting/Index.vue")
+                },
+                {
+                    path: "intra-city-delivery",
+                    name: "storeIntraCityDeliveryManage",
+                    meta: { title: "同城配送" },
+                    component: () => import("@/views/setting/intraCityDelivery/Index.vue")
+                },
+                {
+                    path: "appointment-tpl/list",
+                    name: "storeAppointmentTplManage",
+                    meta: { title: "预约模板" },
+                    component: () => import("@/views/setting/appointmentTpl/List.vue")
                 }
             ]
         },
@@ -85,6 +104,20 @@ export default {
                     name: "EmployeeLogManagement",
                     meta: { title: "操作日志" },
                     component: () => import("@/views/merchant/setting/employeeLog/List.vue")
+                }
+            ]
+        },
+        {
+            path: "",
+            name: "vendorSetting",
+            meta: { title: "供应商设置" },
+            redirect: "/setting/vendor-setting",
+            children: [
+                {
+                    path: "vendor-setting",
+                    name: "vendorSettingManage",
+                    meta: { title: "供应商设置" },
+                    component: () => import("@/views/vendor/setting/shopSetting/Index.vue")
                 }
             ]
         }

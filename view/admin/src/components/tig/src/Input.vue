@@ -17,6 +17,7 @@
             :size="size"
             :prefix-icon="prefixIcon"
             :suffix-icon="suffixIcon"
+            @focus="onFocus"
             @blur="onBlur"
             @input="onInput"
             @clear="onClear"
@@ -26,6 +27,7 @@
             <template #append v-if="$slots.append"> <slot name="append"></slot> </template>
             <template #prepend v-if="$slots.prepend"> <slot name="prepend"></slot> </template>
             <template #suffix v-if="$slots.suffix"> <slot name="suffix"></slot> </template>
+            <template #prefix v-if="$slots.prefix"> <slot name="prefix"></slot> </template>
         </el-input>
     </div>
 </template>
@@ -39,7 +41,7 @@
 //  TigInput type="integer"
 //  */
 
-import { ref, defineProps, defineEmits, defineModel, PropType, VNode, watch } from "vue";
+import { ref, PropType, VNode, watch } from "vue";
 import { useConfigStore } from "@/store/config";
 import { min } from "lodash-es";
 const config = useConfigStore().config;
@@ -126,7 +128,7 @@ const props = defineProps({
         default: "default"
     }
 });
-const emit = defineEmits(["update:modelValue", "clear", "keyupEnter", "blur", "input"]);
+const emit = defineEmits(["update:modelValue", "clear", "keyupEnter", "blur", "input", "focus"]);
 const modelValue = defineModel<any>("modelValue", { default: "" });
 const onBlur = () => {
     try {
@@ -191,6 +193,9 @@ const onClear = () => {
 };
 const onInput = () => {
     emit("input");
+};
+const onFocus = () => {
+    emit("focus");
 };
 </script>
 <style scoped lang="less">

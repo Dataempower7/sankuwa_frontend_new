@@ -3,11 +3,13 @@
         <div class="content_wrapper">
             <div class="container">
                 <div class="lyecs-table-list-warp">
+                    <!-- <TigTabs v-model="filterParams.status" :tabs="shopStatus" @onTabChange="onChange"></TigTabs> -->
                     <div class="list-table-tool lyecs-search-warp">
-                        <div class="list-table-tool-row">
+                        <div class="advanced-search-warp list-table-tool-row">
                             <div class="simple-form-warp">
                                 <div class="simple-form-field">
                                     <div class="form-group">
+                                        <label class="control-label"><span>店铺名称：</span></label>
                                         <div class="control-container">
                                             <TigInput
                                                 v-model="filterParams.keyword"
@@ -26,7 +28,54 @@
                                 </div>
                                 <div class="simple-form-field">
                                     <div class="form-group">
-                                        <TigTabs v-model="filterParams.status" :tabs="shopStatus" @onTabChange="onChange"></TigTabs>
+                                        <label class="control-label"><span>关联账号：</span></label>
+                                        <div class="control-container">
+                                            <TigInput
+                                                v-model="filterParams.account"
+                                                name="account"
+                                                placeholder="输入关联账号名称"
+                                                @keyup.enter="onSearchSubmit"
+                                                clearable
+                                                @clear="onSearchSubmit"
+                                            >
+                                            </TigInput>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="simple-form-field">
+                                    <div class="form-group">
+                                        <label class="control-label"><span>主账号：</span></label>
+                                        <div class="control-container">
+                                            <TigInput
+                                                v-model="filterParams.mainAccount"
+                                                name="mainAccount"
+                                                placeholder="输入主账号名称"
+                                                @keyup.enter="onSearchSubmit"
+                                                clearable
+                                                @clear="onSearchSubmit"
+                                            >
+                                            </TigInput>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="simple-form-field">
+                                    <div class="form-group">
+                                        <label class="control-label"><span>状态 ：</span></label>
+                                        <div class="control-container">
+                                            <el-select v-model="filterParams.status" clearable @change="onSearchSubmit">
+                                                <el-option v-for="value in shopStatus" :label="value.label" :value="value.value" />
+                                            </el-select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="simple-form-warp">
+                                    <div class="simple-form-field">
+                                        <label class="control-label"></label>
+                                        <div class="control-container">
+                                            <el-button type="primary" plain @click="onSearchSubmit">搜索</el-button>
+                                            <el-button plain @click="resetParams">重置</el-button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -46,14 +95,6 @@
                                     >
                                         <el-button type="primary">新增店铺</el-button>
                                     </DialogForm>
-                                    <!-- <el-popconfirm title="您确认要批量删除所选数据吗？" @confirm="onBatchSubmit('del')">
-                                            <template #reference>
-                                                <el-button :disabled="selectedIds.length === 0">批量删除</el-button>
-                                            </template>
-                                        </el-popconfirm>
-                                        <span v-if="selectedIds.length > 0">
-                                            已选择：<b>{{ selectedIds.length }}</b> 项
-                                        </span> -->
                                 </el-space>
                             </div>
                         </div>
@@ -115,44 +156,92 @@
                                         <span v-else-if="row.status === 1" style="color: green">{{ row.statusText }}</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="店铺管理员" align="center">
+                                <!-- <el-table-column label="店铺佣金" align="center">
+                                    <template #default="{ row }">
+                                        {{ row.shopCommission || '--'}}
+                                    </template>
+                                </el-table-column> -->
+                                <el-table-column label="主账号" align="center">
                                     <template #default="{ row }">
                                         <div v-if="row.merchant && row.merchant.admin">
-                                            <p>{{ row.merchant.admin.username || "--" }}</p>
+                                            <DialogForm
+                                                :params="{ id: row.shopId, type: 'shop' }"
+                                                isDrawer
+                                                path="authority/accountManage/Detail"
+                                                title="主账号管理"
+                                                width="900px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <a>{{ row.merchant.admin.username || "--" }}</a>
+                                            </DialogForm>
                                         </div>
                                         <div v-else>--</div>
                                     </template>
                                 </el-table-column>
-                                <!-- <el-table-column label="是否开业" align="center">
-                                    <template #default="{ row }">
-                                        <CustomSwitch v-model="row.status" :params="{ row: row, field: 'status' }" :active-value=1 :inactive-value=10 size="small" @switch-click="handleSwitchChange"></CustomSwitch>
-                                    </template>
-                                </el-table-column> -->
                                 <el-table-column :width="200" fixed="right" label="操作">
                                     <template #default="{ row }">
-                                        <DialogForm
-                                            :params="{ act: 'detail', id: row.shopId }"
-                                            isDrawer
-                                            path="shop/shop/Info"
-                                            title="编辑店铺"
-                                            width="700px"
-                                            @okCallback="loadFilter"
-                                        >
-                                            <a class="btn-link">编辑</a>
-                                        </DialogForm>
-                                        <el-divider direction="vertical" />
-                                        <DialogForm
-                                            :params="{ id: row.shopId }"
-                                            isDrawer
-                                            path="shop/shop/Set"
-                                            title="店铺结算设置"
-                                            width="500px"
-                                            @okCallback="loadFilter"
-                                        >
-                                            <a class="btn-link">结算设置</a>
-                                        </DialogForm>
-                                        <el-divider direction="vertical" />
-                                        <a :href="getShopLink('shop', row.shopId)" target="_blank" class="btn-link">查看店铺</a>
+                                        <el-space :size="0">
+                                            <DialogForm
+                                                :params="{ act: 'detail', id: row.shopId }"
+                                                isDrawer
+                                                path="shop/shop/Info"
+                                                title="编辑店铺"
+                                                width="700px"
+                                                @okCallback="loadFilter"
+                                            >
+                                                <a class="btn-link">编辑</a>
+                                            </DialogForm>
+                                            <el-divider direction="vertical" />
+                                            <a :href="getShopLink('shop', row.shopId)" target="_blank" class="btn-link">店铺首页</a>
+                                            <el-divider direction="vertical" />
+                                            <el-dropdown>
+                                                <el-icon class="btn-link" size="12">
+                                                    <MoreFilled />
+                                                </el-icon>
+                                                <template #dropdown>
+                                                    <el-dropdown-menu>
+                                                        <!-- <el-dropdown-item>
+                                                            <DialogForm
+                                                                :params="{ id: row.shopId }"
+                                                                isDrawer
+                                                                path="shop/shop/Set"
+                                                                title="店铺结算设置"
+                                                                width="500px"
+                                                                @okCallback="loadFilter"
+                                                            >
+                                                                <el-button style="width: 100%" link type="primary">结算设置</el-button>
+                                                            </DialogForm>
+                                                        </el-dropdown-item> -->
+                                                        <el-dropdown-item>
+                                                            <DialogForm
+                                                                :params="{ id: row.shopId, type: 'shop' }"
+                                                                isDrawer
+                                                                path="authority/accountManage/Detail"
+                                                                title="主账号管理"
+                                                                width="900px"
+                                                                @okCallback="loadFilter"
+                                                                :showClose="false"
+                                                                :showOnOk="false"
+                                                            >
+                                                                <el-button style="width: 100%" link type="primary">主账号管理</el-button>
+                                                            </DialogForm>
+                                                        </el-dropdown-item>
+                                                        <DeleteRecord
+                                                            :params="{ id: row.shopId }"
+                                                            title="删除后店铺信息将无法恢复，请确认是否删除该店铺？"
+                                                            :requestApi="delShop"
+                                                            @afterDelete="loadFilter"
+                                                        >
+                                                            <el-dropdown-item>
+                                                                <el-button style="width: 100%" link type="primary">删除</el-button>
+                                                            </el-dropdown-item>
+                                                        </DeleteRecord>
+                                                    </el-dropdown-menu>
+                                                </template>
+                                            </el-dropdown>
+                                        </el-space>
                                     </template>
                                 </el-table-column>
                                 <template #empty>
@@ -178,10 +267,11 @@ import { DialogForm } from "@/components/dialog";
 import { onMounted, reactive, ref } from "vue";
 import { DeleteRecord, Pagination } from "@/components/list";
 import { Image } from "@/components/image";
+import { MoreFilled } from "@element-plus/icons-vue";
 import { message } from "ant-design-vue";
 import { useConfigStore } from "@/store/config";
 import { ShopFilterParams, ShopFilterState } from "@/types/shop/shop.d";
-import { batchSubmit, getShopList, updateShopFiled } from "@/api/shop/shop";
+import { batchSubmit, getShopList, updateShopFiled, delShop } from "@/api/shop/shop";
 import { ElMessageBox } from "element-plus";
 import { getShopLink } from "@/utils/util";
 import { useRouter } from "vue-router";
@@ -189,17 +279,12 @@ import StatusDot from "@/components/form/src/StatusDot.vue";
 import { useListRequest } from "@/hooks/useListRequest";
 const shopStatus = ref<any[]>([
     {
-        label: "全部",
-        value: 0,
-        isShow: true
-    },
-    {
         label: "开业",
         value: 1,
         isShow: true
     },
     {
-        label: "暂停运营",
+        label: "停业",
         value: 4,
         isShow: true
     },
@@ -210,7 +295,6 @@ const shopStatus = ref<any[]>([
     }
 ]);
 const query = useRouter().currentRoute.value.query;
-
 const config: any = useConfigStore();
 const {
     listData: filterState,
@@ -222,16 +306,18 @@ const {
     onSearchSubmit,
     onSortChange,
     onSelectChange,
-    onBatchAction,
-    resetParams
+    onBatchAction
 } = useListRequest<ShopFilterState, ShopFilterParams>({
     apiFunction: getShopList,
     idKey: "shopId",
     defaultParams: {
+        shopType: 1,
         sortField: "",
         sortOrder: "",
         keyword: "",
-        status: 0,
+        account: (query.account as string) || "",
+        mainAccount: "",
+        status: "",
         page: 1,
         size: config.get("pageSize")
     }
@@ -240,12 +326,20 @@ const {
 const onBatchSubmit = async (action: string) => {
     await onBatchAction(action, batchSubmit);
 };
-
+const resetParams = () => {
+    filterParams.keyword = "";
+    filterParams.account = "";
+    filterParams.mainAccount = "";
+    filterParams.status = "";
+    filterParams.page = 1;
+    loadFilter();
+};
 // 初始化加载
 loadFilter();
+useRouter().replace({ query: {} });
 const onChange = (status: number) => {
     filterParams.status = status;
-    filterParams.page = 1
+    filterParams.page = 1;
     loadFilter();
 };
 const handleSwitchChange = (params: any) => {
@@ -315,7 +409,8 @@ const closeCallback = () => {
 
 .display-col {
     display: flex;
-    align-items: center; /* 垂直居中 */
+    align-items: center;
+    /* 垂直居中 */
     gap: 8px;
 
     .image {
@@ -325,7 +420,8 @@ const closeCallback = () => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
@@ -338,31 +434,41 @@ const closeCallback = () => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
     .text {
-        flex-grow: 1; /* 占据剩余空间 */
-        white-space: nowrap; /* 不换行 */
-        overflow: hidden; /* 隐藏超出部分 */
-        text-overflow: ellipsis; /* 超出显示省略号 */
-        margin-left: 8px; /* 与左侧图片的间距 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
+        white-space: nowrap;
+        /* 不换行 */
+        overflow: hidden;
+        /* 隐藏超出部分 */
+        text-overflow: ellipsis;
+        /* 超出显示省略号 */
+        margin-left: 8px;
+        /* 与左侧图片的间距 */
     }
 
     .text_comment {
-        flex-grow: 1; /* 占据剩余空间 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
     }
 }
 
 .multiline_hiding {
-    height: 3.6em; /* 基于字体大小的高度, 3行文本高度 */
+    height: 3.6em;
+    /* 基于字体大小的高度, 3行文本高度 */
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* 限制在3行 */
+    -webkit-line-clamp: 3;
+    /* 限制在3行 */
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
-    line-height: 1.2em; /* 调整这个值以匹配你的字体大小 */
+    line-height: 1.2em;
+    /* 调整这个值以匹配你的字体大小 */
 }
 
 .green {

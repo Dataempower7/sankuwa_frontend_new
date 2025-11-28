@@ -267,7 +267,7 @@
 import { SelectColor } from "@/components/select";
 import { PicList } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel, reactive } from "vue";
+import { ref, reactive } from "vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
 import ComboGroupEdit from "../../src/comboGroup/Edit.vue";
 import { ModuleType, ModuleComboSuggestionsEditType } from "@/types/decorate/decorate.d";

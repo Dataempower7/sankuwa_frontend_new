@@ -12,7 +12,7 @@
                             <view class="service-label">
                                 {{ $t(item.picTitle ?? "") }}
                                 <template>
-                                    <image src="@/static/images/member/enter.png" class="service-arrow-icon" />
+                                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793658IMxPeE9zrC4Oap52bL.jpeg" class="service-arrow-icon" />
                                 </template>
                             </view>
                         </view>

@@ -2,6 +2,7 @@
 
 export interface MailFormResult {
     license: string;
+	domain: string;
 }
 export interface LicensedFormState {
 	license: string;

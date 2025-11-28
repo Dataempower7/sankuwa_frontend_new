@@ -1,0 +1,1 @@
+import{a6 as p}from"./index-B52YIGC0.js";const e=o=>p({url:"o2o/shopPickupConfig/getShopPickupTpl",method:"get",params:o}),s=o=>p({url:"o2o/shopPickupConfig/saveShopPickupTpl",method:"post",data:o});export{e as g,s};

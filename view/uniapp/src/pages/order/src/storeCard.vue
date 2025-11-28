@@ -39,9 +39,9 @@
                                             fontSize: '20rpx',
                                             fontWeight: 'bold'
                                         }"
-                                        :price-data="subItem.price"
+                                        :price-data="getActualPrice(subItem)"
                                     />
-                                    <template v-if="subItem.originPrice && subItem.originPrice !== subItem.price">
+                                    <template v-if="subItem.originPrice && subItem.originPrice !== getActualPrice(subItem)">
                                         <format-price
                                             :font-style="{
                                                 fontWeight: '400',
@@ -327,7 +327,16 @@ const handlecConfirm = () => {
 };
 
 const activityList = (data: any): any[] => {
-    return data.filter((item: any) => item.type === 1 || item.type === 6);
+    // 1秒杀 6限时折扣 7拼团
+    return data.filter((item: any) => item.type === 1 || item.type === 6 || item.type === 7);
+};
+
+/**
+ * 获取商品实际显示价格
+ * 后端已修复，price 字段会根据活动类型返回正确的价格（拼团价/秒杀价/折扣价）
+ */
+const getActualPrice = (item: any): string => {
+    return String(item.price);
 };
 
 const getPriceMargin = (data: any) => {

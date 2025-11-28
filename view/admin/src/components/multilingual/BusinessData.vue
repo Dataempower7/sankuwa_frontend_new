@@ -90,11 +90,13 @@
                 path="setting/multilingual/translationContent/BusinessEditorDialog"
                 :params="{ act: isTranslation ? 'add' : 'detail', id: dataId, dataType: dataType, translationName: modelValue }"
             >
-                <el-button>
-                    <SvgIcon v-if="!isTranslation" name="multilingual-multilingual" width="18" height="18" />
-                    <SvgIcon v-else name="multilingual-multilingual-a" width="18" height="18" />
-                    <span style="margin-left: 5px;">富文本翻译</span>
-                </el-button>
+                <div style="background-color: #fff">
+                    <el-button>
+                        <SvgIcon v-if="!isTranslation" name="multilingual-multilingual" width="18" height="18" />
+                        <SvgIcon v-else name="multilingual-multilingual-a" width="18" height="18" />
+                        <span style="margin-left: 5px">富文本翻译</span>
+                    </el-button>
+                </div>
             </DialogForm>
         </div>
     </div>
@@ -112,7 +114,7 @@
                 <el-button>
                     <SvgIcon v-if="!isTranslation" name="multilingual-multilingual" width="18" height="18" />
                     <SvgIcon v-else name="multilingual-multilingual-a" width="18" height="18" />
-                    <span style="margin-left: 5px;">多语言</span>
+                    <span style="margin-left: 5px">多语言</span>
                 </el-button>
             </DialogForm>
         </div>
@@ -120,7 +122,7 @@
 </template>
 <script lang="ts" setup>
 import { DialogForm } from "@/components/dialog";
-import { ref, defineModel, onMounted, watch, PropType, VNode } from "vue";
+import { ref, onMounted, watch, PropType, VNode } from "vue";
 import { message } from "ant-design-vue";
 import { getCreateTranslation, updateCreateTranslation } from "@/api/multilingual/currencyManagement";
 import { isOverseas } from "@/utils/version";
@@ -221,9 +223,14 @@ const onEnter = () => {
         }
     }
 };
+
 onMounted(() => {
-    if ((props.dataId > 0 || props.dataType > 7) && (modelValue.value !== '' && modelValue.value !== "<p><br></p>")) {
-        _getCreateTranslation();
+    if (isOverseas()) {
+        if ((props.dataId > 0 || props.dataType > 7) && modelValue.value !== "" && modelValue.value !== "<p><br></p>" && props.type == "editor") {
+            _getCreateTranslation();
+        } else {
+            _getCreateTranslation();
+        }
     }
 });
 </script>
@@ -248,10 +255,10 @@ onMounted(() => {
         z-index: 100;
     }
 }
-.multilingual-editor-box{
+.multilingual-editor-box {
     position: relative;
     width: 100%;
-    .multilingual-editor-icon{
+    .multilingual-editor-icon {
         position: absolute;
         z-index: 10;
         right: 10px;

@@ -14,7 +14,7 @@ const router = createRouter({
 });
 
 // 修改路由标题 是否授权  - powered by tigshop
-// processRoutes(router.getRoutes());
+processRoutes(router.getRoutes());
 
 // reset router
 export function resetRouter() {

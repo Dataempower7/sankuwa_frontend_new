@@ -2,7 +2,7 @@
     <div class="container">
         <div class="content_wrapper">
             <div class="notice-warp">
-                <p>积分兑换列表前台地址为：{{ domain }}/exchange/list.html（支持手机版自动跳转）</p>
+                <p>积分兑换列表前台地址为：{{ domain }}/exchange/list.html</p>
             </div>
             <div class="lyecs-table-list-warp">
                 <div class="list-table-tool lyecs-search-warp">

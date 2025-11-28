@@ -47,6 +47,12 @@ export default {
                     component: () => import("@/views/promotion/productActivity/limitdiscount/List.vue")
                 },
                 {
+                    path: "groupon/list",
+                    name: "grouponPromotionManage",
+                    meta: { title: "拼团活动" },
+                    component: () => import("@/views/promotion/groupon/List.vue")
+                },
+                {
                     path: "product-gift/list",
                     name: "productGiftManage",
                     meta: { title: "活动赠品" },
@@ -81,6 +87,12 @@ export default {
                     name: "eCardManage",
                     meta: { title: "电子卡券" },
                     component: () => import("@/views/promotion/eCard/List.vue")
+                },
+                {
+                    path: "buyerShow/list",
+                    name: "buyerShowManage",
+                    meta: { title: "买家秀" },
+                    component: () => import("@/views/promotion/buyerShow/List.vue")
                 }
             ]
         }

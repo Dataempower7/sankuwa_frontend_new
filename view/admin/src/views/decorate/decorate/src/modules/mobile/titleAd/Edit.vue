@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { SelectColor } from "@/components/select";
 import { PicList } from "@/components/decorate";
-import { ref, defineModel, reactive } from "vue";
+import { ref, reactive } from "vue";
 import CommonTitleEdit from "../../src/commonTitle/Edit.vue";
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { ModuleType, ModuleImageType } from "@/types/decorate/decorate.d";

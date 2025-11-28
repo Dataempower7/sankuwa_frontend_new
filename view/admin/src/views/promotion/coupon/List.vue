@@ -218,9 +218,9 @@
                                     <Switch v-model:checked="row.isShow" :requestApi="updateCouponFiled" :params="{ id: row.couponId, field: 'isShow' }" />
                                 </template>
                             </el-table-column>
-                            <el-table-column label="活动时间" prop="timeText">
+                            <el-table-column label="活动时间" prop="time">
                                 <template #default="{ row }">
-                                    {{ row.timeText }}
+                                    {{ row.useStartDate }}  - {{ row.useEndDate }}
                                 </template>
                             </el-table-column>
                             <el-table-column label="操作" fixed="right">

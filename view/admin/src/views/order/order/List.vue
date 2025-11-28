@@ -2,7 +2,8 @@
     <div class="container">
         <div class="content_wrapper">
             <div class="lyecs-table-list-warp">
-                <TigTabs v-model="filterParams.orderStatus" :tabs="orderStatusList" @onTabChange="onTabChange"></TigTabs>
+                <TigTabs v-model="filterParams.orderStatus" :tabs="orderStatusList" @onTabChange="onTabChange">
+                </TigTabs>
                 <div class="list-table-tool lyecs-search-warp">
                     <div class="advanced-search-warp list-table-tool-row">
                         <div class="simple-form-warp">
@@ -13,13 +14,14 @@
                                         <TigInput
                                             v-model="filterParams.keyword"
                                             name="keyword"
-                                            placeholder="订单号/收货人姓名"
+                                            placeholder="订单号/收货人姓名/商品名称"
                                             @keyup.enter="onSearchSubmit"
                                             clearable
                                             @clear="onSearchSubmit"
                                         >
                                             <template #append>
-                                                <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span></el-button>
+                                                <el-button @click="onSearchSubmit"><span
+                                                        class="iconfont icon-chakan1"></span></el-button>
                                             </template>
                                         </TigInput>
                                     </div>
@@ -29,7 +31,17 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>选择店铺：</span></label>
                                     <div class="control-container">
-                                        <SelectShop v-model:shopId="filterParams.shopId" @onChange="onSearchSubmit"></SelectShop>
+                                        <SelectShop v-model:shopId="filterParams.shopId" @onChange="onSearchSubmit">
+                                        </SelectShop>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="simple-form-field" v-if="isS2b2c() && adminType == 'shop'">
+                                <div class="form-group">
+                                    <label class="control-label"><span>供应商：</span></label>
+                                    <div class="control-container">
+                                        <SelectVendor v-model:vendorId="filterParams.vendorId"
+                                            @onChange="onSearchSubmit"></SelectVendor>
                                     </div>
                                 </div>
                             </div>
@@ -38,7 +50,8 @@
                                     <label class="control-label"><span>支付方式：</span></label>
                                     <div class="control-container">
                                         <el-select v-model="filterParams.payCode" clearable @change="onSearchSubmit">
-                                            <el-option v-for="item in payTypeList" :label="item.label" :value="item.value"></el-option>
+                                            <el-option v-for="item in payTypeList" :label="item.label"
+                                                :value="item.value"></el-option>
                                         </el-select>
                                     </div>
                                 </div>
@@ -48,7 +61,8 @@
                                     <label class="control-label"><span>支付状态：</span></label>
                                     <div class="control-container">
                                         <el-select v-model="filterParams.payStatus" clearable @change="onSearchSubmit">
-                                            <el-option v-for="item in payStatusList" :label="item.label" :value="item.value"></el-option>
+                                            <el-option v-for="item in payStatusList" :label="item.label"
+                                                :value="item.value"></el-option>
                                         </el-select>
                                     </div>
                                 </div>
@@ -57,8 +71,10 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>发货状态：</span></label>
                                     <div class="control-container">
-                                        <el-select v-model="filterParams.shippingStatus" clearable @change="onSearchSubmit">
-                                            <el-option v-for="item in shippingStatusList" :label="item.label" :value="item.value"></el-option>
+                                        <el-select v-model="filterParams.shippingStatus" clearable
+                                            @change="onSearchSubmit">
+                                            <el-option v-for="item in shippingStatusList" :label="item.label"
+                                                :value="item.value"></el-option>
                                         </el-select>
                                     </div>
                                 </div>
@@ -67,7 +83,8 @@
                                 <div class="form-group">
                                     <label class="control-label"><span> 详细地址：</span></label>
                                     <div class="control-container">
-                                        <TigInput v-model="filterParams.address" @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit" />
+                                        <TigInput v-model="filterParams.address" @keyup.enter="onSearchSubmit" clearable
+                                            @clear="onSearchSubmit" />
                                     </div>
                                 </div>
                             </div>
@@ -75,7 +92,8 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>Email：</span></label>
                                     <div class="control-container">
-                                        <TigInput v-model="filterParams.email" @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit" />
+                                        <TigInput v-model="filterParams.email" @keyup.enter="onSearchSubmit" clearable
+                                            @clear="onSearchSubmit" />
                                     </div>
                                 </div>
                             </div>
@@ -84,7 +102,8 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>手机号：</span></label>
                                     <div class="control-container">
-                                        <TigInput v-model="filterParams.mobile" @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit" />
+                                        <TigInput v-model="filterParams.mobile" @keyup.enter="onSearchSubmit" clearable
+                                            @clear="onSearchSubmit" />
                                     </div>
                                 </div>
                             </div>
@@ -92,14 +111,13 @@
                                 <div class="form-group">
                                     <label class="control-label"><span>配送物流：</span></label>
                                     <div class="control-container">
-                                        <SelectLogisticsCompany
-                                            v-model:logisticsId="filterParams.logisticsId"
-                                            @onChange="onSearchSubmit"
-                                        ></SelectLogisticsCompany>
+                                        <SelectLogisticsCompany v-model:logisticsId="filterParams.logisticsId"
+                                            @onChange="onSearchSubmit">
+                                        </SelectLogisticsCompany>
                                     </div>
                                 </div>
                             </div>
-                            <div class="simple-form-field">
+                            <div class="simple-form-field" v-if="adminType !== 'vendor'">
                                 <div class="form-group">
                                     <label class="control-label"><span>订单标记：</span></label>
                                     <div class="control-container">
@@ -127,13 +145,9 @@
                             <div class="simple-form-field">
                                 <div class="form-group">
                                     <label class="control-label"><span>下单时间：</span></label>
-                                    <SelectTimeInterval
-                                        v-model:end-date="filterParams.addEndTime"
-                                        v-model:start-date="filterParams.addStartTime"
-                                        :clearable="false"
-                                        type="date"
-                                        value-format="YYYY-MM-DD"
-                                    ></SelectTimeInterval>
+                                    <SelectTimeInterval v-model:end-date="filterParams.addEndTime"
+                                        v-model:start-date="filterParams.addStartTime" :clearable="false" type="date"
+                                        value-format="YYYY-MM-DD"></SelectTimeInterval>
                                 </div>
                             </div>
                             <div class="simple-form-warp">
@@ -151,10 +165,20 @@
                 <div class="list-table-tool-row">
                     <div class="list-table-tool-col">
                         <el-space>
-                            <EditSign v-if="selectedIds.length > 0" title="添加标记" :ids="selectedIds" @callBack="loadFilter">
-                                <el-button> 标记 </el-button>
-                            </EditSign>
-                            <el-button v-else :disabled="true"> 标记 </el-button>
+                            <template v-if="isStore() && adminType !== 'vendor'">
+                                <DialogForm title="扫码核销" :bodyStyle="{ padding: 0 }" v-bind:is-drawer="false"
+                                    path="order/order/src/ScanCode" width="550px" :showFooter="false" :centered="true"
+                                    @okCallback="loadFilter">
+                                    <el-button type="primary"> 扫码核销 </el-button>
+                                </DialogForm>
+                            </template>
+                            <template v-if="adminType !== 'vendor'">
+                                <EditSign v-if="selectedIds.length > 0" title="添加标记" :ids="selectedIds"
+                                    @callBack="loadFilter">
+                                    <el-button> 标记 </el-button>
+                                </EditSign>
+                                <el-button v-else :disabled="true"> 标记 </el-button>
+                            </template>
                             <!-- <DialogForm
                                 v-if="selectedIds.length > 0"
                                 :params="{ act: 'severalDetail', ids: selectedIds }"
@@ -167,18 +191,17 @@
                                 <el-button> 批量发货 </el-button>
                             </DialogForm>
                             <el-button v-else :disabled="true"> 批量发货 </el-button> -->
-                            <el-button v-if="selectedIds.length > 0" @click="openPage(`/admin/print/orderPrint?ids=${selectedIds}`)">
-                                批量打印配送单
+                            <el-button v-if="selectedIds.length > 0"
+                                @click="openPage(`/print/orderPrint?ids=${selectedIds}`)"> 批量打印配送单
                             </el-button>
                             <el-button v-else :disabled="true"> 批量打印配送单 </el-button>
 
                             <template v-if="isPro() && hasPrint">
-                                <el-button v-if="selectedIds.length > 0" @click="handlePrint(selectedIds)">
-                                    批量打印小票
+                                <el-button v-if="selectedIds.length > 0" @click="handlePrint(selectedIds)"> 批量打印小票
                                 </el-button>
-                                <el-button v-else :disabled="true">  批量打印小票 </el-button>
+                                <el-button v-else :disabled="true"> 批量打印小票 </el-button>
                             </template>
-                           
+
                             <span v-if="selectedIds.length > 0">
                                 已选择：<b>{{ selectedIds.length }}</b> 项
                             </span>
@@ -191,28 +214,16 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <el-checkbox
-                                            v-model="selectAll"
-                                            :indeterminate="isIndeterminate"
-                                            class="check-box mr10"
-                                            @change="onSelectChangeAll"
-                                        ></el-checkbox>
-                                        <SortButton
-                                            v-model:sortField="filterParams.sortField"
-                                            v-model:sortOrder="filterParams.sortOrder"
-                                            sortName="orderId"
-                                            text="订单信息(下单时间排序)"
-                                            @loadData="onSearchSubmit()"
-                                        ></SortButton>
+                                        <el-checkbox v-model="selectAll" :indeterminate="isIndeterminate"
+                                            class="check-box mr10" @change="onSelectChangeAll"></el-checkbox>
+                                        <SortButton v-model:sortField="filterParams.sortField"
+                                            v-model:sortOrder="filterParams.sortOrder" sortName="orderId"
+                                            text="订单信息(下单时间排序)" @loadData="onSearchSubmit()"></SortButton>
                                     </th>
                                     <th>
-                                        <SortButton
-                                            v-model:sortField="filterParams.sortField"
-                                            v-model:sortOrder="filterParams.sortOrder"
-                                            sortName="totalAmount"
-                                            text="订单金额"
-                                            @loadData="onSearchSubmit()"
-                                        ></SortButton>
+                                        <SortButton v-model:sortField="filterParams.sortField"
+                                            v-model:sortOrder="filterParams.sortOrder" sortName="totalAmount"
+                                            text="订单金额" @loadData="onSearchSubmit()"></SortButton>
                                     </th>
                                     <th>会员名称</th>
                                     <th>收货人信息</th>
@@ -226,76 +237,72 @@
                             <thead>
                                 <tr class="data-tr">
                                     <th colspan="6">
-                                        <el-checkbox v-model="item.checkBox" class="check-box mr10" @change="onSelectChange(item)"></el-checkbox>
-
+                                        <el-checkbox v-model="item.checkBox" class="check-box mr10"
+                                            @change="onSelectChange(item)"></el-checkbox>
+                                        <!-- && adminType !== 'vendor' -->
                                         <template v-if="item.mark">
-                                            <el-tooltip :disabled="!item.adminNote" :content="item.adminNote" effect="light" placement="top">
+                                            <el-tooltip :disabled="!item.adminNote" :content="item.adminNote"
+                                                effect="light" placement="top">
                                                 <SignTag class="check-box tag" :value="item.mark"></SignTag>
                                             </el-tooltip>
                                         </template>
 
                                         <span class="check-box">订单编号：{{ item.orderSn }}</span>
                                         <el-divider direction="vertical" />
-                                        <span class="check-box" v-if="item.payLog">交易单号：{{ item.payLog?.transactionId }}</span>
+                                        <span class="check-box" v-if="item.payLog">交易单号：{{ item.payLog?.transactionId
+                                            }}</span>
                                         <el-divider direction="vertical" v-if="item.payLog" />
                                         <span class="check-box">下单时间：{{ item.addTime }}</span>
                                         <!--                                    <el-tooltip :content="'操作人：' + item.opAdminName" effect="light" placement="top">-->
                                         <!--                                        <el-tag class="ml10" disable-transitions effect="plain" size="small">代下单</el-tag>-->
                                         <!--                                    </el-tooltip>-->
-                                        <DialogForm
-                                            v-if="item.parentOrderId > 0"
+                                        <DialogForm v-if="item.parentOrderId > 0"
                                             :params="{ act: 'parentDetail', id: item.orderId, isParent: true }"
-                                            :showClose="false"
-                                            :showOnOk="false"
-                                            :title="'订单详情 ' + item.orderSn"
-                                            isDrawer
-                                            :style="{ display: 'inline-block' }"
-                                            path="order/order/Info"
-                                            width="880px"
-                                            @callback="loadFilter"
-                                        >
-                                            <el-tooltip
-                                                v-if="item.parentOrderId > 0"
-                                                :content="'该订单已拆分，点击可查看父订单' + ''"
-                                                effect="light"
-                                                placement="top"
-                                            >
+                                            :showClose="false" :showOnOk="false" :title="'订单详情 ' + item.orderSn"
+                                            isDrawer :style="{ display: 'inline-block' }" path="order/order/Info"
+                                            width="880px" @callback="loadFilter">
+                                            <el-tooltip v-if="item.parentOrderId > 0" :content="'该订单已拆分，点击可查看父订单' + ''"
+                                                effect="light" placement="top">
                                                 <Tag text="子订单"></Tag>
                                             </el-tooltip>
                                         </DialogForm>
 
-                                        <el-tooltip v-if="item.shopId > 0" :content="'订单来自店铺：' + item.shop.shopTitle" effect="light" placement="top">
+                                        <el-tooltip v-if="item.shopId > 0 && isMerchant()"
+                                            :content="'订单来自店铺：' + item.shop.shopTitle" effect="light" placement="top">
                                             <Tag :transparent="false" text="店铺"></Tag>
                                         </el-tooltip>
-                                        <el-tooltip v-if="item.orderSource" :content="'订单来自' + item.orderSource + '下单'" effect="light" placement="top">
-                                            <Tag :text="item.orderSource" :transparent="true" style="text-transform: uppercase"></Tag>
+                                        <el-tooltip v-if="item.shopId > 0 && isStore()"
+                                            :content="'订单来门店：' + item.shop.shopTitle" effect="light" placement="top">
+                                            <Tag :transparent="false" text="门店"></Tag>
+                                        </el-tooltip>
+                                        <el-tooltip v-if="item.vendorId > 0 && isS2b2c()"
+                                            :content="'订单来自供应商：' + item.vendorName" effect="light" placement="top">
+                                            <Tag :transparent="false" color="#c065ff" text="供应商"></Tag>
+                                        </el-tooltip>
+                                        <el-tooltip v-if="item.orderSource" :content="'订单来自' + item.orderSource + '下单'"
+                                            effect="light" placement="top">
+                                            <Tag :text="item.orderSource" :transparent="true"
+                                                style="text-transform: uppercase"></Tag>
                                         </el-tooltip>
                                         <!--<el-tag class="ml10" disable-transitions effect="plain" size="small">-->
                                         <!--团购订单-->
                                         <!--</el-tag>-->
-                                        <Tag v-if="item.isExchangeOrder" :transparent="true" color="red" text="积分兑换"></Tag>
-                                        <el-tooltip
-                                            v-if="item.payLog"
-                                            :content="'订单使用' + payTypeName(item.payLog.payCode) + '下单'"
-                                            effect="light"
-                                            placement="top"
-                                        >
-                                            <Tag :transparent="true" color="blue" :text="payTypeName(item.payLog.payCode)"></Tag>
+                                        <Tag v-if="item.isExchangeOrder" :transparent="true" color="red" text="积分兑换">
+                                        </Tag>
+                                        <el-tooltip v-if="item.payLog"
+                                            :content="'订单使用' + payTypeName(item.payLog.payCode) + '下单'" effect="light"
+                                            placement="top">
+                                            <Tag :transparent="true" color="blue"
+                                                :text="payTypeName(item.payLog.payCode)"></Tag>
                                         </el-tooltip>
                                     </th>
                                     <th class="textR">
                                         <div style="gap: 8px; display: flex; justify-content: right">
-                                            <DialogForm
-                                                :params="{ act: 'detail', id: item.orderId }"
-                                                :showClose="false"
-                                                :showOnOk="false"
-                                                :title="'订单详情 ' + item.orderSn"
-                                                isDrawer
-                                                path="order/order/Info"
-                                                width="880px"
-                                                @callback="loadFilter"
-                                            >
-                                                <el-button bg class="buttonColor mr10" size="small" text type="primary"> 查看详情</el-button>
+                                            <DialogForm :params="{ act: 'detail', id: item.orderId }" :showClose="false"
+                                                :showOnOk="false" :title="'订单详情 ' + item.orderSn" isDrawer
+                                                path="order/order/Info" width="880px" @callback="loadFilter">
+                                                <el-button bg class="buttonColor mr10" size="small" text type="primary">
+                                                    查看详情</el-button>
                                             </DialogForm>
 
                                             <!-- <DialogForm
@@ -309,8 +316,9 @@
                                                 <el-button bg class="buttonColor" size="small" text type="primary"> 备注 </el-button>
                                             </DialogForm> -->
                                             <EditSign title="添加标记" :item="item" @callBack="loadFilter">
-                                                <el-button bg class="buttonColor" size="small" text type="primary"> 标记 </el-button></EditSign
-                                            >
+                                                <el-button bg class="buttonColor" size="small" text type="primary"> 标记
+                                                </el-button>
+                                            </EditSign>
                                         </div>
                                     </th>
                                 </tr>
@@ -319,14 +327,9 @@
                                 <tr v-for="(product, index) in item.items">
                                     <td>
                                         <div class="displayRow flex flex-align-center flex-justify-between">
-                                            <ProductCard
-                                                :picThumb="product.picThumb"
-                                                :productId="product.productId"
-                                                :productName="product.productName"
-                                                :productType="product.productType"
-                                                :url="product.url"
-                                                :skuData="product.skuData"
-                                            ></ProductCard>
+                                            <ProductCard :picThumb="product.picThumb" :productId="product.productId"
+                                                :productName="product.productName" :productType="product.productType"
+                                                :url="product.url" :skuData="product.skuData"></ProductCard>
                                             <div class="displayColumn textR whiteSN widthAuto">
                                                 <div>{{ priceFormat(product.price) }}</div>
                                                 <div>× {{ product.quantity }}</div>
@@ -353,18 +356,14 @@
                                                 </div>
                                             </div> -->
                                             <div>
-                                                <DialogForm
-                                                    v-if="item.status === 6 || item.status === 7"
-                                                    :params="{ act: 'detail', id: item.aftersaleId }"
-                                                    isDrawer
-                                                    path="order/aftersales/Info"
-                                                    :title="'售后详情 ' + item.aftersalesSn"
-                                                    width="800px"
-                                                    @okCallback="loadFilter"
-                                                    :showClose="false"
-                                                    :showOnOk="false"
-                                                >
-                                                    <el-button bg class="buttonColor" size="small" text type="primary"> 售后详情 </el-button>
+                                                <DialogForm v-if="item.status === 6 || item.status === 7"
+                                                    :params="{ act: 'detail', id: item.aftersaleId }" isDrawer
+                                                    path="order/aftersales/Info" :title="'售后详情 ' + item.aftersalesSn"
+                                                    width="800px" @okCallback="loadFilter" :showClose="false"
+                                                    :showOnOk="false">
+                                                    <el-button bg class="buttonColor" size="small" text type="primary">
+                                                        售后详情
+                                                    </el-button>
                                                 </DialogForm>
                                                 <!-- <el-button size="small" text type="primary"> 售后详情 </el-button> -->
                                             </div>
@@ -373,22 +372,17 @@
                                     <td v-if="index == 0" :rowspan="item.items.length">
                                         <div class="displayColumn textL">
                                             <div>
-                                                <DialogForm
-                                                    :params="{ act: 'detail', id: item.userId }"
-                                                    isDrawer
-                                                    path="user/user/Detail"
-                                                    title="用户信息"
-                                                    width="800px"
-                                                    @okCallback="loadFilter"
-                                                    :showOnOk="false"
-                                                >
+                                                <DialogForm :params="{ act: 'detail', id: item.userId }" isDrawer
+                                                    path="user/user/Detail" title="用户信息" width="800px"
+                                                    @okCallback="loadFilter" :showOnOk="false">
                                                     <a>{{ item.user?.nickname || item.user?.username || "--" }}</a>
                                                 </DialogForm>
                                             </div>
                                         </div>
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.items.length">
-                                        <div class="displayColumn fz12 textL">
+                                        <div class="displayColumn fz12 textL"
+                                            v-if="!item.isPickup || item.shippingTypeId == 3">
                                             <div class="gray">
                                                 收货人：
                                                 <span class="black">
@@ -398,7 +392,9 @@
                                             <div class="gray">
                                                 手机号：
                                                 <span class="black">
-                                                    <span><MobileCard :mobile="item.mobile"></MobileCard></span>
+                                                    <span>
+                                                        <MobileCard :mobile="item.mobile"></MobileCard>
+                                                    </span>
                                                 </span>
                                             </div>
                                             <div class="gray user-address">
@@ -408,32 +404,51 @@
                                                 </span>
                                             </div>
                                         </div>
+                                        <div class="displayColumn fz12 textL"
+                                            v-if="item.isPickup && product.productType !== 5 && product.productType !== 6">
+                                            <span class="black"> 自提订单 </span>
+                                        </div>
+                                        <div class="displayColumn fz12 textL"
+                                            v-if="item.isPickup && product.productType === 5">
+                                            <span class="black"> 预约上门订单 </span>
+                                        </div>
+                                        <div class="displayColumn fz12 textL"
+                                            v-if="item.isPickup && product.productType === 6">
+                                            <span class="black"> 预约到店订单 </span>
+                                        </div>
+
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.items.length">
                                         <div class="displayColumn textL">
                                             <div>
-                                                <span>{{ item.payTypeId === 1 ? "在线支付" : item.payTypeId === 2 ? "货到付款" : "线下支付" }}</span>
+                                                <span>{{ item.payTypeId === 1 ? "在线支付" : item.payTypeId === 2 ? "货到付款" :
+                                                    "线下支付"
+                                                    }}</span>
                                             </div>
                                             <div v-if="item.logisticsName">
                                                 {{ item.shippingTypeName }}
-                                                <span class="gray">{{ "" + item.logisticsName + "" }}</span>
+                                                <span class="gray" v-if="item.shippingTypeId !== 3">{{ "" +
+                                                    item.logisticsName + ""
+                                                }}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.items.length">
-                                        <span
-                                            :class="{
-                                                orange: item.orderStatus === 0,
-                                                black: item.orderStatus === 1 || item.orderStatus === 2 || item.orderStatus === 4,
-                                                gray: item.orderStatus === 3,
-                                                green: item.orderStatus === 5
-                                            }"
-                                        >
+                                        <span :class="{
+                                            orange: item.orderStatus === 0,
+                                            black: item.orderStatus === 1 || item.orderStatus === 2 || item.orderStatus === 4,
+                                            gray: item.orderStatus === 3,
+                                            green: item.orderStatus === 5
+                                        }">
                                             {{ item.orderStatusName }}
                                         </span>
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.items.length">
-                                        <div class="buttonStyle">
+                                        <!-- 已付款，待成团不显示操作按钮 -->
+                                         <div class="buttonStyle" v-if="(item.joinStatus===1&&item.orderStatus===1)||item.joinStatus===3">
+                                            -
+                                         </div>
+                                        <div class="buttonStyle" v-else>
                                             <DialogForm
                                                 v-if="item.availableActions.cancelOrder"
                                                 :params="{ act: 'cancelOrder', id: item.orderId }"
@@ -445,62 +460,99 @@
                                             >
                                                 <el-button bg class="buttonColor" size="small" text type="primary"> 取消订单 </el-button>
                                             </DialogForm>
-                                            <el-button
-                                                v-if="item.availableActions.delOrder"
-                                                bg
-                                                size="small"
-                                                text
-                                                type="primary"
-                                                @click="onDelClick(item.orderId)"
-                                            >
+                                            <el-button v-if="item.availableActions.delOrder" bg size="small" text
+                                                type="primary" @click="onDelClick(item.orderId)">
                                                 删除订单
                                             </el-button>
 
-                                            <DialogForm
-                                                :params="{ act: 'detail', id: item.orderId }"
-                                                :title="'订单发货 ' + item.orderSn"
-                                                isDrawer
-                                                path="order/order/src/ToShip"
-                                                width="900px"
-                                                @okCallback="loadFilter"
-                                                v-if="item.availableActions.deliver"
-                                            >
+                                            <DialogForm :params="{ act: 'detail', id: item.orderId }"
+                                                :title="'订单发货 ' + item.orderSn" isDrawer path="order/order/src/ToShip"
+                                                width="900px" @okCallback="loadFilter" v-if="
+                                                    (!item.isPickup && item.availableActions.deliver && adminType !== 'vendor' && !item.vendorId && item.shippingTypeId !== 3) ||
+                                                    (item.availableActions.deliver && adminType == 'vendor')
+                                                ">
                                                 <el-button bg size="small" text type="danger"> 去发货 </el-button>
                                             </DialogForm>
+                                            <DeleteRecord v-if="
+                                                isStore() &&
+                                                item.availableActions.deliver &&
+                                                item.orderType !== 9 &&
+                                                item.orderType !== 10 &&
+                                                (
+                                                    item.isPickup ||
+                                                    item.shippingTypeId === 3
+                                                )
+
+                                            " :params="{
+                                                id: item.orderId,
+                                                shippingMethod: 3,
+                                                deliverData: deliverDataFun(item.items),
+                                                LogisticsId: 0,
+                                                trackingNo: ''
+                                            }" :requestApi="orderDeliver" title="该订单备货完成吗？" message="备货完成"
+                                                @afterDelete="loadFilter">
+                                                <el-button bg size="small" text type="danger"> 去备货 </el-button>
+                                            </DeleteRecord>
                                             <el-button
-                                                v-if="item.availableActions.confirmReceipt"
-                                                bg
-                                                size="small"
-                                                text
-                                                type="danger"
-                                                @click="onReceiptClick(item.orderId)"
-                                            >
-                                                确认收货
+                                                v-if="item.availableActions.deliver && item.vendorId && isS2b2c() && adminType !== 'vendor'"
+                                                bg size="small" text type="danger"
+                                                @click="_remindDeliver(item.orderId)">
+                                                催发货
                                             </el-button>
+                                            <el-button v-if="!item.isPickup && item.availableActions.confirmReceipt" bg
+                                                size="small" text type="danger" @click="onReceiptClick(item.orderId)">
+                                                {{ item.shippingTypeId === 3 ? '完成配送' : '确认收货' }}
+                                            </el-button>
+                                            <DialogForm
+                                                v-if="isStore() && item.isPickup && item.availableActions.confirmReceipt"
+                                                :params="{ act: 'detail', id: item.orderId }"
+                                                :title="'订单核销 ' + item.orderSn" isDrawer
+                                                path="order/order/src/ToWriteOff" width="900px"
+                                                @okCallback="loadFilter">
+                                                <el-button bg size="small" text type="danger"> 去核销 </el-button>
+                                            </DialogForm>
+
+                                            <DialogForm
+                                                v-if="isStore() && item.availableActions.deliver && (item.orderType == 9 || item.orderType == 10)"
+                                                :params="{
+                                                    id: item.orderId,
+                                                    act: 'detail',
+                                                    params: {
+                                                        id: item.orderId,
+                                                        shippingMethod: 3,
+                                                        deliverData: deliverDataFun(item.items),
+                                                        LogisticsId: 0,
+                                                        trackingNo: ''
+                                                    }
+                                                }" :title="'订单核销 ' + item.orderSn" isDrawer
+                                                path="order/order/src/StockUp" width="900px" @okCallback="loadFilter">
+                                                <el-button bg size="small" text type="danger"> 去核销</el-button>
+                                            </DialogForm>
+
                                             <div v-if="item.isChangeOrderStatus">
-                                                <DialogForm
-                                                    v-if="item.availableActions.deliver"
+                                                <DialogForm v-if="item.availableActions.deliver"
                                                     :params="{ id: item.orderId, preOrderStatus: item.preOrderStatus }"
-                                                    isDrawer
-                                                    path="order/order/src/ChangeStatus"
-                                                    title="取消订单"
-                                                    width="600px"
-                                                    @okCallback="loadFilter"
-                                                >
-                                                    <el-button bg class="buttonColor" size="small" text type="primary"> 取消订单 </el-button>
+                                                    isDrawer path="order/order/src/ChangeStatus" title="取消订单"
+                                                    width="600px" @okCallback="loadFilter">
+                                                    <el-button bg class="buttonColor" size="small" text type="primary">
+                                                        取消订单
+                                                    </el-button>
                                                 </DialogForm>
-                                                <DialogForm
-                                                    v-if="item.availableActions.confirmReceipt"
+                                                <DialogForm v-if="item.availableActions.confirmReceipt"
                                                     :params="{ id: item.orderId, preOrderStatus: item.preOrderStatus }"
-                                                    isDrawer
-                                                    path="order/order/src/ChangeStatus"
-                                                    title="取消发货"
-                                                    width="600px"
-                                                    @okCallback="loadFilter"
-                                                >
-                                                    <el-button bg class="buttonColor" size="small" text type="primary"> 取消发货 </el-button>
+                                                    isDrawer path="order/order/src/ChangeStatus" title="取消发货"
+                                                    width="600px" @okCallback="loadFilter">
+                                                    <el-button bg class="buttonColor" size="small" text type="primary">
+                                                        取消发货
+                                                    </el-button>
                                                 </DialogForm>
+
                                             </div>
+
+                                            <!-- <el-button v-if="item.shippingTypeId == 3" bg class="buttonColor"
+                                                size="small" text type="primary">
+                                                完成配送
+                                            </el-button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -512,7 +564,8 @@
                     </a-spin>
                 </div>
                 <div v-if="total > 0" class="pagination-con">
-                    <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                    <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                        @callback="loadFilter" />
                 </div>
             </div>
         </div>
@@ -522,12 +575,12 @@
 <script lang="ts" setup>
 import "@/style/css/list.less";
 import { computed, onMounted, reactive, ref } from "vue";
-import { Pagination, ProductCard } from "@/components/list";
+import { Pagination, ProductCard, DeleteRecord } from "@/components/list";
 import { message, Modal } from "ant-design-vue";
 import { useConfigStore } from "@/store/config";
 import { OrderFilterParams, OrderFilterState } from "@/types/order/order.d";
-import { batchSubmit, getOrderList, operationOrder, getOrderPageConfig, changeOrderStatus } from "@/api/order/order";
-import { SelectShop, SelectLogisticsCompany } from "@/components/select";
+import { batchSubmit, getOrderList, operationOrder, getOrderPageConfig, changeOrderStatus, remindDeliver, orderDeliver } from "@/api/order/order";
+import { SelectShop, SelectLogisticsCompany, SelectVendor } from "@/components/select";
 import { DialogForm } from "@/components/dialog";
 import { PopSelect } from "@/components/pop-form";
 import SortButton from "../../../components/list/src/SortButton.vue";
@@ -536,30 +589,31 @@ import { priceFormat } from "@/utils/format";
 import { useRoute, useRouter } from "vue-router";
 import { Tag } from "@/components/form";
 import { SelectTimeInterval } from "@/components/select";
-import { isMerchant } from "@/utils/version";
+import { isMerchant, isS2b2c, isStore, isPro } from "@/utils/version";
 import MobileCard from "@/components/list/src/MobileCard.vue";
 import EditSign from "@/views/order/order/src/EditSign.vue";
 import SignTag from "@/views/order/order/src/SignTag.vue";
 import { maskString } from "@/utils/util";
 import { hasEnabledPrint, triggerPrint } from "@/api/setting/receiptPrint";
-import { isPro } from "@/utils/version";
+import { getShopType } from "@/utils/storage";
+
 const adminType = ref(localStorage.getItem("adminType"));
 const config: any = useConfigStore();
 // 基本参数定义
 const orderStatusList = reactive([
     { value: -1, label: "全部", isShow: true },
     { value: 0, label: "待支付", isShow: true },
-    { value: 1, label: "待发货", isShow: true },
-    { value: 2, label: "已发货", isShow: true },
+    { value: 1, label: !isStore() ? "待发货" : "待发货/待备货", isShow: true },
+    { value: 2, label: !isStore() ? "已发货" : "已发货/待核销", isShow: true },
     { value: 3, label: "已取消", isShow: true },
     { value: 4, label: "无效", isShow: true },
-    { value: 5, label: "已完成", isShow: true },
+    { value: 5, label: !isStore() ? "已完成" : "已完成/已核销", isShow: true },
     { value: -2, label: "已删除", isShow: true }
 ]);
 
 const shippingStatusList = reactive([
-    { value: 0, label: "待发货" },
-    { value: 1, label: "已发货" },
+    { value: 0, label: !isStore() ? "待发货" : "待发货/待备货" },
+    { value: 1, label: !isStore() ? "已发货" : "已发货/待核销" },
     { value: 2, label: "已收货" },
     { value: 3, label: "配送中" },
     { value: 4, label: "配送失败" }
@@ -636,6 +690,7 @@ const filterParams = reactive<OrderFilterParams>({
     addStartTime: "",
     logisticsId: "",
     shopId: "",
+    vendorId: "",
     payCode: "",
     mark: -1
 });
@@ -656,6 +711,7 @@ const resetParams = () => {
     filterParams.shippingStatus = "";
     filterParams.logisticsId = "";
     filterParams.payStatus = "";
+    filterParams.vendorId = "";
     filterParams.payCode = "";
     filterParams.mark = -1;
     loadFilter();
@@ -667,6 +723,7 @@ const loadFilter = async () => {
     loading.value = true;
     selectedIds.value = [];
     try {
+
         const result = await getOrderList({ ...filterParams });
         if (result.records !== null) {
             const newArr = result.records.map((item) => ({
@@ -730,8 +787,10 @@ onMounted(() => {
 const onSearchSubmit = () => {
     loadFilter();
 };
+const router = useRouter();
 const openPage = (href: string) => {
-    window.open(href, "_blank");
+    let base = location.origin + router.options.history.base + href;
+    window.open(base, "_blank");
 };
 const onDelClick = (id: any) => {
     Modal.confirm({
@@ -756,6 +815,22 @@ const onReceiptClick = (id: any) => {
         onOk: async () => {
             try {
                 const result = await operationOrder("confirmReceipt", { id: id });
+                message.success("操作成功");
+                loadFilter();
+            } catch (error: any) {
+                message.error(error.message);
+            } finally {
+                loading.value = false;
+            }
+        }
+    });
+};
+const _remindDeliver = (id: any) => {
+    Modal.confirm({
+        title: "确认催发货该订单吗？",
+        onOk: async () => {
+            try {
+                const result = await remindDeliver({ id: id });
                 message.success("操作成功");
                 loadFilter();
             } catch (error: any) {
@@ -797,6 +872,18 @@ const onSelectChange = (e: any) => {
             selectedIds.value.splice(index, 1);
         }
     }
+};
+
+const deliverDataFun = (items: any) => {
+    let deliverData: any = [];
+    items.forEach((item: any) => {
+        let data = {
+            itemId: item.itemId,
+            toDeliveryQuantity: item.quantity
+        };
+        deliverData.push(data);
+    });
+    return deliverData;
 };
 </script>
 <style lang="less" scoped>
@@ -973,11 +1060,14 @@ const onSelectChange = (e: any) => {
         color: #999999;
     }
 }
+
 .table-container {
     overflow-x: auto;
-    > * {
+
+    >* {
         min-width: 1000px;
     }
+
     .table-container-con {
         min-width: 800px;
     }
@@ -987,31 +1077,39 @@ const onSelectChange = (e: any) => {
     .tabs {
         flex-wrap: wrap;
         gap: 10px !important;
+
         .item {
             margin: 0 !important;
         }
     }
+
     .table-container {
         overflow-x: auto;
-        > * {
+
+        >* {
             width: 1000px;
         }
+
         .table-container-con {
             min-width: 800px;
         }
     }
 }
+
 @media only screen and (max-width: 1400px) {
     .list-table-tool-col {
         :deep(.el-space) {
             flex-wrap: wrap;
         }
     }
+
     .table-container {
         overflow-x: auto;
-        > * {
+
+        >* {
             width: 1000px;
         }
+
         .table-container-con {
             min-width: 800px;
         }

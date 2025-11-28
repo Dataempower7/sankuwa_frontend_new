@@ -101,7 +101,7 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from '@/components/decorate'
-import { ref, defineModel } from 'vue';
+import { ref } from 'vue';
 import { ModuleType, PcCatProductType } from '@/types/decorate/decorate.d';
 import { SelectCategory, SelectColor } from '@/components/select'
 const module = defineModel<ModuleType & PcCatProductType>('module', {default: () => ({})});

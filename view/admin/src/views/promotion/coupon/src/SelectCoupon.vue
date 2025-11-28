@@ -162,7 +162,4 @@ defineExpose({
     background: #fff;
 }
 
-// :deep .hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox {
-//     display: none;
-// }
 </style>

@@ -20,7 +20,7 @@
             <div class="title" id="regionalSettings">地区设置</div>
             <el-form-item label="商城默认地区" prop="shopCountry">
                 <div class="itemWidth">
-                    <SelectRegion v-if="!loading" v-model="shopRegions"></SelectRegion>
+                    <SelectRegion v-if="!loading" v-model:selectedIds="shopRegions"></SelectRegion>
                 </div>
                 <div class="extra">此地区会在系统未判断出用户IP所在地域时，默认定位地区（仅影响PC端右上角送货地址）</div>
             </el-form-item>

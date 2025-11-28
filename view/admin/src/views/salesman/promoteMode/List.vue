@@ -15,13 +15,41 @@
                 <div class="tit" v-if="!loading">
                     <h2>分销员等级方案</h2>
                 </div>
+                <!-- <el-form :model="formState" label-width="auto">
+                    <el-form-item label="成为分销员：" required>
+                        <div>
+                            <el-radio-group v-model="formState.registerToSalesman">
+                                <el-radio :value="0">手动创建分销员</el-radio>
+                                <el-radio :value="1">自动成为分销员</el-radio>
+                            </el-radio-group>
+                            <div class="extra" v-if="formState.registerToSalesman === 0">手动创建分销员：商城所有一级分销员，需人工手动创建</div>
+                            <div class="extra" v-if="formState.registerToSalesman === 1">
+                                自动成为分销员：用户通过商城完成注册流程后，系统自动授予分销员身份
+                            </div>
+                        </div>
+                    </el-form-item>
+                </el-form> -->
                 <div class="promote-table">
                     <stepTable v-if="!loading" ref="stepTableRef" :distributionLevel="formState.saleType" :typeData="formState.level"> </stepTable>
                 </div>
+                <el-form :model="formState" label-width="auto" class="mt20">
+                    <el-form-item label="成为分销员：" required>
+                        <div>
+                            <el-radio-group v-model="formState.registerToSalesman">
+                                <el-radio :value="0">手动创建分销员</el-radio>
+                                <el-radio :value="1">自动成为分销员</el-radio>
+                            </el-radio-group>
+                            <div class="extra" v-if="formState.registerToSalesman === 0">手动创建分销员：商城所有一级分销员，需人工手动创建</div>
+                            <div class="extra" v-if="formState.registerToSalesman === 1">
+                                自动成为分销员：用户通过商城完成注册流程后，系统自动授予分销员身份
+                            </div>
+                        </div>
+                    </el-form-item>
+                </el-form>
             </a-spin>
         </div>
         <div style="height: 20px"></div>
-        <div class="selected-action-warp selected-warp-left" v-if="!loading" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+        <div class="selected-action-warp selected-warp-left" v-if="!loading" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
             <div class="selected-action">
                 <el-button :loading="loading" class="form-submit-btn" size="large" type="primary" @click="handleSubmit">保 存</el-button>
             </div>
@@ -41,8 +69,9 @@ const { themeInfo } = useThemeStore();
 const loading = ref<boolean>(true);
 const stepTableRef = shallowRef();
 const formState = ref<SalesmanConfigFormState>({
+    level: [],
     saleType: 1,
-    level: []
+    registerToSalesman: 1
 });
 const handleSubmit = async () => {
     await stepTableRef.value.formRef.validate();

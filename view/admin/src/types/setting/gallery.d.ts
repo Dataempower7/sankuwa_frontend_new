@@ -33,7 +33,7 @@ export interface GalleryFormState {
 export interface VideoDetail {
     videoUrl: string;
     videoName: string;
-    galleryId?: number
+    galleryId?: any;
     videoCover: string;
     format: string;
     duration: string;

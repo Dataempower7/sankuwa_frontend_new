@@ -139,7 +139,6 @@ const onEditHotarea = (index: number) => {
     visible.value = true;
     editPicIndex.value = index;
     hotarea.value = cloneDeep(photos.value[editPicIndex.value].hotarea) || []; //深拷贝，用于存保存
-    console.log(hotarea.value);
 };
 // 操作热图
 const hotarea = ref(<HotareaType[]>[]);

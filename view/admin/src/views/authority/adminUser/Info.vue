@@ -3,27 +3,26 @@
         <div class="content_wrapper">
             <div class="lyecs-form-table">
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
-                    <el-form-item
-                        :rules="[{ required: true, message: (adminType == 'shop' ? '员工名称' : '管理员名称') + '不能为空!' }]"
-                        :label="adminType == 'shop' ? '员工名称' : '管理员名称'"
-                        prop="username"
-                    >
+                    <el-form-item :rules="[{ required: true, message: '管理员名称不能为空!' }]" :label="'管理员名称'" prop="username">
                         <TigInput width="100%" v-model="formState.username" />
                     </el-form-item>
-                    <el-form-item v-if="adminType == 'admin'" label="手机号" prop="mobile" :rules="[{ required: true, message: '手机号不能为空!' }]">
+                    <el-form-item v-if="adminType == 'admin'" label="手机号" prop="mobile"
+                        :rules="[{ required: true, message: '手机号不能为空!' }]">
                         <TigInput width="100%" v-model="formState.mobile" />
                     </el-form-item>
-                    <el-form-item v-if="adminType != 'shop'" label="邮箱" prop="email">
+                    <el-form-item v-if="adminType == 'admin'" label="邮箱" prop="email">
                         <TigInput width="100%" v-model="formState.email" />
                     </el-form-item>
-                    <el-form-item v-if="adminType != 'shop'" label="头像" prop="avatar">
-                        <UploadAvatar v-model:avatar="formState.avatar" :avatarType="avatarType" :loading="loading"></UploadAvatar>
+                    <el-form-item v-if="adminType === 'admin'" label="头像" prop="avatar">
+                        <UploadAvatar v-model:avatar="formState.avatar" :avatarType="avatarType" :loading="loading">
+                        </UploadAvatar>
                     </el-form-item>
-                    <template v-if="operation == 'create' && adminType != 'shop'">
+                    <template v-if="operation == 'create' && adminType == 'admin'">
                         <el-form-item :rules="[{ required: true, message: '设置密码不能为空!' }]" label="设置密码" prop="password">
                             <TigInput width="100%" v-model="formState.password" type="password" />
                         </el-form-item>
-                        <el-form-item :rules="[{ required: true, message: '确认密码不能为空!' }]" label="确认密码" prop="pwdConfirm">
+                        <el-form-item :rules="[{ required: true, message: '确认密码不能为空!' }]" label="确认密码"
+                            prop="pwdConfirm">
                             <TigInput width="100%" v-model="formState.pwdConfirm" type="password" />
                         </el-form-item>
                     </template>
@@ -35,16 +34,17 @@
                             <TigInput width="100%" v-model="formState.pwdConfirm" type="password" />
                         </el-form-item>
                     </template>
-                    <el-form-item v-if="adminType != 'shop'" :label="adminType == 'shop' ? '员工权限组' : '管理员权限组'" prop="roleId">
+                    <el-form-item v-if="adminType == 'admin'" :label="'管理员权限组'" prop="roleId">
                         <template v-if="formState.roleId != 2">
                             <el-select v-model="formState.roleId" style="width: 100%">
                                 <el-option :value="0" label="自定义权限"></el-option>
-                                <el-option v-for="item in roleList" :label="item.roleName" :value="item.roleId"></el-option>
+                                <el-option v-for="item in roleList" :label="item.roleName"
+                                    :value="item.roleId"></el-option>
                             </el-select>
                         </template>
                         <template v-else> 供应商</template>
                     </el-form-item>
-                    <el-form-item v-if="formState.roleId === 0 && adminType != 'shop'" label="" prop="authList">
+                    <el-form-item v-if="formState.roleId === 0 && adminType == 'admin'" label="" prop="authList">
                         <AuthoritySelect v-model="formState.authList"></AuthoritySelect>
                     </el-form-item>
                     <el-form-item v-if="adminType == 'shop'" label="店铺列表" prop="userShop">
@@ -64,19 +64,6 @@
                                     {{ row.shop?.statusText }}
                                 </template>
                             </el-table-column>
-                            <!-- <el-table-column width="100" label="头像" prop="avatar">
-                                <template #default="{ row }">
-                                    <template v-if="extractContent(String(row.user.avatar)) == 'one'">
-                                        <el-avatar :size="30" :src="imageFormat(row.user.avatar)" />
-                                    </template>
-                                    <template v-else-if="extractContent(String(row.user.avatar)) == 'def'">
-                                        <el-avatar :size="30" :src="returnAvatar(row.user.avatar)" />
-                                    </template>
-                                    <template v-else>
-                                        <el-avatar :size="30" src="" />
-                                    </template>
-                                </template>
-                            </el-table-column> -->
                             <el-table-column width="100" label="员工昵称" prop="username">
                                 <template #default="{ row }">
                                     {{ row.username || formState.username || "-" }}
@@ -95,7 +82,8 @@
                         </el-table>
                     </el-form-item>
                     <el-form-item v-show="!props.isDialog" :wrapper-col="{ offset: 4, span: 16 }">
-                        <el-button ref="submitBtn" class="form-submit-btn" type="primary" @click="onSubmit">提交</el-button>
+                        <el-button ref="submitBtn" class="form-submit-btn" type="primary"
+                            @click="onSubmit">提交</el-button>
                     </el-form-item>
                 </el-form>
                 <a-spin :spinning="loading" style="width: 100%; margin-top: 100px" />
@@ -188,6 +176,12 @@ const fetchAdminUserConfit = async () => {
     try {
         const result = await getAdminUserConfig();
         roleList.value = result;
+        if (action.value === "detail") {
+            // 获取详情数据
+            fetchAdminUser();
+        } else {
+            loading.value = false;
+        }
     } catch (error: any) {
         message.error(error.message);
     }
@@ -195,12 +189,6 @@ const fetchAdminUserConfit = async () => {
 
 onMounted(() => {
     fetchAdminUserConfit();
-    if (action.value === "detail") {
-        // 获取详情数据
-        fetchAdminUser();
-    } else {
-        loading.value = false;
-    }
     if (operation != "update" && props.type === "suppliers") {
         formState.roleId = 2;
         formState.suppliersId = props.suppliersId;

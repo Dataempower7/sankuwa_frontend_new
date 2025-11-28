@@ -103,20 +103,25 @@
                                     :price-data="item.marketPrice"
                             /></view>
                         </view>
-                        <view class="qianggou-btn" :class="{ flex: item.seckillStock === 0, 'align-center': item.seckillStock > 0 }">
-                            <view v-if="item.seckillStock === 0" class="btn-txt"> {{ $t("已抢完") }} </view>
-                            <view v-else class="btn-txt">
-                                <view class="txt">{{ $t("马上抢") }}</view>
-                                <view class="progress-box flex align-center">
-                                    <view class="progress-bar">
-                                        <view
-                                            class="progress"
-                                            :style="{
-                                                width: seckillPercentage(item.seckillSales, item.seckillStock)
-                                            }"
-                                        />
+                        <view class="qianggou-btn-container">
+                            <view v-if="countdownMap[item.productId] && item.seckillStock > 0" class="countdown-txt">
+                                {{ countdownMap[item.productId] }}
+                            </view>
+                            <view class="qianggou-btn" :class="{ flex: item.seckillStock === 0, 'align-center': item.seckillStock > 0 }">
+                                <view v-if="item.seckillStock === 0" class="btn-txt"> {{ $t("已抢完") }} </view>
+                                <view v-else class="btn-txt">
+                                    <view class="txt">{{ $t("马上抢") }}</view>
+                                    <view class="progress-box flex align-center">
+                                        <view class="progress-bar">
+                                            <view
+                                                class="progress"
+                                                :style="{
+                                                    width: seckillPercentage(item.seckillSales, item.seckillStock)
+                                                }"
+                                            />
+                                        </view>
+                                        <view class="progress-txt">{{ seckillPercentage(item.seckillSales, item.seckillStock) }}</view>
                                     </view>
-                                    <view class="progress-txt">{{ seckillPercentage(item.seckillSales, item.seckillStock) }}</view>
                                 </view>
                             </view>
                         </view>
@@ -167,7 +172,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, nextTick } from "vue";
+import { ref, reactive, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { imageFormat } from "@/utils/format";
 import { getSeckill } from "@/api/seckill/seckill";
 import type { SeckillFilterState } from "@/types/seckill/seckill";
@@ -382,6 +387,92 @@ const applyFilter = () => {
         seckillProductList.value = filteredList;
     }
 };
+
+// 倒计时相关
+const countdownMap = ref<{ [key: number]: string }>({});
+let countdownTimer: any = null;
+
+// 计算倒计时
+const calculateCountdown = (startTime: string, endTime: string): string => {
+    if (!endTime) return "";
+    
+    const now = new Date().getTime();
+    const start = new Date(startTime).getTime();
+    const end = new Date(endTime).getTime();
+    
+    // 判断秒杀是否还未开始
+    if (now < start) {
+        const diff = start - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if (days > 0) {
+            return `距开始 ${days}天 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        return `距开始 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    // 判断秒杀是否已结束
+    const diff = end - now;
+    if (diff <= 0) {
+        return "已结束";
+    }
+    
+    // 正在进行中
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    if (days > 0) {
+        return `距结束 ${days}天 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    return `距结束 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+// 更新所有倒计时
+const updateAllCountdowns = () => {
+    seckillProductList.value.forEach((item) => {
+        if (item.seckkillData?.seckillEndTime && item.seckkillData?.seckillStartTime) {
+            countdownMap.value[item.productId] = calculateCountdown(
+                item.seckkillData.seckillStartTime,
+                item.seckkillData.seckillEndTime
+            );
+        }
+    });
+};
+
+// 启动倒计时定时器
+const startCountdownTimer = () => {
+    updateAllCountdowns();
+    countdownTimer = setInterval(() => {
+        updateAllCountdowns();
+    }, 1000);
+};
+
+// 停止倒计时定时器
+const stopCountdownTimer = () => {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+};
+
+// 生命周期
+onMounted(() => {
+    startCountdownTimer();
+});
+
+onUnmounted(() => {
+    stopCountdownTimer();
+});
+
+// 监听商品列表变化，重新计算倒计时
+watch(seckillProductList, () => {
+    updateAllCountdowns();
+}, { deep: true });
 </script>
 <style>
 page {
@@ -596,6 +687,25 @@ page {
                 }
             }
 
+            .qianggou-btn-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8rpx;
+                
+                .countdown-txt {
+                    font-size: 20rpx;
+                    color: #ff4d4f;
+                    font-weight: 600;
+                    background: rgba(255, 255, 255, 0.95);
+                   // padding: 6rpx 16rpx;
+                    border-radius: 10rpx;
+                    white-space: nowrap;
+                    box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.2);
+                    line-height: 1.4;
+                }
+            }
+            
             .qianggou-btn {
                 width: 190rpx;
                 height: 75rpx;
@@ -608,6 +718,11 @@ page {
                     width: 100%;
                     color: #fff;
                     position: relative;
+                    
+                    .txt {
+                        font-size: 28rpx;
+                        font-weight: 600;
+                    }
                 }
 
                 .progress-box {

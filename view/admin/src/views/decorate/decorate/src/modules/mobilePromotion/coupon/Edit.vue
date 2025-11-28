@@ -140,7 +140,7 @@ import { SelectColor } from '@/components/select'
 import { PicSelect } from '@/components/decorate'
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { ModuleCouponType } from "@/types/decorate/decorate.d";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import { defaultFrame, defaultIcoPic } from '@/views/decorate/decorate/src/modules/'
 
 const module = defineModel<ModuleCouponType>("module", { default: () => ({}) });

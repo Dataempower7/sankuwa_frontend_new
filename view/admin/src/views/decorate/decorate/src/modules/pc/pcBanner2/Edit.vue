@@ -18,7 +18,6 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from "@/components/decorate";
-import { ref, defineModel } from "vue";
 import { ModuleType, PcBannerType } from "@/types/decorate/decorate.d";
 const module = defineModel<ModuleType & PcBannerType>("module", { default: () => ({}) });
 </script>

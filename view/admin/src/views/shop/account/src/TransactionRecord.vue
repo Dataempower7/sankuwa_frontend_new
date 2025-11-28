@@ -10,20 +10,20 @@
         </el-tabs>
         <div class="table-container">
             <el-table :data="filterState" :loading="loading" :total="total" row-key="logId" v-loading="loading">
-                <el-table-column label="时间" prop="addTime" width="160"></el-table-column>
+                <el-table-column label="时间" prop="addTime" width="200"></el-table-column>
                 <el-table-column label="购买用户" width="160">
                     <template #default="{ row }">
                         <span>{{ row.user.username }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="订单编号" prop="orderSn" width="160"></el-table-column>
+                <el-table-column label="订单编号" prop="orderSn" width="180"></el-table-column>
 
                 <el-table-column label="金额(元)|明细">
                     <template #default="{ row }">
                         <span>总金额: {{ priceFormat(row.totalAmount) || 0.0 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" prop="orderStatusName" width="120"></el-table-column>
+                <el-table-column label="状态" prop="orderStatusName" width="150"></el-table-column>
                 <el-table-column label="操作" width="80">
                     <template #default="{ row }">
                         <DialogForm
@@ -65,15 +65,12 @@ import { OrderFilterParams } from "@/types/order/order.d";
 import { useListRequest } from "@/hooks/useListRequest";
 const config: any = useConfigStore();
 const orderStatusList = reactive([
-    { value: -1, label: "全部" },
-    { value: 0, label: "待支付" },
-    { value: 1, label: "待发货" },
-    { value: 2, label: "已发货" },
-    { value: 3, label: "已取消" },
-    { value: 4, label: "无效" },
-    { value: 5, label: "已完成" },
-    { value: -2, label: "已删除" },
-    { value: 99, label: "待结算" }
+    { value: '-1', label: "全部" },
+    { value: '0,1,2', label: "进行中" },
+    { value: '99', label: "待结算" },
+    { value: '88', label: "退款" },
+    { value: '5', label: "交易成功" },
+    { value: '3,4,-2', label: "交易关闭" }
 ]);
 const {
     listData: filterState,
@@ -83,25 +80,31 @@ const {
     loadData: loadFilter,
 } = useListRequest<any, OrderFilterParams>({
     apiFunction: getOrderList,
-    idKey: "articleId",
+    idKey: "orderId",
     defaultParams: {
         page: 1,
         size: config.get("pageSize"),
         sortField: "",
         sortOrder: "",
         orderStatus: -1,
-        isSettlement: 0
+        isSettlement: 0,
+        payStatus: ""
     }
 });
 
 loadFilter();
 
 const onTabChange = (e: number) => {
-    if (orderStatusList[e].value != 99) {
-        filterParams.orderStatus = orderStatusList[e].value;
-    } else {
-        filterParams.orderStatus = -1;
+    filterParams.payStatus = "";
+    if(orderStatusList[e].value == '99'){
         filterParams.isSettlement = 0;
+        filterParams.orderStatus = -1;
+    }else if (orderStatusList[e].value == '88') {
+        filterParams.isSettlement = 0;
+        filterParams.orderStatus = -1;
+        filterParams.payStatus = 3;
+    }else{
+        filterParams.orderStatus = orderStatusList[e].value;
     }
     loadFilter();
 };

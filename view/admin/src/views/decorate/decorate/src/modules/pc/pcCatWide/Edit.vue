@@ -19,7 +19,6 @@
 </template>
 <script lang="ts" setup>
 import { PicList, LinkList } from '@/components/decorate'
-import { ref, defineModel } from 'vue';
 import { ModuleType, PcCatProductType } from '@/types/decorate/decorate.d';
 import { SelectCategory, SelectColor } from '@/components/select'
 import { ProductSelect } from '@/components/decorate'

@@ -3,7 +3,7 @@
         <view v-show="!loadEndStatus">
             <tig-layout ref="layoutRef" :immediate-log="false" :product-id="productId" :shop-id="product.shopId">
                 <productNav v-model="scrollTop" v-model:active-module="activeModule" :event="handleScrollTo" />
-                <productImg class="product-area" :video-list="videoList" :pic-list="picList" :product-info="product" :seckill-value="seckillValue" />
+                <productImg class="product-area" :video-list="videoList" :pic-list="picList" :product-info="product" :seckill-value="seckillValue" :groupon-value="grouponValue" />
                 <template v-if="isSeckill">
                     <productSeckillTitle
                         :product-info="product"
@@ -21,18 +21,59 @@
                         :product-stock="productStock"
                     />
                 </template>
+                <template v-if="isGroupon">
+                    <productGrouponTitle
+                        :product-info="product"
+                        :product-origin-price="productOriginPrice!"
+                        :product-price="productPrice"
+                        :groupon-value="grouponValue"
+                        :product-stock="productStock"
+                    />
+                </template>
 
                 <view class="productDetail-content" :style="{ 'padding-bottom': `${product.productStatus === 0 || productStock === 0 ? 160 : 100}rpx` }">
                     <productTitleInfo
                         v-model:show-coupon="showCoupon"
                         :is-seckill="isSeckill"
+                        :is-discount="isDiscount"
+                        :is-groupon="isGroupon"
                         :promotion-list="promotionList"
                         :product-info="product"
                         :product-price="productPrice"
-                        :is-discount="isDiscount"
                         :type="type"
                         :exchange-integral="exchangeIntegral"
                     />
+
+                    <view v-if="isGroupon" class="group-card-row">
+                        <template v-if="totalGroupCount">
+                            <view class="flex justify-between align-center">
+                                <view class="group-num">{{ grouponValue.joinNumCount }}{{ $t('人在拼单，可直接参与') }}</view>
+                                <view class="flex align-center group-desc" @click="handleShowMore">查看更多
+                                    <view class="iconfont-h5 icon-gengduo1 more" />
+                                </view>
+                            </view>
+                            <view class="group">
+                                <productGroupon :groups="twoGroupList" @join-click="hanldeJoinGroup" padding="" />
+                            </view>
+                        </template>
+                        <view class="instructions">
+                            <text class="">{{ $t("拼团说明") }}</text>
+                            <view class="process">
+                                <view class="process-item">
+                                    <image class="process-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761728622974e9MBcgz28ufX2Vd.jpeg" />
+                                    <text>{{ $t("1.开团/参加") }}</text>
+                                </view>
+                                <view class="process-item">
+                                    <image class="process-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761728621OFvyeOTJTxNKY0O90W.jpeg" />
+                                    <text>{{ $t("2.邀友参团") }}</text>
+                                </view>
+                                <view class="process-item">
+                                    <image class="process-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761728622sTiCFlMeSiiCZVfYA3.jpeg" />
+                                    <text>{{ $t("3.人满成团") }}</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
 
                     <view class="product-card-row">
                         <view class="cart-item flex align-center justify-between" @click="showSpecification">
@@ -50,6 +91,7 @@
                             <view>
                               <image class="arrow-icon" src="/static/images/common/right.png" style="width: 27rpx; height: 27rpx;"/>
                             </view>
+
                         </view>
 
                         <template
@@ -190,8 +232,14 @@
                                     </template>
                                     <template v-else>
                                         <template v-if="product.productType === 1">
-                                            <view class="btn cart-new" @click="showSpecification(false)">{{ $t("加入购物车") }}</view>
-                                            <view class="btn buy-new" @click="showSpecification(true)">{{ $t("立即购买") }}</view>
+                                            <template v-if="isGroupon">
+                                                <view class="btn cart-new" @click="showSpecification(false)">{{ $t("单独购买") }}</view>
+                                                <view class="btn buy-new" @click="showGrouponPoup">{{ $t("我要开团") }}</view>
+                                            </template>
+                                            <template v-else>
+                                                <view class="btn cart-new" @click="showSpecification(false)">{{ $t("加入购物车") }}</view>
+                                                <view class="btn buy-new" @click="showSpecification(true)">{{ $t("立即购买") }}</view>
+                                            </template>
                                         </template>
                                         <template v-else>
                                             <view class="other-products-btn" @click="showSpecification(true)">{{ $t("立即购买") }}</view>
@@ -214,12 +262,18 @@
                     v-model:sku-id="skuId"
                     :type="type"
                     :buy-only="buyOnly"
+                    :groupon-enable="grouponEnable"
+                    :grouponRecordInfo="grouponRecordInfo"
                     @load-end="getLoadStatus"
                     @add-card-succeed="getShowAnimation"
                     @send-value="getValue"
                 />
 
                 <productCoupon v-model="showCoupon" :product-id="Number(productId)" :promotion-list="promotionList" />
+                
+                <!--更多拼团列表-->
+                <productGrouponMore v-model="showMoreGroupon" :productId="product.productId" :group-list="groupList"
+                    @join-click="hanldeJoinGroup" :total="totalGroupCount" />
                 <tig-popup v-model:show="showAttrRef">
                     <scroll-view scroll-y="true" class="attr_table-box">
                         <view class="popup-title title">{{ $t("规格参数") }}</view>
@@ -246,6 +300,9 @@ import productImg from "./src/productImg.vue";
 import productTitleInfo from "./src/productTitleInfo.vue";
 import productSeckillTitle from "./src/productSeckillTitle.vue";
 import productDiscountTitle from "./src/productDiscountTitle.vue";
+import productGrouponTitle from "./src/productGrouponTitle.vue";
+import productGroupon from "./src/productGroupon.vue";
+import productGrouponMore from "./src/productGrouponMore.vue";
 import productComment from "./src/productComment.vue";
 import productShopInfo from "./src/productShopInfo.vue";
 import specification from "@/components/product/specification.vue";
@@ -264,13 +321,16 @@ import { getShopDetail } from "@/api/shop/shop";
 import type { PicList, ProductItem, AttrList, SkuList, ServiceList, RankDetail, DescArr, SkuPromotion, VideoList } from "@/types/product/product";
 import type { ShopDetailItem } from "@/types/shop/shop";
 import { redirect, getElementRect, staticResource, isMerchant, isB2B } from "@/utils";
-import { useScrollTop } from "@/hooks";
+import { useScrollTop, useList } from "@/hooks";
 import { useUserStore } from "@/store/user";
+import type { GrouponRecordListParams, GrouponRecordItem } from "@/types/groupon/groupon";
+import { getGrouponRecordList } from "@/api/groupon/groupon";
 
 const userStore = useUserStore();
 const { scrollTop } = useScrollTop();
 const productId = ref(0);
 const showAttrRef = ref(false);
+const showMoreGroupon = ref(false);
 const configStore = useConfigStore();
 const specificationRef = ref();
 const specificationId = ref(0);
@@ -287,8 +347,30 @@ const showDrawer = () => {
     showAttrRef.value = true;
 };
 const showSpecification = (isBuyOnly = false) => {
-    buyOnly.value = isBuyOnly;
+    // 单独购买时，禁用拼团功能，但保持正常的购物车和立即购买选项
+    if (isGroupon.value) {
+        grouponEnable.value = false;
+        buyOnly.value = false; // 单独购买时显示购物车和立即购买按钮
+    } else {
+        buyOnly.value = isBuyOnly;
+    }
     if (specificationRef.value) {
+        specificationRef.value.handleShowPopup();
+    }
+};
+
+const handleShowMore = () => {
+    showMoreGroupon.value = true;
+};
+
+/**
+ * 显示拼团弹窗
+ */
+const showGrouponPoup = () => {
+    if (specificationRef.value) {
+        grouponEnable.value = true;
+        grouponRecordInfo.value.minGroupNum = 0;
+        grouponRecordInfo.value.grouponPromotionRecordId = 0;
         specificationRef.value.handleShowPopup();
     }
 };
@@ -334,6 +416,7 @@ const __getProductDetail = async (id: number) => {
         checkedValue.value = result.checkedValue;
         descArr.value = result.descArr;
         serviceList.value = result.serviceList;
+        getGrouponRecordsParams.productId = product.value.productId;
         uni.setNavigationBarTitle({
             title: result.item.productName
         });
@@ -387,6 +470,9 @@ const promotionList = ref<SkuPromotion[]>([]);
 const isDiscount = ref<number>(0);
 const discountValue = ref<any>({});
 const discountEndTime = ref<string>("");
+const isGroupon = ref<number>(0);
+const grouponValue = ref<any>({});
+const grouponEnable = ref(true);
 
 interface Ival {
     productOriginPrice: string | null;
@@ -401,6 +487,7 @@ interface Ival {
     discountValue: AnyObject;
     discountEndTime: string;
     promotionList: SkuPromotion[];
+    grouponValue: AnyObject;
 }
 const getValue = (val: Ival) => {
     if (val.productSkuId && val.skuStr) {
@@ -416,6 +503,16 @@ const getValue = (val: Ival) => {
     isDiscount.value = val.isDiscount;
     discountValue.value = val.discountValue;
     discountEndTime.value = val.discountEndTime;
+    grouponValue.value = val.grouponValue;
+    
+    
+    if (grouponValue.value && Object.keys(grouponValue.value).length > 0) {
+        isGroupon.value = 1;
+    }
+
+    if (isGroupon.value) {
+        getGrouponRecords();
+    }
 };
 const cartCount = ref<number>(0);
 const _getCartCount = async () => {
@@ -578,6 +675,64 @@ const handleLoginSuccess = () => {
     });
 };
 
+const grouponRecordInfo = ref<{
+    grouponPromotionRecordId: number,
+    minGroupNum: number;
+}>({
+    grouponPromotionRecordId: 0,
+    minGroupNum: 0
+});
+
+const getGrouponRecordsParams: GrouponRecordListParams = ({
+    page: 1,
+    size: 1,
+    // isMine: false,
+    joinStatus: 1,
+    productId: 0
+});
+const groupList = ref<GrouponRecordItem[]>([]);
+
+/**
+ * 两个拼团的展示数据
+ */
+const twoGroupList = ref<GrouponRecordItem[]>([]);
+const totalGroupCount = ref(0);
+const getGrouponRecords = async () => {
+    try {
+        const res = await getGrouponRecordList(getGrouponRecordsParams);
+        if (res.records) {
+            groupList.value = res.records;
+            totalGroupCount.value = res.total;
+            console.log('totalGroupCount:', totalGroupCount.value);
+            console.log('groupList:', groupList.value);
+            if (groupList.value && groupList.value.length) {
+                if (groupList.value.length > 1) {
+                    twoGroupList.value = groupList.value.slice(0, 2);
+                } else {
+                    twoGroupList.value = groupList.value;
+                }
+                console.log('twoGroupList:', twoGroupList.value);
+            }
+        }
+    } catch (error) {
+        console.log('getGrouponRecords error:', error);
+    }
+};
+
+/**
+ * 加入拼团
+ * @param item
+ */
+const hanldeJoinGroup = (item: GrouponRecordItem) => {
+    showMoreGroupon.value = false;
+    nextTick(() => {
+        grouponRecordInfo.value.grouponPromotionRecordId = item.grouponPromotionRecordId;
+        grouponRecordInfo.value.minGroupNum = item.minGroupNum;
+        grouponEnable.value = true;
+        specificationRef.value.handleShowPopup();
+    })
+};
+
 const showService = computed(() => {
     if (Object.keys(shopInfo.value).length > 0) {
         if (shopInfo.value.kefuInlet && shopInfo.value.kefuInlet.length > 0 && shopInfo.value.kefuInlet.includes(1)) {
@@ -614,6 +769,94 @@ const showService = computed(() => {
 }
 .productDetail-content {
     padding: 0 20rpx;
+    
+    .group-card-row {
+        background-color: #fff;
+        padding: 20rpx;
+        border-radius: 20rpx;
+        margin: 20rpx 0;
+
+        .group-num {
+            color: #1a1a1a;
+            font-size: 28rpx;
+            font-weight: bold;
+        }
+
+        .group-desc {
+            color: #3a3a3a;
+            font-size: 28rpx;
+        }
+
+        .more {
+            padding-left: 8rpx;
+            color: #818181;
+            font-size: 24rpx;
+        }
+
+        .group {
+            padding: 18rpx 0;
+        }
+
+        .instructions {
+            padding-top: 40rpx;
+            padding-bottom: 46rpx;
+            width: 100%;
+            border-top: 2rpx solid #f5f5f5;
+
+            text {
+                width: 109rpx;
+                height: 27rpx;
+                font-weight: bold;
+                font-size: 28rpx;
+                color: #2a2a2a;
+                line-height: 56rpx;
+            }
+
+            .process {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 25rpx;
+
+                .process-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 22rpx 0;
+                    position: relative;
+
+                    // 创建三个小圆点的连接线效果
+                    &:not(:last-child)::after {
+                        position: absolute;
+                        display: block;
+                        content: ' ';
+                        width: 45rpx;
+                        height: 10rpx;
+                        background: radial-gradient(circle, #f5f5f5 3rpx, transparent 3rpx);
+                        background-size: 15rpx 10rpx;
+                        background-repeat: repeat-x;
+                        right: -90rpx;
+                        top: 30rpx;
+                    }
+
+                    text {
+                        width: 129rpx;
+                        height: 20rpx;
+                        font-weight: 400;
+                        font-size: 20rpx;
+                        color: #9a9a9a;
+                        line-height: 18rpx;
+                        text-align: center;
+                    }
+
+                    .process-image {
+                        width: 63rpx;
+                        height: 56rpx;
+                    }
+                }
+            }
+        }
+    }
+    
     .product-card-row {
         background-color: #fff;
         padding: 20rpx;

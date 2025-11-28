@@ -21,3 +21,8 @@ export { default as SelectShopProductCategory } from "./src/SelectShopProductCat
 export { default as SelectSalesmanGroup } from "./src/SelectSalesmanGroup.vue";
 export { default as SelectPromoteMode } from "./src/SelectPromoteMode.vue";
 export { default as SelectLocaleCode } from "./src/SelectLocaleCode.vue";
+export { default as SelectVendor } from "./src/SelectVendor.vue";
+export { default as SelectVendorShop } from "./src/SelectVendorShop.vue";
+export { default as SelectVendorMerchant } from "./src/SelectVendorMerchant.vue";
+export { default as SelectStore } from "./src/SelectStore.vue";
+export { default as SslectArea } from "./src/SslectArea.vue";

@@ -1,7 +1,13 @@
 <template>
     <div class="bg-info">
         <div class="entry-main">
-            <img class="bg-image" src="@/assets/join/ruzhubg.BuLq4iPg.jpg" />
+            <img class="bg-image" src="@/assets/join/ruzhubg.png" />
+            <div class="title-row">
+                <div class="title-txt-1">阶段一：入驻前准备</div>
+                <div class="title-txt-2">阶段二：入驻申请</div>
+                <div class="title-txt-3">阶段三：资质审核</div>
+                <div class="title-txt-4">阶段四：开店任务</div>
+            </div>
             <div class="module-part" :class="['part-' + index, 'size-' + item.size]" v-for="(item, index) in module">
                 <h3 class="part-title" :class="['title-' + item.align]">{{ item.title }}</h3>
                 <span class="content" v-html="item.content"></span>
@@ -43,8 +49,38 @@ const props = defineProps({
             width: 100%;
         }
 
+        .title-row {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+            font-size: 16px;
+            div {
+                position: absolute;
+                left: 60px;
+            }
+            .title-txt-1 {
+                top: 1.5%;
+            }
+            .title-txt-2 {
+                top: 23.2%;
+            }
+            .title-txt-3 {
+                top: 54.1%;
+            }
+            .title-txt-4 {
+                top: 78.2%;
+            }
+        }
+
         .module-part {
             position: absolute;
+            z-index: 11;
             background-color: transparent;
             display: flex;
             flex-direction: column;
@@ -80,7 +116,6 @@ const props = defineProps({
                 }
             }
         }
-
 
         .part-0 {
             left: 31%;
@@ -126,7 +161,6 @@ const props = defineProps({
             top: 93.6%;
         }
 
-
         .size-0 {
             width: 22%;
             height: 3.8%;
@@ -142,7 +176,7 @@ const props = defineProps({
         .size-2 {
             width: 31%;
             height: 4.8%;
-          //background-color: #00b2ff;
+            //background-color: #00b2ff;
         }
         .size-3 {
             width: 31%;
@@ -159,43 +193,108 @@ const props = defineProps({
             height: 3.8%;
             //background-color: rgba(222, 222, 222, 0.9);
         }
-
+    }
+}
+@media only screen and (max-width: 3000px) {
+    .title-row {
+        font-size: 22px !important;
+        div {
+            left: 100px !important;
+        }
+    }
+}
+@media only screen and (max-width: 2200px) {
+    .title-row {
+        font-size: 20px !important;
+        div {
+            left: 80px !important;
+        }
+    }
+}
+@media only screen and (max-width: 1950px) {
+    .title-row {
+        font-size: 18px !important;
+        div {
+            left: 60px !important;
+        }
+    }
+}
+@media only screen and (max-width: 1750px) {
+    .title-row {
+        font-size: 14px !important;
+        div {
+            left: 60px !important;
+        }
     }
 }
 @media only screen and (max-width: 1600px) {
-    .title-1{
-        padding-left: 30px!important;
+    .title-row {
+        font-size: 14px !important;
+        div {
+            left: 60px !important;
+        }
     }
-    .part-title  {
-        font-size: 14px!important;
+    .title-1 {
+        padding-left: 30px !important;
     }
-    .content{
+    .part-title {
+        font-size: 14px !important;
+    }
+    .content {
         font-size: 10px !important;
-        line-height: 16px!important;
+        line-height: 16px !important;
+    }
+}
+@media only screen and (max-width: 1500px) {
+    .title-row {
+        font-size: 12px !important;
+        div {
+            left: 45px !important;
+        }
+    }
+}
+@media only screen and (max-width: 1300px) {
+    .title-row {
+        font-size: 10px !important;
+        div {
+            left: 30px !important;
+        }
     }
 }
 @media only screen and (max-width: 1200px) {
-    .title-1{
-        padding-left: 18px!important;
+    .title-row {
+        font-size: 8px !important;
+        div {
+            left: 30px !important;
+        }
     }
-    .part-title  {
-        font-size: 8px!important;
+    .title-1 {
+        padding-left: 18px !important;
     }
-    .content{
+    .part-title {
+        font-size: 8px !important;
+    }
+    .content {
         font-size: 7px !important;
-        line-height: 12px!important;
+        line-height: 12px !important;
     }
 }
 @media only screen and (max-width: 750px) {
-    .title-1{
-        padding-left: 19px!important;
+     .title-row {
+        font-size: 6px !important;
+        div {
+            left: 30px !important;
+        }
     }
-    .part-title  {
-        font-size: 7px!important;
+    .title-1 {
+        padding-left: 19px !important;
     }
-    .content{
+    .part-title {
+        font-size: 7px !important;
+    }
+    .content {
         font-size: 5px !important;
-        line-height: 8px!important;
+        line-height: 8px !important;
     }
 }
 </style>

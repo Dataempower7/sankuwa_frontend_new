@@ -1,4 +1,3 @@
-import * as exp from "constants";
 
 // 列表查询时筛选参数类型
 export interface OrderFilterParams {
@@ -20,9 +19,13 @@ export interface OrderFilterParams {
     addTime?: string[];
     addEndTime?: string;
     addStartTime?: string;
-    payCode?: string;
+    endDate?: string;
+    startDate?: string;
+    payCode?: number | string;
     isSettlement?: number | string;
     mark?: number | null;
+    shopType?: number | null;
+    vendorId?: number | string;
 }
 
 // 获取列表返回参数类型
@@ -94,9 +97,12 @@ export interface OrderPrintBillFormResult {
 
 export interface OrderFilterState {
     orderId?: number;
+    vendorId: number;
+    vendorName: string;
     payTypeId?: number;
     addTime?: string;
     checkBox?: boolean;
+    isPickup?: boolean;
     orderSn?: string;
     preOrderStatusDesc: string;
     preOrderStatus: number;
@@ -115,6 +121,7 @@ export interface OrderFilterState {
     payType?: number;
     payStatus?: number;
     logisticsName?: string;
+    shippingTypeId?: number;
     shippingTypeName?: string;
     shippingFee?: string;
     orderStatus?: number;
@@ -141,7 +148,10 @@ export interface OrderFilterState {
     payLog: {
         payCode: string;
         transactionId: string;
-    }
+    },
+    joinStatus?: number;
+    joinStatusDesc?: string;
+    orderType?: number;
 }
 export interface ItemInfo {
     productId?: number;
@@ -176,7 +186,9 @@ export interface AvailableActionsInfo {
 
 export interface OrderFormState {
     orderId?: number;
+    vendorId?: number;
     shopId?: number;
+    isPickup?: boolean;
     mark?: number;
     orderSn?: string;
     addTime?: string;
@@ -240,6 +252,13 @@ export interface OrderFormState {
         shopTitle?: string;
         shopId?: number;
     };
+    pickupDetail?: {
+        shopId: number;
+        shopTitle: string;
+        shopRegionNames: string[];
+        address: string;
+    }
+    expectPickupTime?: string;
 }
 
 export interface StepStatus {
@@ -290,6 +309,7 @@ export interface OrderToShipFormState {
     orderStatus?: number;
     trackingNo?: string;
     billRemark?: string;
+    pickupSn?: string;
 }
 
 export interface ShippingInfoTrace {

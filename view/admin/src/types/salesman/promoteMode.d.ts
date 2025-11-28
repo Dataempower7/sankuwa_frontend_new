@@ -2,6 +2,7 @@
 
 export interface SalesmanConfigFormState {
 	saleType: number;
+	registerToSalesman: number;
 	level: Level[];
 }
 

@@ -142,7 +142,7 @@ const defaultModule = ref({
     productSource: "products", // 商品来源 手动选择: products, 商品分组: productGroup
     productGroups: [], // 商品分组
     productList: pruductList || [], // 商品列表
-    moduleColor_style: "orange", // 模块颜色风格
+    moduleColorStyle: "orange", // 模块颜色风格
     prodcutTitles: [], // 自定义商品标题/卖点
     moduleTitle: {
         // 模块标题

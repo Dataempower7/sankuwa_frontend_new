@@ -1,0 +1,1 @@
+import{a6 as e}from"./index-B52YIGC0.js";const a=t=>e({url:`setting/seo/translateToSeoIdentification?chineseText=${t}`,method:"get"}),n=t=>e({url:"setting/seo/batchUpdateCategoryLink",method:"post",data:t}),r=t=>e({url:"setting/seo/batchUpdateProductLink",method:"post",data:t});export{r as a,n as b,a as g};

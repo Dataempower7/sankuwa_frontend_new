@@ -3,12 +3,9 @@
         <div class="content_wrapper">
             <div class="lyecs-form-table">
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
-                    <el-form-item prop="translationName" label="翻译原文："
-                                  :rules="[{ required: true, message: '翻译原文不能为空!' }]">
-                        <TigInput type="text" :maxlength="60" v-model="formState.translationName" width="300px;"
-                                  class="mr10" />
-                        <el-button type="primary" @click="_updateTranslation(formState.translationName)">一键生成翻译
-                        </el-button>
+                    <el-form-item prop="translationName" label="翻译原文：" :rules="[{ required: true, message: '翻译原文不能为空!' }]">
+                        <TigInput type="text" :maxlength="60" v-model="formState.translationName" width="300px;" class="mr10" />
+                        <el-button type="primary" @click="translation(formState.translationName)">一键生成翻译 </el-button>
                     </el-form-item>
                     <el-form-item prop="language" label="翻译列表：">
                         <el-table :data="localesList" style="width: 100%">
@@ -100,20 +97,21 @@ const _getLocales = async () => {
     }
 };
 const localesList = ref<LocalesFilterState[]>([]);
+
 const _getLocalesList = async () => {
     try {
         const result = await getLocalesList({
             isEnabled: 1,
             size: -1
         });
-        result.records.forEach(item => {
+        result.records.forEach((item) => {
             item.translationValue = "";
         });
         Object.assign(localesList.value, result.records);
         if (action.value === "detail" && formState.value.items.length > 0) {
-            formState.value.items.forEach(translation => {
+            formState.value.items.forEach((translation) => {
                 console.log(translation);
-                localesList.value.forEach(locale => {
+                localesList.value.forEach((locale) => {
                     if (translation.localeId === locale.id) {
                         locale.translationValue = translation.translationValue;
                     }
@@ -127,24 +125,31 @@ const _getLocalesList = async () => {
         loading.value = false;
     }
 };
-const _updateTranslation = async (text: any) => {
+const translation = async (text: any) => {
     await formRef.value.validate();
+    localesList.value.forEach((locale) => {
+        let data = {
+            code: locale.localeCode,
+            text
+        };
+        _updateTranslation(data, locale);
+    });
+};
+const _updateTranslation = async (data: any, locale: any) => {
     try {
-        localesList.value.forEach(async locale => {
-            let data = {
-                code: locale.localeCode,
-                text
-            };
-            const result = await updateTranslation(data);
-            locale.translationValue = result.translation;
-        });
+        const result = await updateTranslation(data);
+        locale.translationValue = result.translation;
     } catch (error: any) {
-        message.error(error.message);
+        if (error.code == 1001) {
+            message.error(error.message);
+        } else {
+            message.error(error.message);
+        }
     }
 };
 const filterateLocales = (locales: LocalesFilterState[]) => {
     let arr: any = [];
-    locales.forEach(item => {
+    locales.forEach((item) => {
         let obj = {
             localeId: item.id,
             translationValue: item.translationValue
@@ -159,7 +164,8 @@ const onSubmit = async () => {
     try {
         emit("update:confirmLoading", true);
         const result = await updateCreateTranslation({
-            dataId: id.value, ...formState.value,
+            dataId: id.value,
+            ...formState.value,
             items: filterateLocales(localesList.value)
         });
         emit("submitCallback", result);
@@ -176,7 +182,4 @@ const onFormSubmit = () => {
 };
 defineExpose({ onFormSubmit });
 </script>
-<style lang="less" scoped>
-
-
-</style>
+<style lang="less" scoped></style>

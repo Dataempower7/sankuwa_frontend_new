@@ -17,9 +17,9 @@ export function imageFormat(path: string | undefined) {
 
 //格式化头像
 export function avatarFormat(avatar: string) {
-    if(extractContent(String(avatar)) == 'def'){
+    if (extractContent(String(avatar)) == 'def') {
         return returnAvatar(avatar)
-    }else{
+    } else {
         return imageFormat(avatar)
     }
 }
@@ -37,25 +37,31 @@ export function priceFormat(price: number | undefined | null, currencyFormat = t
 }
 
 // 链接格式化
-export function urlFormat(params: string | { path: string; [key: string]: any; platform?: string }): string {
+export function urlFormat(params: string | { path: string;[key: string]: any; platform?: string }): string {
     const config = useConfigStore();
-    const domain = config.get("pcDomain") ? config.get("pcDomain") : config.get("h5Domain");
+    const clientDefaultUse = config.get("clientDefaultUse") || 0;
+    const domain = clientDefaultUse == 1 ? config.get("h5Domain") : config.get("pcDomain");
+
     if (typeof params === "string") {
         return domain + params;
     } else {
         switch (params.path) {
             case "product":
-                return domain + "/item/" + params.sn + "";
+                if (clientDefaultUse == 1) {
+                    return (domain ? domain : "/mobile") + "/pages/product/index?id=" + params.id + "";
+                } else {
+                    return domain + "/item/" + params.sn + "";
+                }
             default:
                 return domain + params.path;
         }
     }
 }
-export function urlWapFormat(params: string | { path: string; [key: string]: any }): string {
+export function urlWapFormat(params: string | { path: string;[key: string]: any }): string {
     const config = useConfigStore();
     const domain = config.get("h5Domain") ? config.get("h5Domain") : "";
     if (typeof params === "string") {
-        return domain + "/mobile" +  params;
+        return domain + params;
     } else {
         switch (params.path) {
             case "product":
@@ -68,15 +74,25 @@ export function urlWapFormat(params: string | { path: string; [key: string]: any
 
 export function convertNullsToEmptyStrings(obj: any) {
     if (obj && typeof obj === 'object') {
-      for (const key in obj) {
-        if (obj[key] === null || obj[key] === undefined || obj[key] === 'null' || obj[key] === 'undefined') {
-          obj[key] = '';
-        } else if (typeof obj[key] === 'object') {
-          // 递归处理嵌套对象
-          convertNullsToEmptyStrings(obj[key]);
+        for (const key in obj) {
+            if (obj[key] === null || obj[key] === undefined || obj[key] === 'null' || obj[key] === 'undefined') {
+                obj[key] = '';
+            } else if (typeof obj[key] === 'object') {
+                // 递归处理嵌套对象
+                convertNullsToEmptyStrings(obj[key]);
+            }
         }
-      }
-      return obj;
+        return obj;
     }
     return {};
-  }
+}
+
+//格式化头像
+export function baseDirFormat(path: string) {
+    if (path) {
+        const result = /^\//.test(path);
+        return result ? path : `/${path}`
+    } else {
+        return '';
+    }
+}

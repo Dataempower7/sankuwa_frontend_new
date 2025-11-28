@@ -1,7 +1,8 @@
 <template>
     <div class="container">
         <a-spin :spinning="loading">
-            <el-form ref="formRef" :model="formState" label-width="140px" style="display: flex; gap: 12px; flex-direction: column">
+            <el-form ref="formRef" :model="formState" label-width="140px"
+                style="display: flex; gap: 12px; flex-direction: column">
                 <div class="content_wrapper" v-if="adminType === 'admin'">
                     <div class="title">后台风格</div>
                     <ThemeTogglePopup v-model:formState="formState"></ThemeTogglePopup>
@@ -9,7 +10,8 @@
                 <div class="content_wrapper">
                     <div class="title">SEO设置</div>
                     <el-form-item label="SEO标题后缀" prop="shopTitleSuffix">
-                        <BusinessData v-model:modelValue="formState.shopTitleSuffix" :dataType="5" :dataId="2"></BusinessData>
+                        <BusinessData v-model:modelValue="formState.shopTitleSuffix" :dataType="5" :dataId="2">
+                        </BusinessData>
                         <div class="extra">该后缀将显示在浏览器的标题栏，与SEO有关，建议长度不要超过20字符，效果如：“购物车 - Tig商城”</div>
                     </el-form-item>
                     <el-form-item label="首页SEO标题" prop="shopTitle">
@@ -17,40 +19,104 @@
                         <div class="extra">商城首页的完整标题（不带后缀）</div>
                     </el-form-item>
                     <el-form-item label="首页SEO关键词" prop="shopKeywords">
-                        <BusinessData type="select" v-if="!loading" v-model:modelValue="formState.shopKeywords" :dataType="5" :dataId="4"></BusinessData>
+                        <BusinessData type="select" v-if="!loading" v-model:modelValue="formState.shopKeywords"
+                            :dataType="5" :dataId="4"></BusinessData>
                         <div class="extra">首页关键词，该设置与SEO有关，建议不要超过10个关键词（输入完请按回车键确认）</div>
                     </el-form-item>
                     <el-form-item label="首页SEO描述" prop="shopDesc">
                         <BusinessData v-model:modelValue="formState.shopDesc" :dataType="5" :dataId="5"></BusinessData>
                         <div class="extra">首页描述，该设置与SEO有关，建议长度不要超过50字符</div>
                     </el-form-item>
+                    <el-form-item label="商品类目链接使用" prop="seoCategoryEnable" v-if="isOverseas()">
+                        <el-radio-group v-model="formState.seoCategoryEnable" class="itemWidth">
+                            <div style="width: 100%;line-height: 22px;">
+                                <el-radio :value="0">
+                                    <span>基础链接</span>
+                                </el-radio>
+                                <div class="extra link-extra">链接格式：域名/category/[id]</div>
+                            </div>
+                            <div style="width: 100%;line-height: 22px;">
+                                <el-radio :value="1">
+                                    <span>SEO链接</span>
+                                </el-radio>
+                                <div class="extra link-extra">链接格式：域名/category/分类1/分类2</div>
+                            </div>
+                            <div style="padding-left: 20px;">
+                                <el-popconfirm title="仅更新SEO链接为空的商品类目，请勿刷新页面，点击确定更新"
+                                    @confirm="onBatchUpdateCategoryLink" placement="right" width="300px">
+                                    <template #reference>
+                                        <el-button style="margin-top: 2px" :loading="batchCategoryLoading" link
+                                            type="primary">批量更新商品类目SEO链接</el-button>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="商品链接使用" prop="seoProductEnable" v-if="isOverseas()">
+                        <el-radio-group v-model="formState.seoProductEnable" class="itemWidth">
+                            <div style="width: 100%;line-height: 22px;">
+                                <el-radio :value="0">
+                                    <span>基础链接</span>
+                                </el-radio>
+                                <div class="extra link-extra">链接格式：域名/product/[sn]</div>
+                            </div>
+
+                            <div style="width: 100%;line-height: 22px;">
+                                <el-radio :value="1">
+                                    <span>SEO链接</span>
+                                </el-radio>
+                                <div class="extra link-extra">链接格式：域名/product/分类1/分类2/商品英文名称.[sn]</div>
+
+                            </div>
+                            <div style="padding-left: 20px;">
+                                <el-popconfirm title="仅更新SEO链接为空的商品，请勿刷新页面，点击确定更新" @confirm="onBatchUpdateProductLink"
+                                    placement="right" width="300px">
+                                    <template #reference>
+                                        <el-button style="margin-top: 2px" :loading="batchProductLoading" link
+                                            type="primary">批量更新商品SEO链接</el-button>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
+
+                        </el-radio-group>
+                    </el-form-item>
+
                     <el-form-item label="ico图标上传" prop="icoImg">
                         <FormAddGallery v-model:photo="formState.icoImg" style="width: 100%" />
                         <div class="extra">推荐使用高清128*128像素，格式为png或ico</div>
                     </el-form-item>
+                </div>
+                <!-- <div class="content_wrapper">
+                    <div class="title">会员设置</div>
                     <el-form-item label="会员默认头像" prop="defaultAvatar">
                         <FormAddGallery v-model:photo="formState.defaultAvatar" style="width: 100%" />
                         <div class="extra">请上传1:1的200*200像素以内的图片</div>
                     </el-form-item>
-                </div>
+
+                </div> -->
 
                 <div class="content_wrapper" id="domain-setting">
                     <div class="title">域名设置</div>
-                    <el-form-item label="PC客户端域名" prop="pcDomain" :rules="[{ required: false, validator: validateDomain }]">
+                    <el-form-item label="PC客户端域名" prop="pcDomain"
+                        :rules="[{ required: false, validator: validateDomain }]">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.pcDomain" :maxlength="40" placeholder="" />
+                            <TigInput classType="tig-form-input" v-model="formState.pcDomain" :maxlength="40"
+                                placeholder="" />
                             <div class="extra">格式参考：https://www.tigshop.com，填写后查看商城或查看商品默认跳PC端，不填则默认跳转环境解析的域名</div>
                         </div>
                     </el-form-item>
-                    <el-form-item label="H5客户端域名" prop="h5Domain" :rules="[{ required: false, validator: validateDomain }]">
+                    <el-form-item label="H5客户端域名" prop="h5Domain"
+                        :rules="[{ required: false, validator: validateDomain }]">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.h5Domain" :maxlength="40" placeholder="" />
+                            <TigInput classType="tig-form-input" v-model="formState.h5Domain" :maxlength="40"
+                                placeholder="" />
                             <div class="extra">格式参考：https://m.tigshop.com，填写后查看商城或查看商品默认跳H5端，不填则默认跳转到PC端</div>
                         </div>
                     </el-form-item>
                     <!-- <el-form-item label="客服系统域名" prop="imDomain">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.imDomain" :maxlength="40" placeholder="" />
+                            <TigInput classType="tig-form-input" v-model="formState.imDomain" :maxlength="40"
+                                placeholder="" />
                             <div class="extra">格式参考：wss://tigshop.com/ws，填写后在线客服功能将使用该域名</div>
                         </div>
                     </el-form-item> -->
@@ -61,9 +127,11 @@
                         </el-radio-group>
                         <div class="extra">如果开启，且配置了H5端域名，移动设备打开PC客户端则会自动跳转到H5端域名</div>
                     </el-form-item>
-                    <el-form-item label="管理员后台域名" prop="adminDomain" :rules="[{ required: false, validator: validateDomain }]">
+                    <el-form-item label="管理员后台域名" prop="adminDomain"
+                        :rules="[{ required: false, validator: validateDomain }]">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.adminDomain" :maxlength="40" placeholder="" />
+                            <TigInput classType="tig-form-input" v-model="formState.adminDomain" :maxlength="40"
+                                placeholder="" />
                             <div class="extra">格式参考：https://admin.tigshop.com，填写后默认跳后台管理端，不填则默认跳转环境解析的域名</div>
                         </div>
                     </el-form-item>
@@ -100,6 +168,25 @@
                         </el-radio-group>
                         <div class="extra">开启后将自动分词，比如：儿童机器人，分拆分为：儿童、机器人（会降低搜索结果精准度）</div>
                     </el-form-item>
+                    <el-form-item label="默认搜索引擎" prop="selectSearchType">
+                        <div>
+                            <el-radio-group v-model="formState.selectSearchType" class="itemWidth">
+                                <el-radio value="es">Elasticsearch（推荐）</el-radio>
+                                <el-radio value="mysql">MySQL（降级模式）</el-radio>
+                            </el-radio-group>
+                            <el-space class="mt20" v-if="formState.selectSearchType === 'es'">
+                                <el-button type="primary" plain :loading="InitAllToEsLoadding"
+                                    @click="_InitAllToEsProduct()">
+                                    <i class="iconfont-admin icon-elasticsearchElasticsearch"
+                                        style="font-size: 18px; margin-right: 5px"></i>
+                                    同步到搜索引擎
+                                </el-button>
+                            </el-space>
+                            <div class="extra">
+                                选择Elasticsearch后，点击按钮将一次性将所有商品数据同步到搜索引擎中。此操作为异步执行，预计需要几分钟完成，请勿重复点击。
+                            </div>
+                        </div>
+                    </el-form-item>
                 </div>
                 <div class="content_wrapper">
                     <div class="title">地区设置</div>
@@ -111,17 +198,24 @@
                             <div class="extra">此地区会在系统未判断出用户IP所在地域时，默认定位地区（仅影响PC端右上角送货地址）</div>
                         </div>
                     </el-form-item>
+
                     <el-form-item label="默认国家" prop="defaultCountry">
                         <div>
                             <el-select v-model="formState.defaultCountry" style="width: 300px">
                                 <el-option :value="0" label="不选择" />
-                                <el-option v-for="item in countryList" :key="item.regionId" :value="item.regionId" :label="item.regionName" />
+                                <el-option v-for="item in countryList" :key="item.regionId" :value="item.regionId"
+                                    :label="item.regionName" />
                             </el-select>
                             <div class="extra">
                                 如果选择了默认国家，则会员在选择地址时默认会显示该国家下的省份或地区，不再显示国家选择（修改设置对已经添加的会员地址不生效）
                             </div>
                         </div>
                     </el-form-item>
+                </div>
+                <template v-if="isStore()">
+                    <MapSetting></MapSetting>
+                </template>
+                <div class="content_wrapper">
                     <div class="title">ICO图标库</div>
                     <el-form-item label="自定义ico图标库" prop="icoDefinedCss">
                         <div>
@@ -155,7 +249,8 @@
                     </el-form-item> -->
                     <el-form-item label="图片访问域名" prop="storageLocalUrl" v-if="formState.storageType == 0">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.storageLocalUrl" @blur="validateUrl(formState.storageLocalUrl)" />
+                            <TigInput classType="tig-form-input" v-model="formState.storageLocalUrl"
+                                @blur="validateUrl(formState.storageLocalUrl)" />
                             <div>
                                 <div class="error" v-if="isErrorText">图片访问域名结尾必须带斜杠 /</div>
                                 <div class="extra">参考格式： https://oss.tigshop.com/</div>
@@ -164,7 +259,8 @@
                     </el-form-item>
                     <el-form-item label="图片访问域名" prop="storageOssUrl" v-if="formState.storageType == 1">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.storageOssUrl" @blur="validateUrl(formState.storageOssUrl)" />
+                            <TigInput classType="tig-form-input" v-model="formState.storageOssUrl"
+                                @blur="validateUrl(formState.storageOssUrl)" />
                             <div>
                                 <div class="error" v-if="isErrorText">图片访问域名结尾必须带斜杠 /</div>
                                 <div class="extra">参考格式： https://oss.tigshop.com/</div>
@@ -173,7 +269,8 @@
                     </el-form-item>
                     <el-form-item label="图片访问域名" prop="storageCosUrl" v-if="formState.storageType == 2">
                         <div>
-                            <TigInput classType="tig-form-input" v-model="formState.storageCosUrl" @blur="validateUrl(formState.storageCosUrl)" />
+                            <TigInput classType="tig-form-input" v-model="formState.storageCosUrl"
+                                @blur="validateUrl(formState.storageCosUrl)" />
                             <div>
                                 <div class="error" v-if="isErrorText">图片访问域名结尾必须带斜杠 /</div>
                                 <div class="extra">参考格式： https://oss.tigshop.com/</div>
@@ -181,27 +278,24 @@
                         </div>
                     </el-form-item>
                     <template v-if="formState.storageType != 0">
-                        <el-form-item label="AccessKeyId" prop="storageOssAccessKeyId" v-if="formState.storageType == 1">
+                        <el-form-item label="AccessKeyId" prop="storageOssAccessKeyId"
+                            v-if="formState.storageType == 1">
                             <TigInput classType="tig-form-input" v-model="formState.storageOssAccessKeyId" />
                         </el-form-item>
                         <el-form-item label="SecretId" prop="storageCosSecretId" v-if="formState.storageType == 2">
                             <TigInput classType="tig-form-input" v-model="formState.storageCosSecretId" />
                         </el-form-item>
-                        <el-form-item label="AccessKeySecret" prop="storageOssAccessKeySecret" v-if="formState.storageType == 1">
+                        <el-form-item label="AccessKeySecret" prop="storageOssAccessKeySecret"
+                            v-if="formState.storageType == 1">
                             <div>
                                 <div class="flex flex-align-center" style="gap: 10px">
                                     <div class="secret-txt line1" style="max-width: 380px">
                                         {{ formState.storageOssAccessKeySecret }}
                                     </div>
-                                    <DialogForm
-                                        :maskClose="false"
-                                        :isDrawer="false"
+                                    <DialogForm :maskClose="false" :isDrawer="false"
                                         :params="{ title: 'AccessKeySecret', content: formState.storageOssAccessKeySecret }"
-                                        path="setting/config/src/EditSecret"
-                                        title="AccessKeySecret"
-                                        width="600px"
-                                        @okCallback="formState.storageOssAccessKeySecret = $event"
-                                    >
+                                        path="setting/config/src/EditSecret" title="AccessKeySecret" width="600px"
+                                        @okCallback="formState.storageOssAccessKeySecret = $event">
                                         <el-button style="margin-top: 3px" link type="primary"> 编辑 </el-button>
                                     </DialogForm>
                                 </div>
@@ -209,7 +303,8 @@
                             </div>
                         </el-form-item>
                         <el-form-item label="KeySecret" prop="storageCosSecretKey" v-if="formState.storageType == 2">
-                            <TigInput classType="tig-form-input" type="textarea" v-model="formState.storageCosSecretKey" />
+                            <TigInput classType="tig-form-input" type="textarea"
+                                v-model="formState.storageCosSecretKey" />
                         </el-form-item>
                         <el-form-item label="空间名称" prop="storageOssBucket" v-if="formState.storageType == 1">
                             <TigInput classType="tig-form-input" v-model="formState.storageOssBucket" />
@@ -246,15 +341,10 @@
                                 <div class="secret-txt line1" style="max-width: 380px">
                                     {{ formState.langVolcengineAccessKey }}
                                 </div>
-                                <DialogForm
-                                    :maskClose="false"
-                                    :isDrawer="false"
+                                <DialogForm :maskClose="false" :isDrawer="false"
                                     :params="{ title: '火山翻译AssessKey', content: formState.langVolcengineAccessKey }"
-                                    path="setting/config/src/EditSecret"
-                                    title="火山翻译AssessKey"
-                                    width="600px"
-                                    @okCallback="formState.langVolcengineAccessKey = $event"
-                                >
+                                    path="setting/config/src/EditSecret" title="火山翻译AssessKey" width="600px"
+                                    @okCallback="formState.langVolcengineAccessKey = $event">
                                     <el-button style="margin-top: 3px" link type="primary"> 编辑 </el-button>
                                 </DialogForm>
                             </div>
@@ -267,15 +357,10 @@
                                 <div class="secret-txt line1" style="max-width: 380px">
                                     {{ formState.langVolcengineSecret }}
                                 </div>
-                                <DialogForm
-                                    :maskClose="false"
-                                    :isDrawer="false"
+                                <DialogForm :maskClose="false" :isDrawer="false"
                                     :params="{ title: '火山翻译SecretKey', content: formState.langVolcengineSecret }"
-                                    path="setting/config/src/EditSecret"
-                                    title="火山翻译SecretKey"
-                                    width="600px"
-                                    @okCallback="formState.langVolcengineSecret = $event"
-                                >
+                                    path="setting/config/src/EditSecret" title="火山翻译SecretKey" width="600px"
+                                    @okCallback="formState.langVolcengineSecret = $event">
                                     <el-button style="margin-top: 3px" link type="primary"> 编辑 </el-button>
                                 </DialogForm>
                             </div>
@@ -287,28 +372,33 @@
         </a-spin>
     </div>
     <div style="height: 20px"></div>
-    <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+    <div class="selected-action-warp selected-warp-left"
+        :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
         <div class="selected-action">
-            <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交 </el-button>
+            <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提
+                交
+            </el-button>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import MapSetting from "@/views/setting/config/base/src/MapSetting.vue";
 import { DialogForm } from "@/components/dialog";
 import { SelectRegion } from "@/components/select";
 import { onMounted, ref, shallowRef } from "vue";
 import { FormAddGallery } from "@/components/gallery";
 import { message } from "ant-design-vue";
 import { GlobalConfig } from "@/types/setting/config";
-import { getConfigGlobal, saveConfigGlobal } from "@/api/setting/config";
+import { getConfigGlobal, saveConfigGlobal, InitAllToEsProduct } from "@/api/setting/config";
+import { batchUpdateCategoryLink, batchUpdateProductLink } from "@/api/setting/seo";
 import { useConfigStore } from "@/store/config";
 import BusinessData from "@/components/multilingual/BusinessData.vue";
 import { convertNullsToEmptyStrings } from "@/utils/format";
 import { ThemeTogglePopup } from "@/components/themetogglepopup";
 import { BaseDisplayConfig, Regions } from "@/types/setting/config";
-import { isOverseas } from "@/utils/version";
+import { isOverseas, isStore } from "@/utils/version";
 import { useThemeStore } from "@/store/theme";
 const { themeInfo } = useThemeStore();
 const adminType = localStorage.getItem("adminType");
@@ -318,6 +408,9 @@ const formRef = shallowRef();
 const shopRegions = ref<number[]>([]);
 const confirmLoading = ref<boolean>(false);
 const countryList = ref<Regions[]>([]);
+const batchCategoryLoading = ref<boolean>(false);
+const batchProductLoading = ref<boolean>(false);
+
 const formState = ref<Partial<GlobalConfig>>({
     layout: "default",
     navTheme: "dark",
@@ -357,8 +450,11 @@ const formState = ref<Partial<GlobalConfig>>({
     langVolcengineSecret: "",
     msgHackWord: "",
     isOpenPscws: "",
+    selectSearchType: "",
     shopDefaultRegions: "",
-    searchKeywords: ""
+    searchKeywords: "",
+    seoCategoryEnable: undefined,
+    seoProductEnable: undefined
 });
 // 加载列表
 onMounted(async () => {
@@ -381,14 +477,14 @@ const validateDomain = (rule: any, value: any, callback: any) => {
     if (!urlPattern.test(value)) {
         callback(new Error("请输入正确的域名格式"));
         // 页面滚动到domain-setting
-        scrollIntoView()
+        scrollIntoView();
         return;
     }
     // 检查是否以斜杠 / 结尾
     if (value.endsWith("/")) {
         callback(new Error("域名不能以斜杠 / 结尾"));
         // 页面滚动到domain-setting
-        scrollIntoView()
+        scrollIntoView();
         return;
     }
     callback();
@@ -416,6 +512,47 @@ const loadFilter = async () => {
         loading.value = false;
     }
 };
+
+const InitAllToEsLoadding = ref(false);
+const _InitAllToEsProduct = async () => {
+    InitAllToEsLoadding.value = true;
+    try {
+        const result = await InitAllToEsProduct();
+        message.success("已开始异步更新数据，更新过程可能需要几分钟，请稍后查看结果。");
+        setTimeout(() => {
+            InitAllToEsLoadding.value = false;
+        }, 1000);
+    } catch (error: any) {
+        message.error(error.message);
+    }
+};
+
+
+const onBatchUpdateCategoryLink = async () => {
+    try {
+
+        batchCategoryLoading.value = true;
+        const result = await batchUpdateCategoryLink({});
+        message.success("操作成功");
+    } catch (error: any) {
+        message.error(error.message);
+    } finally {
+        batchCategoryLoading.value = false;
+    }
+};
+
+const onBatchUpdateProductLink = async () => {
+    try {
+        batchProductLoading.value = true;
+        const result = await batchUpdateProductLink({});
+        message.success("操作成功");
+    } catch (error: any) {
+        message.error(error.message);
+    } finally {
+        batchProductLoading.value = false;
+    }
+};
+
 // 表单通过验证后提交
 const onSubmit = async () => {
     await formRef.value.validate();
@@ -424,8 +561,8 @@ const onSubmit = async () => {
         formState.value.storageType == 0
             ? formState.value.storageLocalUrl
             : formState.value.storageType == 1
-              ? formState.value.storageOssUrl
-              : formState.value.storageCosUrl;
+                ? formState.value.storageOssUrl
+                : formState.value.storageCosUrl;
     await validateUrl(url);
     if (isErrorText.value) {
         message.error("图片访问域名结尾必须带斜杠 /");
@@ -485,5 +622,16 @@ const onSubmit = async () => {
 
 .error {
     color: red;
+}
+
+.seo-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.link-extra {
+    margin-left: 20px;
+    margin-bottom: 10px;
 }
 </style>

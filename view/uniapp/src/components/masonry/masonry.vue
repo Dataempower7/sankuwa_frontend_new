@@ -68,7 +68,7 @@
                                         </template>
                                         <template v-else>
                                             <!-- <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" /> -->
-                                           <img src="/static/images/category/addProduct.png" style="width: 25px; height: 25px;"/>
+                                           <img src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793404em9KntR0tkKeCV0UQD.jpeg" style="width: 25px; height: 25px;"/>
                                         </template>
                                     </template>
                                 </view>
@@ -148,7 +148,7 @@
                                         </template>
                                         <template v-else>
                                             <!-- <text class="iconfont-h5 icon-gouwuche3 buy_btn_icon" /> -->
-                                                <img src="/static/images/category/addProduct.png" style="width: 25px; height: 25px;"/>
+                                                <img src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793404em9KntR0tkKeCV0UQD.jpeg" style="width: 25px; height: 25px;"/>
                                         </template>
                                     </template>
                                 </view>
@@ -333,6 +333,9 @@ const handleClose = () => {
 .activity-box {
     min-height: 0;
     height: auto;
+    flex-wrap: wrap;
+    // gap: 1rpx;
+    // margin: 0 16rpx 10rpx;
     
     &:not(:empty) {
         min-height: 55rpx;

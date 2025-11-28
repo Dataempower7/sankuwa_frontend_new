@@ -44,12 +44,6 @@ export default {
                     component: () => import("@/views/shop/shopFunds/List.vue")
                 },
                 {
-                    path: "shop-account-raply/list",
-                    name: "shopAccountRaplyManage",
-                    meta: { title: "提现管理" },
-                    component: () => import("@/views/shop/shopAccountRaply/List.vue")
-                },
-                {
                     path: "financial-log/list",
                     name: "financialLogManage",
                     meta: { title: "资金日志" },

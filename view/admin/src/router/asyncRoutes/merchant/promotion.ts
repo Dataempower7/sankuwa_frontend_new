@@ -47,6 +47,12 @@ export default {
                     component: () => import("@/views/promotion/productActivity/limitdiscount/List.vue")
                 },
                 {
+                    path: "groupon/list",
+                    name: "grouponPromotionManage",
+                    meta: { title: "拼团活动" },
+                    component: () => import("@/views/promotion/groupon/List.vue")
+                },
+                {
                     path: "product-gift/list",
                     name: "productGiftManage",
                     meta: { title: "活动赠品" },

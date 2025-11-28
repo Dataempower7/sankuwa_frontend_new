@@ -57,9 +57,11 @@ watch(
         if (!newVal) {
             isError.value = true;
             isLoading.value = false;
+            srcData.value = "";
         } else {
             isError.value = false;
             isLoading.value = true;
+            // imageFormat 会处理各种路径格式，包括本地静态资源
             srcData.value = imageFormat(newVal);
         }
     },

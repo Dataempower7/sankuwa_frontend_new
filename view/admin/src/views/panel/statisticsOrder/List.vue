@@ -44,92 +44,286 @@
                 </el-form>
 
                 <div class="main-panel">
-                    <ul :class="{three: adminType !== 'admin'}">
-                        <li class="main-panel-item">
-                            <div class="main-panel-item-title">商品支付金额</div>
-                            <div class="main-panel-item-value">{{ filterState?.salesData?.productPayment ?? 0 }}</div>
-                            <div class="main-panel-item-increase">
-                                环比：
-                                <span>{{ filterState?.salesData?.productPaymentGrowthRate }}%</span>
-                                <i
-                                    v-if="
-                                        filterState?.salesData?.productPaymentGrowthRate.toString() !== '--' &&
-                                        Number(filterState?.salesData?.productPaymentGrowthRate) > 0
-                                    "
-                                    class="admin-iconfont red f12 up"
-                                    >&#xe61a;</i
-                                >
-                                <i v-else class="admin-iconfont green f12">&#xe61a;</i>
-                            </div>
-                        </li>
-                        <li class="main-panel-item">
-                            <div class="main-panel-item-title">商品退款金额</div>
-                            <div class="main-panel-item-value">{{ filterState?.salesData?.productRefund ?? 0 }}</div>
-                            <div class="main-panel-item-increase">
-                                环比：
-                                <span>{{ filterState?.salesData?.productRefundGrowthRate }}%</span>
-                                <i
-                                    v-if="
-                                        filterState?.salesData?.productRefundGrowthRate.toString() !== '--' &&
-                                        Number(filterState?.salesData?.productRefundGrowthRate) > 0
-                                    "
-                                    class="admin-iconfont red f12 up"
-                                    >&#xe61a;</i
-                                >
-                                <i v-else class="admin-iconfont green f12">&#xe61a;</i>
-                            </div>
-                        </li>
-                        <li class="main-panel-item">
-                            <div class="main-panel-item-title">营业额</div>
-                            <div class="main-panel-item-value">{{ filterState?.salesData?.turnover ?? 0 }}</div>
-                            <div class="main-panel-item-increase">
-                                环比：
-                                <span>{{ filterState?.salesData?.turnoverGrowthRate }}%</span>
-                                <i
-                                    v-if="
-                                        filterState?.salesData?.turnoverGrowthRate.toString() !== '--' && Number(filterState?.salesData?.turnoverGrowthRate) > 0
-                                    "
-                                    class="admin-iconfont red f12 up"
-                                    >&#xe61a;</i
-                                >
-                                <i v-else class="admin-iconfont green f12">&#xe61a;</i>
-                            </div>
-                        </li>
+                    <ul :class="{ three: adminType !== 'admin' }">
+                        <template v-if="filterParams.statisticType == '1'">
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                        <template #content>
+                                            <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>商品支付金额</div>
+                                            <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.productPayment ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.productPaymentGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.productPaymentGrowthRate != null &&
+                                            filterState?.salesData?.productPaymentGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.productPaymentGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                        <template #content>
+                                            <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                根据筛选时间，平台/店铺售后金额（不含充值订单）
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>商品退款金额</div>
+                                            <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.productRefund ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.productRefundGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.productRefundGrowthRate != null &&
+                                            filterState?.salesData?.productRefundGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.productRefundGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                        <template #content>
+                                            <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                根据筛选时间，平台/店铺销售的营业额，等于实收金额减去售后金额（不含充值订单）
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>营业额</div>
+                                            <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.turnover ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.turnoverGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.turnoverGrowthRate != null &&
+                                            filterState?.salesData?.turnoverGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.turnoverGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
 
-                        <li class="main-panel-item" v-if="adminType === 'admin'">
-                            <div class="main-panel-item-title">充值金额</div>
-                            <div class="main-panel-item-value">{{ filterState?.salesData?.rechargeAmount ?? 0 }}</div>
-                            <div class="main-panel-item-increase">
-                                环比：
-                                <span>{{ filterState?.salesData?.rechargeAmountGrowthRate }}%</span>
-                                <i
-                                    v-if="
-                                        filterState?.salesData?.rechargeAmountGrowthRate.toString() !== '--' &&
-                                        Number(filterState?.salesData?.rechargeAmountGrowthRate) > 0
-                                    "
-                                    class="admin-iconfont red f12 up"
-                                    >&#xe61a;</i
-                                >
-                                <i v-else class="admin-iconfont green f12">&#xe61a;</i>
-                            </div>
-                        </li>
-                        <li class="main-panel-item" v-if="adminType === 'admin'">
-                            <div class="main-panel-item-title">余额支付金额</div>
-                            <div class="main-panel-item-value">{{ filterState?.salesData?.balancePayment ?? 0 }}</div>
-                            <div class="main-panel-item-increase">
-                                环比：
-                                <span>{{ filterState?.salesData?.balancePaymentGrowthRate }}%</span>
-                                <i
-                                    v-if="
-                                        filterState?.salesData?.balancePaymentGrowthRate.toString() !== '--' &&
-                                        Number(filterState?.salesData?.balancePaymentGrowthRate) > 0
-                                    "
-                                    class="admin-iconfont red f12 up"
-                                    >&#xe61a;</i
-                                >
-                                <i v-else class="admin-iconfont green f12">&#xe61a;</i>
-                            </div>
-                        </li>
+                            <li class="main-panel-item" v-if="adminType === 'admin'">
+                                <div class="main-panel-item-title">
+                                    <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                        <template #content>
+                                            <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                根据筛选时间，平台/店铺充值订单的金额
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>充值金额</div>
+                                            <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.rechargeAmount ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.rechargeAmountGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.rechargeAmountGrowthRate != null &&
+                                            filterState?.salesData?.rechargeAmountGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.rechargeAmountGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item" v-if="adminType === 'admin'">
+                                <div class="main-panel-item-title">
+                                    <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                        <template #content>
+                                            <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                根据筛选时间，平台/店铺使用余额支付的金额（不含充值订单）
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>余额支付金额</div>
+                                            <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.balancePayment ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.balancePaymentGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.balancePaymentGrowthRate != null &&
+                                            filterState?.salesData?.balancePaymentGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.balancePaymentGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                        </template>
+                        <template v-if="filterParams.statisticType == '0'">
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    支付订单数
+                                    <!-- <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                    <template #content>
+                                        <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                            根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                        </div>
+                                    </template>
+                                    <div class="flex flex-align-center">
+                                        <div>支付订单数</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                    </div>
+                                </el-tooltip> -->
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.productPaymentNum ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.productPaymentNumGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.productPaymentNumGrowthRate != null &&
+                                            filterState?.salesData?.productPaymentNumGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.productPaymentNumGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    退款订单数量
+                                    <!-- <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                    <template #content>
+                                        <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                            根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                        </div>
+                                    </template>
+                                    <div class="flex flex-align-center">
+                                        <div>退款订单数量</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                    </div>
+                                </el-tooltip> -->
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.productRefundNum ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.rechargeNumGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.rechargeNumGrowthRate != null &&
+                                            filterState?.salesData?.rechargeNumGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.rechargeNumGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    充值订单数
+                                    <!-- <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                    <template #content>
+                                        <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                            根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                        </div>
+                                    </template>
+                                    <div class="flex flex-align-center">
+                                        <div>充值订单数</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                    </div>
+                                </el-tooltip> -->
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.rechargeNum ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.productRefundNumGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.productRefundNumGrowthRate != null &&
+                                            filterState?.salesData?.productRefundNumGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.productRefundNumGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                            <li class="main-panel-item">
+                                <div class="main-panel-item-title">
+                                    余额支付订单数
+                                    <!-- <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                    <template #content>
+                                        <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                            根据筛选时间，订单合计金额减免掉优惠券、满减/满折、会员折扣后成功支付的金额，再扣除掉积分余额，后实际支付的金额（自提以支付成功后计入统计；不含充值订单）
+                                        </div>
+                                    </template>
+                                    <div class="flex flex-align-center">
+                                        <div>余额支付订单数</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                    </div>
+                                </el-tooltip> -->
+                                </div>
+                                <div class="main-panel-item-value">{{ filterState?.salesData?.balancePaymentNum ?? 0 }}</div>
+                                <div class="main-panel-item-increase">
+                                    环比：
+                                    <span>{{ filterState?.salesData?.balancePaymentNumGrowthRate }}%</span>
+                                    <i
+                                        v-if="
+                                            filterState?.salesData?.balancePaymentNumGrowthRate != null &&
+                                            filterState?.salesData?.balancePaymentNumGrowthRate.toString() !== '--' &&
+                                            Number(filterState?.salesData?.balancePaymentNumGrowthRate) > 0
+                                        "
+                                        class="admin-iconfont red f12 up"
+                                        >&#xe61a;</i
+                                    >
+                                    <i v-else class="admin-iconfont green f12">&#xe61a;</i>
+                                </div>
+                            </li>
+                        </template>
                     </ul>
                 </div>
             </div>
@@ -143,6 +337,7 @@
 </template>
 
 <script lang="ts" setup>
+import { QuestionFilled } from "@element-plus/icons-vue";
 import { ref, onMounted, reactive, provide } from "vue";
 import type { TabsPaneContext } from "element-plus";
 import { formatDate } from "@/utils/util";

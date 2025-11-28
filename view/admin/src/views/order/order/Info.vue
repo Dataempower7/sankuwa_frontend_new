@@ -12,57 +12,36 @@
             </div>
             <el-space :size="10" class="button-card">
                 <div v-if="formState.isChangeOrderStatus">
-                    <DialogForm
-                        v-if="formState.availableActions.deliver"
-                        :params="{ id: formState.orderId, preOrderStatus: formState.preOrderStatus }"
-                        isDrawer
-                        path="order/order/src/ChangeStatus"
-                        title="取消订单"
-                        width="600px"
-                        @okCallback="updateDataWithList"
-                    >
+                    <DialogForm v-if="formState.availableActions.deliver"
+                        :params="{ id: formState.orderId, preOrderStatus: formState.preOrderStatus }" isDrawer
+                        path="order/order/src/ChangeStatus" title="取消订单" width="600px" @okCallback="updateDataWithList">
                         <el-button bg class="buttonColor" size="small" text type="primary"> 取消订单 </el-button>
                     </DialogForm>
-                    <DialogForm
-                        v-if="formState.availableActions.confirmReceipt"
-                        :params="{ id: formState.orderId, preOrderStatus: formState.preOrderStatus }"
-                        isDrawer
-                        path="order/order/src/ChangeStatus"
-                        title="取消发货"
-                        width="600px"
-                        @okCallback="updateDataWithList"
-                    >
+                    <DialogForm v-if="formState.availableActions.confirmReceipt"
+                        :params="{ id: formState.orderId, preOrderStatus: formState.preOrderStatus }" isDrawer
+                        path="order/order/src/ChangeStatus" title="取消发货" width="600px" @okCallback="updateDataWithList">
                         <el-button bg class="buttonColor" size="small" text type="primary"> 取消发货 </el-button>
                     </DialogForm>
                 </div>
                 <!--                <el-button v-if="formState.availableActions.setConfirm" bg class="buttonColor" size="small" text type="primary" @click="setConfirm">-->
                 <!--                    确认订单<Tooltip ico content="确认订单可允许在未支付的情况下发货" />-->
                 <!--                </el-button>-->
-                <DialogForm
-                    v-if="formState.availableActions.setPaid"
-                    :params="{ act: 'setPaid', id: formState.orderId }"
-                    isDrawer
-                    path="order/order/src/Operation"
-                    title="设置为已支付"
-                    width="600px"
-                    @okCallback="updateDataWithList"
-                >
+                <DialogForm v-if="formState.availableActions.setPaid"
+                    :params="{ act: 'setPaid', id: formState.orderId }" isDrawer path="order/order/src/Operation"
+                    title="设置为已支付" width="600px" @okCallback="updateDataWithList">
                     <el-button bg class="buttonColor" size="small" text type="primary"> 设置为已支付 </el-button>
                 </DialogForm>
-                <DialogForm
-                    v-if="formState.availableActions.cancelOrder"
-                    :params="{ act: 'cancelOrder', id: formState.orderId }"
-                    isDrawer
-                    path="order/order/src/Operation"
-                    title="取消订单"
-                    width="600px"
-                    @okCallback="updateDataWithList"
-                >
+                <DialogForm v-if="formState.availableActions.cancelOrder"
+                    :params="{ act: 'cancelOrder', id: formState.orderId }" isDrawer path="order/order/src/Operation"
+                    title="取消订单" width="600px" @okCallback="updateDataWithList">
                     <el-button bg class="buttonColor" size="small" text type="primary"> 取消订单 </el-button>
                 </DialogForm>
-                <el-button v-if="formState.availableActions.delOrder" bg size="small" text type="primary" @click="onDelClick"> 删除订单 </el-button>
-                <DialogForm
-                    v-if="formState.availableActions.deliver"
+                <el-button v-if="formState.availableActions.delOrder" bg size="small" text type="primary"
+                    @click="onDelClick"> 删除订单
+                </el-button>
+                <!-- formState.availableActions.deliver -->
+                <!-- <DialogForm
+                    v-if="(formState.availableActions.deliver && adminType == 'admin' && !formState.vendorId) || (formState.availableActions.deliver  && adminType == 'vendor')"
                     :params="{ act: 'detail', id: formState.orderId }"
                     :title="'订单发货 ' + formState.orderSn"
                     isDrawer
@@ -71,10 +50,39 @@
                     @okCallback="updateDataWithList"
                 >
                     <el-button bg size="small" text type="danger"> 去发货 </el-button>
+                </DialogForm> -->
+                <DialogForm :params="{ act: 'detail', id: formState.orderId }" :title="'订单发货 ' + formState.orderSn"
+                    isDrawer path="order/order/src/ToShip" width="900px" @okCallback="updateDataWithList" v-if="
+                        (!formState.isPickup && formState.availableActions.deliver && adminType !== 'vendor' && !formState.vendorId && formState.shippingTypeId !== 3) ||
+                        (formState.availableActions.deliver && adminType == 'vendor')
+                    ">
+                    <el-button bg size="small" text type="danger"> 去发货 </el-button>
                 </DialogForm>
-                <el-button v-if="formState.availableActions.confirmReceipt" bg size="small" text type="primary" @click="onReceiptClick"> 确认已收货 </el-button>
-                <el-button v-if="formState.availableActions.splitOrder" bg size="small" text type="danger" @click="onSplitClick">
-                    拆分店铺订单<Tooltip ico content="该订单来自多个店铺且还未拆分，在做任何操作前，您需要先拆分该订单" />
+
+                <DeleteRecord
+                    v-if="isStore() && formState.availableActions.deliver && formState.items[0].productType !== 5 && formState.items[0].productType !== 6 && (formState.isPickup || formState.shippingTypeId === 3)"
+                    :params="{
+                        id: formState.orderId,
+                        shippingMethod: 3,
+                        deliverData: deliverDataFun(formState.items),
+                        LogisticsId: 0,
+                        trackingNo: ''
+                    }" :requestApi="orderDeliver" title="该订单备货完成吗？" message="备货完成" @afterDelete="updateDataWithList">
+                    <el-button bg size="small" text type="danger"> 去备货 </el-button>
+                </DeleteRecord>
+                <el-button v-if="!formState.isPickup && formState.availableActions.confirmReceipt" bg size="small" text
+                    type="primary" @click="onReceiptClick">
+                    确认已收货
+                </el-button>
+                <DialogForm v-if="isStore() && formState.isPickup && formState.availableActions.confirmReceipt"
+                    :params="{ act: 'detail', id: formState.orderId }" :title="'订单核销 ' + formState.orderSn" isDrawer
+                    path="order/order/src/ToWriteOff" width="900px" @okCallback="updateDataWithList">
+                    <el-button bg size="small" text type="danger"> 去核销 </el-button>
+                </DialogForm>
+                <el-button v-if="formState.availableActions.splitOrder" bg size="small" text type="danger"
+                    @click="onSplitClick">
+                    拆分店铺订单
+                    <Tooltip ico content="该订单来自多个店铺且还未拆分，在做任何操作前，您需要先拆分该订单" />
                 </el-button>
                 <!-- <DialogForm
                     :params="{ act: 'detail', id: formState.orderId, valueName: 'adminNote' }"
@@ -86,20 +94,14 @@
                 >
                     <el-button bg class="buttonColor" size="small" text type="primary"> 商家备注 </el-button>
                 </DialogForm> -->
-                <el-button bg size="small" text type="primary" @click="openPage(`/admin/print/orderPrint?ids=${formState.orderId}`, 'order')">
-                    打印配送单
-                </el-button>
-                <el-button
-                    v-if="formState.wayBill"
-                    bg
-                    size="small"
-                    text
-                    type="primary"
-                    @click="openPage(`/admin/print/waybill?id=${formState.orderId}`, 'waybill')"
-                >
+                <el-button bg size="small" text type="primary"
+                    @click="openPage(`/print/orderPrint?ids=${formState.orderId}`, 'order')"> 打印配送单 </el-button>
+                <el-button v-if="formState.wayBill" bg size="small" text type="primary"
+                    @click="openPage(`/print/waybill?id=${formState.orderId}`, 'waybill')">
                     打印面单
                 </el-button>
-                <el-button v-if="isPro() && hasPrint" bg size="small" text type="primary" :loading="loadingPrint" @click="handlePrint"> 打印小票 </el-button>
+                <el-button v-if="isPro() && hasPrint" bg size="small" text type="primary" :loading="loadingPrint"
+                    @click="handlePrint"> 打印小票 </el-button>
             </el-space>
             <div v-if="formState.mark" style="margin-left: 10px">
                 <EditSign title="编辑标记" :item="formState" @callBack="fetchOrder">
@@ -111,7 +113,8 @@
                 </EditSign>
             </div>
             <div class="button-card babyBlue pd20" v-if="formState.stepStatus">
-                <Steps :current="formState.stepStatus.current" size="small" :status="formState.stepStatus.status" :items="formState.stepStatus.steps"></Steps>
+                <Steps :current="formState.stepStatus.current" size="small" :status="formState.stepStatus.status"
+                    :items="formState.stepStatus.steps"></Steps>
             </div>
             <!-- <div v-if="formState.adminNote">
                 <span class="orange">商家备注：</span>{{ formState.adminNote }}
@@ -130,30 +133,32 @@
         <div class="container-card">
             <div class="title">订单明细</div>
             <div class="info-card">
-                <div class="card-title">
+                <div class="card-title" v-if="!formState.isPickup || formState.shippingTypeId == 3">
                     <div class="min-title">
                         收货人信息
-                        <DialogForm
-                            v-if="!isParent"
-                            :params="{ act: 'detail', id: formState.orderId, form: formState }"
-                            isDrawer
-                            path="order/order/src/EditConsignee"
-                            title="编辑收货人信息"
-                            width="550px"
-                            @okCallback="updateDataWithList"
-                        >
-                            <el-button bg class="ml10" size="small" text type="primary"> 编辑 </el-button>
+                        <DialogForm v-if="!isParent" :params="{ act: 'detail', id: formState.orderId, form: formState }"
+                            isDrawer path="order/order/src/EditConsignee" title="编辑收货人信息" width="550px"
+                            @okCallback="updateDataWithList" :disabled="adminType == 'admin' && formState.vendorId">
+                            <el-button bg class="ml10" size="small" text type="primary"
+                                :disabled="adminType == 'admin' && formState.vendorId">
+                                编辑
+                            </el-button>
                         </DialogForm>
                     </div>
                     <ul>
                         <li class="card-li">
-                            会员名称：<span class="li-info">{{ formState.user?.nickname || formState.user?.username || "--" }}</span>
+                            会员名称：<span class="li-info">{{ formState.user?.nickname || formState.user?.username || "--"
+                            }}</span>
                         </li>
                         <li class="card-li">
-                            &nbsp;&nbsp;&nbsp;&nbsp;收货人：<span class="li-info">{{ formState.consignee ? formState.consignee : "--" }}</span>
+                            &nbsp;&nbsp;&nbsp;&nbsp;收货人：<span class="li-info">{{ formState.consignee ?
+                                formState.consignee :
+                                "--" }}</span>
                         </li>
                         <li class="card-li">
-                            联系电话：<span class="li-info"> <MobileCard :mobile="formState.mobile"></MobileCard></span>
+                            联系电话：<span class="li-info">
+                                <MobileCard :mobile="formState.mobile"></MobileCard>
+                            </span>
                         </li>
                         <li class="card-li" v-if="formState.telephone">
                             手机：<span class="li-info">{{ formState.telephone ? formState.telephone : "--" }}</span>
@@ -178,19 +183,16 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-title">
+                <div class="card-title" v-if="!formState.isPickup || formState.shippingTypeId == 3">
                     <div class="min-title">
                         配送信息
-                        <DialogForm
-                            v-if="!isParent"
-                            :params="{ act: 'detail', id: formState.orderId }"
-                            isDrawer
-                            path="order/order/src/EditShipping"
-                            title="编辑配送方式"
-                            width="600px"
-                            @okCallback="updateDataWithList"
-                        >
-                            <el-button :disabled="!formState.availableActions.modifyShippingInfo" bg class="buttonColor" size="small" text type="primary">
+                        <DialogForm v-if="!isParent" :params="{ act: 'detail', id: formState.orderId }" isDrawer
+                            path="order/order/src/EditShipping" title="编辑配送方式" width="600px"
+                            :disabled="!formState.availableActions.modifyShippingInfo || (adminType == 'admin' && formState.vendorId)"
+                            @okCallback="updateDataWithList">
+                            <el-button
+                                :disabled="!formState.availableActions.modifyShippingInfo || (adminType == 'admin' && formState.vendorId)"
+                                bg class="buttonColor" size="small" text type="primary">
                                 编辑
                             </el-button>
                         </DialogForm>
@@ -200,14 +202,51 @@
                             配送方式：<span class="li-info">{{ formState.shippingTypeName }}</span>
                         </li>
                         <li class="card-li">
-                            发货时间：<span class="li-info">{{ formState.shippingTime ? formState.shippingTime : "--" }}</span>
+                            发货时间：<span class="li-info">{{ formState.shippingTime ? formState.shippingTime : "--"
+                            }}</span>
                         </li>
                         <li class="card-li">
-                            物流名称：<span class="li-info">{{ formState.logisticsName ? formState.logisticsName : "--" }}</span>
+                            物流名称：<span class="li-info">{{ formState.logisticsName && formState.shippingTypeId !== 3 ?
+                                formState.logisticsName : "--"
+                                }}</span>
                         </li>
                         <li class="card-li">
                             发货单号：<span class="li-info">{{ formState.trackingNo ? formState.trackingNo : "--" }}</span>
                         </li>
+                    </ul>
+                </div>
+                <div class="card-title"
+                    v-if="formState.isPickup && formState.items[0].productType !== 5 && formState.items[0].productType !== 6">
+                    <div class="min-title">自提信息</div>
+                    <ul>
+                        <li class="card-li">配送方式：<span class="li-info">到店自提</span></li>
+                        <li class="card-li" v-if="formState.pickupDetail">
+                            自提点：&nbsp;&nbsp;&nbsp;&nbsp;<span class="li-info">{{ formState.pickupDetail.shopTitle
+                            }}</span>
+                        </li>
+                        <li class="card-li" v-if="formState.pickupDetail">
+                            自提地址：<span class="li-info">
+                                {{ formState.pickupDetail.shopRegionNames.join("") }}
+                                {{ formState.pickupDetail.address }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-title"
+                    v-if="formState.isPickup && (formState.items[0].productType === 5 || formState.items[0].productType === 6)">
+                    <div class="min-title">预约信息</div>
+                    <ul>
+                        <li class="card-li">预约人：<span class="li-info">{{ formState.user?.nickname ||
+                            formState.user?.username ||
+                            "--" }}</span></li>
+                        <li class="card-li">手机号：<span class="li-info">
+                                <MobileCard :mobile="formState.mobile"></MobileCard>
+                            </span></li>
+                        <li class="card-li" v-if="formState.items[0].productType === 5"> 地址：<span class=" li-info">{{
+                            formState.userAddress ? formState.userAddress :
+                                "--"
+                        }}</span></li>
+
                     </ul>
                 </div>
                 <div class="card-title">
@@ -225,6 +264,11 @@
                         <li class="card-li">
                             付款时间：<span class="li-info">{{ formState.payTime ? formState.payTime : "--" }}</span>
                         </li>
+                        <li class="card-li">
+                            自提时间：<span class="li-info">{{ formState.expectPickupTime ? formState.expectPickupTime :
+                                "--"
+                            }}</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -232,16 +276,15 @@
         <div class="container-card">
             <div class="title">
                 商品信息
-                <DialogForm
-                    v-if="!isParent"
-                    :params="{ act: 'detail', id: formState.orderId }"
-                    isDrawer
-                    path="order/order/src/EditProduct"
-                    title="编辑商品信息"
-                    width="1050px"
-                    @okCallback="updateDataWithList"
-                >
-                    <el-button :disabled="!formState.availableActions.modifyOrder" bg class="buttonColor" size="small" text type="primary"> 编辑 </el-button>
+                <DialogForm v-if="!isParent" :params="{ act: 'detail', id: formState.orderId }" isDrawer
+                    path="order/order/src/EditProduct" title="编辑商品信息" width="1050px"
+                    :disabled="!formState.availableActions.modifyOrder || (adminType == 'admin' && formState.vendorId)"
+                    @okCallback="updateDataWithList">
+                    <el-button
+                        :disabled="!formState.availableActions.modifyOrder || (adminType == 'admin' && formState.vendorId)"
+                        bg class="buttonColor" size="small" text type="primary">
+                        编辑
+                    </el-button>
                 </DialogForm>
             </div>
             <el-table :data="formState.items">
@@ -249,28 +292,24 @@
                     <template #default="{ row }">
                         <div class="product-card-tp">
                             <div class="gift" v-if="row.isGift">赠</div>
-                            <ProductCard
-                                :picThumb="row.picThumb"
-                                :productId="row.productId"
-                                :productName="row.productName"
-                                :productType="row.productType"
-                                :url="row.url"
-                            >
+                            <ProductCard :picThumb="row.picThumb" :productId="row.productId"
+                                :productName="row.productName" :productType="row.productType" :url="row.url">
                             </ProductCard>
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="属性" prop="productAttr">
                     <template #default="{ row }">
-                        {{ row.skuValue || "无属性" }}
+                        {{ row.skuValue || "-" }}
                     </template>
                 </el-table-column>
                 <el-table-column label="附加规格" prop="extraSkuData">
                     <template #default="{ row }">
-                        <div v-if="row.extraSkuData && row.extraSkuData.length > 0" class="extraskudata" v-for="item in row.extraSkuData" :key="item">
+                        <div v-if="row.extraSkuData && row.extraSkuData.length > 0" class="extraskudata"
+                            v-for="item in row.extraSkuData" :key="item">
                             {{ item.attrName + item.attrValue + priceFormat(item.totalAttrPrice) }}
                         </div>
-                        <div v-else>无附加规格</div>
+                        <div v-else>-</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="商品编号" width="150">
@@ -297,20 +336,18 @@
             </el-table>
             <div class="total">
                 <span class="gray" style="margin-right: 16px">商品总重量：{{ formState.totalProductWeight }}kg</span>
-                <span>合计：{{ priceFormat(Number(formState.productAmount) - Number(formState.couponAmount) - Number(formState.discountAmount)) }}</span>
+                <span>合计：{{ priceFormat(Number(formState.productAmount) - Number(formState.couponAmount) -
+                    Number(formState.discountAmount)) }}</span>
             </div>
             <div class="title">
                 订单金额
-                <DialogForm
-                    v-if="!isParent"
-                    :params="{ act: 'detail', id: formState.orderId }"
-                    isDrawer
-                    path="order/order/src/EditMoney"
-                    title="编辑金额"
-                    width="600px"
-                    @okCallback="updateDataWithList"
-                >
-                    <el-button :disabled="!formState.availableActions.modifyOrderMoney" bg class="buttonColor" size="small" text type="primary">
+                <DialogForm v-if="!isParent" :params="{ act: 'detail', id: formState.orderId }" isDrawer
+                    path="order/order/src/EditMoney" title="编辑金额" width="600px"
+                    :disabled="!formState.availableActions.modifyOrderMoney || (adminType == 'admin' && formState.vendorId)"
+                    @okCallback="updateDataWithList">
+                    <el-button
+                        :disabled="!formState.availableActions.modifyOrderMoney || (adminType == 'admin' && formState.vendorId)"
+                        bg class="buttonColor" size="small" text type="primary">
                         编辑
                     </el-button>
                 </DialogForm>
@@ -341,14 +378,12 @@
                 </div>
             </div>
         </div> -->
-        <div class="container-card" v-if="formState.orderId && (formState.orderStatus === 2 || formState.orderStatus === 5)">
+        <div class="container-card"
+            v-if="formState.orderId && (formState.orderStatus === 2 || formState.orderStatus === 5)">
             <div class="title">物流追踪</div>
-            <LogisticsTracking
-                :trackingNo="formState.trackingNo"
-                :logisticsName="formState.logisticsName"
-                :shippingMethod="formState.shippingMethod"
-                v-model:id="formState.orderId"
-            ></LogisticsTracking>
+            <LogisticsTracking :trackingNo="formState.trackingNo" :logisticsName="formState.logisticsName"
+                :shippingMethod="formState.shippingMethod" v-model:id="formState.orderId"
+                :shippingTypeId="formState.shippingTypeId"></LogisticsTracking>
         </div>
         <OperationLog v-if="!isParent" :orderId="formState.orderId"></OperationLog>
     </div>
@@ -359,12 +394,22 @@ import { onMounted, ref, shallowRef, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { message, Steps, Modal } from "ant-design-vue";
 import { OrderFormState } from "@/types/order/order.d";
-import { getOrder, updateOrder, getOrderLogList, setConfirmOrder, splitStoreOrder, operationOrder, getOrderPrint, getOrderPrintBill } from "@/api/order/order";
+import {
+    getOrder,
+    updateOrder,
+    getOrderLogList,
+    setConfirmOrder,
+    splitStoreOrder,
+    operationOrder,
+    getOrderPrint,
+    getOrderPrintBill,
+    orderDeliver
+} from "@/api/order/order";
 import { DialogForm } from "@/components/dialog";
 import { OrderMoney } from "@/components/order";
 import { imageFormat, priceFormat } from "@/utils/format";
 import { Tooltip } from "@/components/form";
-import { ProductCard, Pagination } from "@/components/list";
+import { ProductCard, Pagination, DeleteRecord } from "@/components/list";
 import { useConfigStore } from "@/store/config";
 import OperationLog from "@/views/order/order/src/OperationLog.vue";
 import LogisticsTracking from "@/views/order/order/src/LogisticsTracking.vue";
@@ -372,9 +417,9 @@ import MobileCard from "@/components/list/src/MobileCard.vue";
 import EditSign from "@/views/order/order/src/EditSign.vue";
 import SignTag from "@/views/order/order/src/SignTag.vue";
 import { hasEnabledPrint, triggerPrint } from "@/api/setting/receiptPrint";
-import { isPro } from "@/utils/version";
+import { isPro, isStore } from "@/utils/version";
 const config: any = useConfigStore();
-
+const adminType = ref(localStorage.getItem("adminType"));
 const emit = defineEmits(["submitCallback", "callback", "update:confirmLoading", "close"]);
 
 const props = defineProps({
@@ -413,7 +458,8 @@ const formState = ref<OrderFormState>({
     paidAmount: 0,
     updateOrderSn: 0,
     unpaidAmount: 0,
-    discountAmount: 0
+    discountAmount: 0,
+    expectPickupTime: ""
 });
 const hasPrint = ref(false);
 
@@ -433,6 +479,18 @@ const fetchOrder = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const deliverDataFun = (items: any) => {
+    let deliverData: any = [];
+    items.forEach((item: any) => {
+        let data = {
+            itemId: item.itemId,
+            toDeliveryQuantity: item.quantity
+        };
+        deliverData.push(data);
+    });
+    return deliverData;
 };
 
 const setConfirm = async () => {
@@ -518,8 +576,9 @@ const onSubmit = async () => {
 const onFormSubmit = () => {
     onSubmit();
 };
-
+const router = useRouter();
 const openPage = async (href: string, type: string) => {
+    let base = location.origin + router.options.history.base + href;
     try {
         if (type === "order") {
             await getOrderPrint({ ids: formState.value.orderId });
@@ -527,7 +586,7 @@ const openPage = async (href: string, type: string) => {
         if (type === "waybill") {
             await getOrderPrintBill({ id: formState.value.orderId });
         }
-        window.open(href, "_blank");
+        window.open(base, "_blank");
     } catch (error: any) {
         message.error(error.message);
     }
@@ -647,8 +706,10 @@ defineExpose({ onFormSubmit });
         text-align: right;
     }
 }
+
 .product-card-tp {
     position: relative;
+
     .gift {
         z-index: 99;
         color: white;
@@ -665,6 +726,7 @@ defineExpose({ onFormSubmit });
 
 .extraskudata {
     padding-bottom: 5px;
+
     &:last-child {
         padding-bottom: 0;
     }

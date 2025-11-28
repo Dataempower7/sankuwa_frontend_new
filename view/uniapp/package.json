@@ -1,6 +1,9 @@
 {
     "name": "tigshop",
     "version": "0.0.0",
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "scripts": {
         "uvm": "npx @dcloudio/uvm@latest",
         "dev:app": "uni -p app",

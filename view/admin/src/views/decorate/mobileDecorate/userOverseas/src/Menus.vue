@@ -22,7 +22,7 @@
 </template>
 <script lang="ts" setup>
 import "@/views/decorate/decorate/src/css/decorate.less";
-import { defineProps, PropType } from "vue";
+import { PropType } from "vue";
 import { imageFormat } from "@/utils/format";
 import { ArrowRight } from "@element-plus/icons-vue";
 import { DecorateUserMenu } from "@/types/decorate/decorateDiscrete.d";

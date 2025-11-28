@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <a-spin :spinning="loading">
-            <el-form ref="formRef" :model="formState" label-width="140px" style="display: flex;gap:12px;flex-direction: column">
+            <el-form ref="formRef" :model="formState" label-width="155px" style="display: flex; gap: 12px; flex-direction: column">
                 <div class="content_wrapper">
                     <div class="title">商品货币设置</div>
                     <el-form-item label="商品货币符" prop="dollarSign">
@@ -45,10 +45,41 @@
                         </el-radio-group>
                         <div class="extra">是否在商品详情页价格栏目中显示市场价</div>
                     </el-form-item>
+                    <template v-if="isB2b()">
+                        <el-form-item label="是否开启询价功能" prop="isEnquiry">
+                            <el-radio-group v-model="formState.isEnquiry" class="itemWidth">
+                                <el-radio :value="1">开启</el-radio>
+                                <el-radio :value="0">关闭</el-radio>
+                            </el-radio-group>
+                            <div class="extra">开启后，前台商城的商品价格需要提交询价之后才能查看。</div>
+                        </el-form-item>
+                        <el-form-item label="商品规格显示批量采购" prop="bulkPurchase">
+                            <el-radio-group v-model="formState.bulkPurchase" class="itemWidth">
+                                <el-radio :value="1">是</el-radio>
+                                <el-radio :value="0">否</el-radio>
+                            </el-radio-group>
+                            <div class="extra">
+                                商品详情页将同时支持单品采购和批量采购。<el-popover :width="300" placement="right-end" trigger="click">
+                                    <template #reference>
+                                        <a>查看示例</a>
+                                    </template>
+                                    <template #default>
+                                        <img src="@/style/images/bulkPurchase-mobile.png" style="width: 280px" />
+                                    </template>
+                                </el-popover>
+                            </div>
+                        </el-form-item>
+                    </template>
+                    <el-form-item label="显示筛选信息" prop="enableAttributeFilter">
+                        <el-radio-group v-model="formState.enableAttributeFilter" class="itemWidth">
+                            <el-radio :value="1">是</el-radio>
+                            <el-radio :value="0">否</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                 </div>
             </el-form>
             <div style="height: 20px"></div>
-            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+            <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                 <div class="selected-action">
                     <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交 </el-button>
                 </div>
@@ -67,6 +98,7 @@ import { useConfigStore } from "@/store/config";
 import { useRoute } from "vue-router";
 import { convertNullsToEmptyStrings } from "@/utils/format";
 import { useThemeStore } from "@/store/theme";
+import { isOverseas, isS2b2c, isB2b } from "@/utils/version";
 const { themeInfo } = useThemeStore();
 const route = useRoute();
 const configStore = useConfigStore();
@@ -79,6 +111,8 @@ const formState = ref<Partial<BasicProductConfig>>({
     snPrefix: "",
     showSelledCount: undefined,
     showMarketprice: undefined,
+    isEnquiry: undefined,
+    bulkPurchase: undefined,
     marketPriceRate: 0
 });
 // 加载列表

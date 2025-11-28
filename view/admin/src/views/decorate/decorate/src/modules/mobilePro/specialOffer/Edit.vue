@@ -43,7 +43,7 @@
                     <div class="value"></div>
                 </div>
                 <div class="dec-edit-group-con">
-                    <el-radio-group class="dec-radio-group" v-model="module.moduleColorStyle">
+                    <el-radio-group class="dec-radio-group" v-model="module.moduleColorStyle" @change="resetColor">
                         <el-radio :value="'orange'">番茄橙</el-radio>
                         <el-radio :value="'red'">中国红</el-radio>
                         <el-radio :value="'blue'">天空蓝</el-radio>
@@ -413,7 +413,7 @@
 import { SelectColor } from "@/components/select";
 import { ProductGroupSelect, ProductInfoSelect } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel, watch } from "vue";
+import { ref, watch } from "vue";
 import CommonImageFillEdit from "../../src/commonImageFill/Edit.vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
@@ -449,12 +449,12 @@ const handleTimeChange = (value: any) => {
         const startTimestamp = new Date(value[0]).getTime();
         const endTimestamp = new Date(value[1]).getTime();
         module.value.moduleTitle.dailyTime = [startTimestamp, endTimestamp];
-    }else{
+    } else {
         const timestamp = new Date(value).getTime();
         module.value.moduleTitle.specifyTime = timestamp;
     }
     console.log(222);
-}
+};
 watch(
     () => [module.value.productList, module.value.productSource, module.value.productGroups, module.value.moduleColorStyle],
     ([productList, productSource, productGroups, moduleColorStyle]) => {
@@ -478,7 +478,7 @@ watch(
         }
         // 处理 moduleColorStyle
         type ModuleThemeKey = keyof typeof ModuleTheme;
-        if (moduleColorStyle) {
+        if (moduleColorStyle && module.value.contentStyle.gradientColorA == '' && module.value.contentStyle.gradientColorB == '') {
             module.value.moduleColor.countdownTitleColor = ModuleTheme[moduleColorStyle as ModuleColorStyle].textColor;
             module.value.contentStyle.gradientColorA = ModuleTheme[moduleColorStyle as ModuleColorStyle].gradientColorA;
             module.value.contentStyle.gradientColorB = ModuleTheme[moduleColorStyle as ModuleColorStyle].gradientColorB;
@@ -486,4 +486,10 @@ watch(
     },
     { deep: true, immediate: true }
 );
+
+const resetColor = (e: ModuleColorStyle) => {
+    module.value.moduleColor.countdownTitleColor = ModuleTheme[e as ModuleColorStyle].textColor;
+    module.value.contentStyle.gradientColorA = ModuleTheme[e as ModuleColorStyle].gradientColorA;
+    module.value.contentStyle.gradientColorB = ModuleTheme[e as ModuleColorStyle].gradientColorB;
+};
 </script>

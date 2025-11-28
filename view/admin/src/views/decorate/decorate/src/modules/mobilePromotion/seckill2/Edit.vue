@@ -151,7 +151,6 @@ import { ref, onMounted, computed, ComputedRef } from "vue";
 import CommonTitleEdit from "../../src/commonTitle/Edit.vue";
 import { ModuleActivityType } from "@/types/decorate/decorate.d";
 import { defaultFrame } from "@/views/decorate/decorate/src/modules/";
-import { defineModel } from "vue";
 const module = defineModel<ModuleActivityType>("module", { default: () => ({}) });
 const selectLabel = ref<any>({
     style: {

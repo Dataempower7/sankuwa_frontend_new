@@ -28,7 +28,7 @@
                                 :clone="clone"
                             >
                                 <template #item="{ element, index }">
-                                    <div class="list-item tool-list-item" @click="onAdd(index, 'toolList', element)">
+                                    <div class="list-item tool-list-item" @click="onAdd(index, 'toolList', element)" v-if="element.isShow">
                                         <span v-if="element.content" class="pic" v-html="element.content"> </span>
                                         <span v-if="element.label" class="content">{{ element.label }}</span>
                                     </div>
@@ -55,14 +55,14 @@
                                 :clone="clone"
                             >
                                 <template #item="{ element, index }">
-                                    <div class="list-item tool-list-item" @click="onAdd(index, 'otherList')">
+                                    <div class="list-item tool-list-item" @click="onAdd(index, 'otherList')" v-if="element.isShow">
                                         <span v-if="element.content" class="pic" v-html="element.content"> </span>
                                         <span v-if="element.label" class="content">{{ element.label }}</span>
                                     </div>
                                 </template>
                             </draggable>
                         </el-collapse-item>
-                        <el-collapse-item title="高级模块" name="advanced" v-if="activeName === 'advancedList' && isPro()">
+                        <el-collapse-item title="高级模块" name="advanced" v-if="activeName === 'advancedList' && isPro() && adminType === 'admin'">
                             <template #title>
                                 <div class="modules-head J_ModuleListHead">
                                     <span>高级模块</span>
@@ -82,7 +82,7 @@
                                 :clone="clone"
                             >
                                 <template #item="{ element, index }">
-                                    <div class="list-item tool-list-item" @click="onAdd(index, 'advancedList')">
+                                    <div class="list-item tool-list-item" @click="onAdd(index, 'advancedList')"  v-if="element.isShow">
                                         <span v-if="element.content" class="pic" v-html="element.content"> </span>
                                         <span v-if="element.label" class="content">{{ element.label }}</span>
                                     </div>
@@ -100,7 +100,7 @@
 import { ref, defineAsyncComponent, onMounted, shallowRef } from "vue";
 import draggable from "vuedraggable";
 import { cloneDeep } from "lodash";
-import { isPro } from "@/utils/version";
+import { isPro, isOverseas, isStore } from "@/utils/version";
 const adminType = localStorage.getItem("adminType");
 const activeNames = ref(["tool", "other", "advanced"]);
 const props = defineProps({
@@ -115,11 +115,11 @@ const modules = ref(props.modules);
 const toolList = ref([
     // { type: "article", url: "mobile", label: "文章列表", content: '<i class="iconfont-admin icon-article"></i>', module: {}, isShow: true },
     { type: "imageAd", url: "mobile", label: "图片广告1", content: '<i class="iconfont-admin icon-image_nav"></i>', module: {}, isShow: true },
-    { type: "imageAd2", url: "mobile", label: "图片广告2", content: '<i class="iconfont-admin icon-image_nav"></i>', module: {}, isShow: true },
+    { type: "imageAd2", url: "mobile", label: "图片广告2", content: '<i class="iconfont-admin icon-image_nav"></i>', module: {}, isShow: isOverseas() },
     { type: "imageSquareAd", url: "mobile", label: "图片魔方", content: '<i class="iconfont-admin icon-image_square_ad"></i>', module: {}, isShow: true },
     { type: "imageHotarea", url: "mobile", label: "热图绘制", content: '<i class="iconfont-admin icon-image_hotarea"></i>', module: {}, isShow: true },
     { type: "product", url: "mobile", label: "商品", content: '<i class="iconfont-admin icon-product"></i>', module: {}, isShow: true },
-    { type: "product2", url: "mobile", label: "商品2", content: '<i class="iconfont-admin icon-product"></i>', module: {}, isShow: true },
+    { type: "product2", url: "mobile", label: "商品2", content: '<i class="iconfont-admin icon-product"></i>', module: {}, isShow: isOverseas() },
     { type: "whiteLine", url: "mobile", label: "分割线", content: '<i class="iconfont-admin icon-white_line"></i>', module: {}, isShow: true },
     { type: "whiteBlank", url: "mobile", label: "空白辅助", content: '<i class="iconfont-admin icon-white_blank"></i>', module: {}, isShow: true },
     { type: "imageNav", url: "mobile", label: "图文导航", content: '<i class="iconfont-admin icon-image_nav"></i>', module: {}, isShow: true },
@@ -169,22 +169,25 @@ const advancedList = ref([
     },
     { type: "slidingImage", url: "mobilePro", label: "小图滑动", content: '<i class="iconfont-admin icon-sliding_image"></i>', module: {}, isShow: true },
     { type: "banner", url: "mobilePro", label: "首焦轮播", content: '<i class="iconfont-admin icon-banner"></i>', module: {}, isShow: true },
+    { type: "bannerA2", url: "mobilePro", label: "首焦轮播A2", content: '<i class="iconfont-admin icon-banner"></i>', module: {}, isShow: isStore() ? true : false },
     { type: "categoryNav", url: "mobilePro", label: "类目导航", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: true },
     { type: "categoryNavA1", url: "mobilePro", label: "类目导航A1", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: true },
     { type: "categoryNavA2", url: "mobilePro", label: "类目导航A2", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: true },
-    { type: "categoryNavA3", url: "mobilePro", label: "类目导航A3", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: true }
+    { type: "categoryNavA3", url: "mobilePro", label: "类目导航A3", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: true },
+    { type: "storeNav", url: "mobilePro", label: "门店导航", content: '<i class="iconfont-admin icon-category_nav"></i>', module: {}, isShow: isStore() ? true : false }
 ]);
 const otherList = ref([
     { type: "coupon", url: "mobilePromotion", label: "优惠券", content: '<i class="iconfont-admin icon-coupon"></i>', module: {}, isShow: true }
 ]);
 const adminToolList = ref([
     { type: "searchBar", url: "mobile", label: "商品搜索", content: '<i class="iconfont-admin icon-search_bar"></i>', module: {}, isShow: true },
-    { type: "searchBar2", url: "mobile", label: "商品搜索2", content: '<i class="iconfont-admin icon-search_bar"></i>', module: {}, isShow: true },
+    { type: "searchBar2", url: "mobile", label: "商品搜索2", content: '<i class="iconfont-admin icon-search_bar"></i>', module: {}, isShow: isOverseas() },
     { type: "catNav", url: "mobile", label: "分类导航", content: '<i class="iconfont-admin icon-cat_nav"></i>', module: {}, isShow: true }
 ]);
 const adminOtherList = ref([
     { type: "seckill", url: "mobilePromotion", label: "秒杀", content: '<i class="iconfont-admin icon-seckill"></i>', module: {}, isShow: true },
-    { type: "seckill2", url: "mobilePromotion", label: "秒杀2", content: '<i class="iconfont-admin icon-seckill"></i>', module: {}, isShow: true }
+    { type: "seckill2", url: "mobilePromotion", label: "秒杀2", content: '<i class="iconfont-admin icon-seckill"></i>', module: {}, isShow: isOverseas() },
+    { type: "groupon", url: "mobilePromotion", label: "拼团", content: '<i class="iconfont-admin icon-seckill"></i>', module: {}, isShow: true },
 ]);
 const shopToolList = ref([
     { type: "shopInfo", url: "mobilePromotion", label: "店铺信息", content: '<i class="iconfont-admin icon-product"></i>', module: {}, isShow: true }

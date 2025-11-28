@@ -1,14 +1,11 @@
 <template>
     <view class="new-category-page">
         <!-- 顶部搜索栏 -->
-        <view class="search-header">
+        <view class="search-header" :class="{ 'non-wechat': !isWechatEcosystem }">
             <view class="search-container">
                 <view class="search-box" @click="toSearch">
                     <image style="width: 32rpx; height: 32rpx;" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
                     <text class="search-placeholder">{{ $t("点击搜索商品") }}</text>
-                </view>
-                <view class="location-icon">
-                    <text class="iconfont-h5 icon-weizhi" />
                 </view>
             </view>
         </view>
@@ -144,7 +141,11 @@
                         </view>
                         
                         <view v-else-if="productList.length === 0" class="empty-container">
-                            <up-empty :icon="staticResource('salesman/no_order.png')" :text="$t('暂无商品')" />
+                            <view class="empty-content">
+                                <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg" mode="aspectFit" />
+                                <text class="empty-text">{{ $t("暂无商品") }}</text>
+                                <text class="empty-desc">{{ $t("敬请期待更多精彩商品") }}</text>
+                            </view>
                         </view>
                         
                         <view v-else class="products-grid" :class="{ 'single-column': listViewMode === 'single' }">
@@ -194,7 +195,7 @@
                                         </template>
                                         <template v-else>
                                             <image 
-                                                src="/static/images/category/addProduct.png" 
+                                                src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793404em9KntR0tkKeCV0UQD.jpeg" 
                                                 mode="aspectFit"
                                                 class="cart-icon"
                                             />
@@ -238,6 +239,14 @@ import { staticResource, redirect } from "@/utils";
 import type { filterSeleted } from "@/types/productCate/productCate";
 import type { GetProductFilterResult } from "@/types/home/home";
 import specification from "@/components/product/specification.vue";
+import { useConfigStore } from "@/store/config";
+
+const configStore = useConfigStore();
+
+// 判断是否为微信生态
+const isWechatEcosystem = computed(() => {
+    return configStore.XClientType === 'wechat' || configStore.XClientType === 'miniProgram';
+});
 
 // Props
 const props = defineProps({
@@ -671,7 +680,12 @@ onMounted(() => {
 
 .search-header {
     background-color: #fff;
-    padding: 20rpx 135rpx 22rpx 30rpx;
+    padding: 20rpx 210rpx 22rpx 30rpx;
+    
+    // 非微信生态下，减少右侧 padding，让搜索框变长
+    &.non-wechat {
+        padding: 20rpx 30rpx 22rpx 30rpx;
+    }
     
     .search-container {
         display: flex;
@@ -695,18 +709,6 @@ onMounted(() => {
             }
         }
         
-        .location-icon {
-            width: 70rpx;
-            height: 70rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            .iconfont-h5 {
-                font-size: 40rpx;
-                color: #333;
-            }
-        }
     }
 }
 
@@ -938,14 +940,47 @@ onMounted(() => {
         min-height: 0; // 允许滚动容器收缩
     }
     
-    .loading-container,
-    .empty-container {
+    .loading-container {
         display: flex;
         align-items: center;
         justify-content: center;
         height: 400rpx;
         flex-direction: column;
         gap: 20rpx;
+    }
+    
+    .empty-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+        padding: 40rpx;
+        
+        .empty-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            
+            .empty-image {
+                width: 300rpx;
+                height: 300rpx;
+                margin-bottom: 40rpx;
+            }
+            
+            .empty-text {
+                font-size: 32rpx;
+                color: #333;
+                font-weight: 500;
+                margin-bottom: 16rpx;
+            }
+            
+            .empty-desc {
+                font-size: 28rpx;
+                color: #999;
+                line-height: 1.5;
+            }
+        }
     }
     
     .products-grid {

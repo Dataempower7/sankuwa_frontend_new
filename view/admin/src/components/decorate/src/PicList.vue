@@ -17,8 +17,18 @@
                             <div class="dec-pic-group-item">
                                 <div class="dec-pic-group-item-con">
                                     <div class="item-image" v-if="showImage">
-                                        <div class="item-image-con">
-                                            <img class="item-image-src" v-if="element.picThumb" :src="imageFormat(element.picThumb)" />
+                                        <div class="item-image-con" v-if="element.picThumb">
+                                            <BusinessImg
+                                                v-if="pageType == 'overseas'"
+                                                v-model:modelValue="element.picUrl"
+                                                :picThumb="element.picThumb"
+                                                :dataId="element.picId"
+                                                :dataType="dataType"
+                                                @Edit="onEdit"
+                                            >
+                                                <img class="item-image-src" :src="imageFormat(element.picThumb)" />
+                                            </BusinessImg>
+                                            <img v-else class="item-image-src" :src="imageFormat(element.picThumb)" />
                                             <DialogForm type="gallery" class="" @okCallback="onEdit" :params="{ isMultiple: false }" :data="{ index: index }">
                                                 <span class="change-image">更换图片</span>
                                             </DialogForm>
@@ -65,7 +75,17 @@
                         <div class="dec-pic-group-item-con">
                             <div class="item-image" v-if="showImage">
                                 <div class="item-image-con">
-                                    <img class="item-image-src" v-if="photo.picThumb" :src="imageFormat(photo.picThumb)" />
+                                    <BusinessImg
+                                        v-if="pageType == 'overseas'"
+                                        v-model:modelValue="photo.picUrl"
+                                        :picThumb="photo.picThumb"
+                                        :dataId="photo.picId"
+                                        :dataType="dataType"
+                                        @Edit="onEdit"
+                                    >
+                                        <img class="item-image-src" :src="imageFormat(photo.picThumb)" />
+                                    </BusinessImg>
+                                    <img v-if="pageType != 'overseas'" class="item-image-src" :src="imageFormat(photo.picThumb)" />
                                     <DialogForm type="gallery" class="" @okCallback="onEdit" :params="{ isMultiple: false }">
                                         <span class="change-image">{{ photo.picThumb ? "更换图片" : "添加图片" }}</span>
                                     </DialogForm>
@@ -112,14 +132,13 @@
     </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, toRefs } from "vue";
+import BusinessImg from "@/components/multilingual/BusinessImg.vue";
+import { reactive, ref, toRefs, computed } from "vue";
 import { SelectColor } from "@/components/select";
-import type { Ref } from "vue";
 import { DialogForm } from "@/components/dialog";
 import draggable from "vuedraggable";
 import { SelectLink } from "@/components/select";
 import { imageFormat } from "@/utils/format";
-const dom: Ref<HTMLDivElement> = ref(null) as any;
 
 const props = defineProps({
     isMultiple: {
@@ -153,12 +172,19 @@ const props = defineProps({
     decorateType: {
         type: String,
         default: ""
+    },
+    pageType: {
+        type: String,
+        default: ""
+    },
+    dataType: {
+        type: Number,
+        default: 0
     }
 });
 // 动态解析props
 const photos = defineModel<any>("photos", { type: Array, default: [] });
 const photo = defineModel<any>("photo", { type: Object, default: {} });
-// const emit = defineEmits(['update:photo'])
 const { isMultiple } = toRefs(props);
 
 const onEdit = (result: any, data: any) => {
@@ -182,6 +208,8 @@ const onAdd = (result: any) => {
         photos.value.push(obj);
     } else if (props.showColor) {
         let obj = {
+            picTitle: "",
+            picDesc: "",
             gradientColorA: props.backgroundColor[0],
             gradientColorB: props.backgroundColor[1]
         };
@@ -190,6 +218,13 @@ const onAdd = (result: any) => {
         });
         photos.value.push(...result);
     } else {
+        let obj = {
+            picTitle: "",
+            picDesc: ""
+        };
+        result.forEach((item: any) => {
+            Object.assign(item, obj);
+        });
         photos.value.push(...result);
     }
 };
@@ -212,7 +247,7 @@ const removePhoto = () => {
             }
         },
         gradientColorA: "",
-        gradientColorB: "",
+        gradientColorB: ""
     };
 };
 </script>

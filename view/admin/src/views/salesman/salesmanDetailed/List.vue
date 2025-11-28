@@ -62,7 +62,7 @@
                         <el-table :data="filterState" :total="total" row-key="productId" @sort-change="onSortChange">
                             <el-table-column label="手机号" prop="productId" :width="130" fixed="left">
                                 <template #default="{ row }">
-                                    {{ row.baseUserInfo?.mobile || '-' }}
+                                    <MobileCard :mobile="row.baseUserInfo?.mobile"></MobileCard>
                                 </template>
                             </el-table-column>
                             <el-table-column label="昵称" prop="productId" :width="150" fixed="left">
@@ -206,6 +206,7 @@
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import MobileCard from "@/components/list/src/MobileCard.vue";
 import { DialogForm } from "@/components/dialog";
 import { onMounted, reactive, ref } from "vue";
 import { Pagination } from "@/components/list";

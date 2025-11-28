@@ -1,0 +1,1 @@
+import{aL as e}from"./BjkHNVA8.js";const o=()=>e({url:"user/invoice/detail",method:"get"}),s=t=>e({url:"user/invoice/update",method:"post",data:t}),n=t=>e({url:"user/invoice/create",method:"post",data:t}),u=()=>e({url:"user/invoice/getStatus",method:"get"});export{o as a,u as g,n as i,s as u};

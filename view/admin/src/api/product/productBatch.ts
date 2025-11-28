@@ -20,7 +20,7 @@ export const productBatchExportSubmit = (params: object) => {
 
 // 商品批量上传/修改
 export const productBatchModifySubmit = (data: object) => {
-    return request({
+    return request<any>({
         url: "product/productBatch/productBatchModify",
         method: "post",
         headers: {

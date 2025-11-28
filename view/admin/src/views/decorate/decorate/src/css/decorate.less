@@ -122,6 +122,7 @@
         display: flex;
         align-items: center;
         border-radius: 2px;
+
         .el-icon--right {
             padding-top: 2px;
         }
@@ -515,6 +516,17 @@
 .modules-item {
     clear: both;
     position: relative;
+    .module-mask{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255,255,255,0.6);
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9b9b9d;
+    }
 }
 
 .modules-item .empty_img {
@@ -814,8 +826,7 @@
 
 .dec-edit-group .dec-edit-group-title {
     display: flex;
-    align-items: flex-start;
-    padding-top: 8px;
+    align-items: center;
 }
 
 .dec-edit-group .dec-edit-group-title .title {
@@ -1821,6 +1832,8 @@ body .layui-layer-tips.dec-tip-box i.layui-layer-TipsB {
 
 // 其它页面的装修
 .decoratePgaeWrap {
+    min-height: 560px;
+
     .box-wrapper .left-wrapper {
         background: #fff;
         border-right: 1px solid #f0f2f5;
@@ -1830,7 +1843,7 @@ body .layui-layer-tips.dec-tip-box i.layui-layer-TipsB {
 
     .box-wrapper .left-box {
         //max-height: 500px;
-        min-height: 280px;
+        min-height: 80px;
         overflow: hidden;
     }
 
@@ -1854,6 +1867,21 @@ body .layui-layer-tips.dec-tip-box i.layui-layer-TipsB {
     }
 
     .decorateWrap .img {
+        width: 100%;
+        height: auto;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 10px;
+    }
+
+    .decorate-nav-warp {
+        margin-right: 30px;
+        position: relative;
+        position: relative;
+        max-width: 750px;
+    }
+
+    .decorate-nav-warp .img {
         width: 100%;
         height: auto;
         border: 1px solid #eee;
@@ -1897,5 +1925,61 @@ body .layui-layer-tips.dec-tip-box i.layui-layer-TipsB {
         border-left: 3px solid #155bd4;
         padding-left: 10px;
         font-size: 14px;
+    }
+}
+
+.decorate-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.top-wrapper {
+    border-bottom: 1px solid #f0f2f5;
+    margin-bottom: 25px;
+    padding: 0 20px;
+    display: none;
+
+    .left-box {
+        overflow: hidden;
+    }
+
+    .left-box .left-cont {
+        cursor: pointer;
+        padding: 20px 24px;
+    }
+
+    .left-box .left-cont.current {
+        color: var(--tig-primary);
+        background-color: #f0faff;
+        border-bottom: 2px solid var(--tig-primary);
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .left-wrapper {
+        display: none;
+    }
+    .top-wrapper{
+        display: block;
+    }
+    .decorateWrap{
+        width: 100%;
+    }
+    .content_wrapper{
+        padding: 20px 0;
+    }
+    .decoratePgaeWrap .decorateWrap{
+        margin-right: 0;
+        padding: 10px;
+    }
+    .decoratePgaeWrap .decorateWrap .img{
+        padding: 0;
+    }
+    .decoratePgaeWrap .decorate-nav-warp{
+        margin-right: 0;
+        padding: 10px;
+    }
+    .decoratePgaeWrap .decorate-nav-warp .img{
+        padding: 0;
     }
 }

@@ -57,7 +57,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="添加时间" prop="sortOrder" sortable="custom" :width="300">
+                            <el-table-column label="添加时间" prop="addTime" sortable="custom" :width="300">
                                 <template #default="{ row }">
                                     {{ row.addTime }}
                                 </template>

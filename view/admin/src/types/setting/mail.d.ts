@@ -9,5 +9,14 @@ export interface MailFormState {
     smtpMail?: string;
     mailCharset?: string;
     testMailAddress?: string;
+    serviceEMail?: string;
 }
 
+export interface DingFormState {
+    dingTalkRobotToken?: string;
+    dingAppSecret?: string;
+}
+
+export interface WXWorkFormState {
+    wxworkWebhookUrl?: string;
+}

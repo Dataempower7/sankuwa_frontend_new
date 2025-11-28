@@ -21,78 +21,8 @@
                 <div class="container-card">
                     <div class="title flex flex-justify-between">
                         <p>售后明细</p>
-                        <div class="btn flex" v-if="type != 2">
-                            <div v-if="formState.aftersaleType == 1">
-                                <DialogForm
-                                    v-if="formState.status === 1 || formState.status === 3"
-                                    :params="{ status: 2, formData: formState }"
-                                    isDrawer
-                                    path="order/aftersales/Handle"
-                                    title="处理售后"
-                                    width="600px"
-                                    :showClose="false"
-                                    :showOnOk="false"
-                                    @okCallback="fetchBrand"
-                                >
-                                    <el-button type="primary" style="margin-right: 10px"> 同意并发送退货地址 </el-button>
-                                </DialogForm>
-                                <DialogForm
-                                    v-if="formState.status === 1"
-                                    :params="{ status: 3, formData: formState }"
-                                    isDrawer
-                                    path="order/aftersales/Handle"
-                                    title="处理售后"
-                                    width="600px"
-                                    :showClose="false"
-                                    :showOnOk="false"
-                                    @okCallback="fetchBrand"
-                                >
-                                    <el-button> 拒绝退货退款 </el-button>
-                                </DialogForm>
-                            </div>
-                            <div v-if="formState.aftersaleType == 2">
-                                <DialogForm
-                                    v-if="formState.status === 1 || formState.status === 3"
-                                    :params="{ status: 2, formData: formState }"
-                                    isDrawer
-                                    path="order/aftersales/Handle"
-                                    title="处理售后"
-                                    width="600px"
-                                    :showClose="false"
-                                    :showOnOk="false"
-                                    @okCallback="fetchBrand"
-                                >
-                                    <el-button type="primary" style="margin-right: 10px"> 同意仅退款 </el-button>
-                                </DialogForm>
-                                <DialogForm
-                                    v-if="formState.status === 1"
-                                    :params="{ status: 3, formData: formState }"
-                                    isDrawer
-                                    path="order/aftersales/Handle"
-                                    title="处理售后"
-                                    width="600px"
-                                    :showClose="false"
-                                    :showOnOk="false"
-                                    @okCallback="fetchBrand"
-                                >
-                                    <el-button> 拒绝仅退款 </el-button>
-                                </DialogForm>
-                            </div>
-                            <div v-if="formState.status == 3">
-                                <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" title="确认永久关闭售后?" @confirm="closeOrder">
-                                    <template #reference>
-                                        <el-button style="margin-left: 10px"> 关闭售后 </el-button>
-                                    </template>
-                                </el-popconfirm>
-                            </div>
-                            <div v-if="formState.aftersaleType == 1 && formState.status == 5">
-                                <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" title="确认已收到货?" @confirm="confirmReceipt">
-                                    <template #reference>
-                                        <el-button type="primary"> 确认收货 </el-button>
-                                    </template>
-                                </el-popconfirm>
-                            </div>
-                        </div>
+                        <InfoBtn :formState="formState" :type="type" @callback="fetchBrand" @closeOrder="closeOrder" @confirmReceipt="confirmReceipt">
+                        </InfoBtn>
                     </div>
                     <div class="info-card">
                         <div class="card-title">
@@ -144,11 +74,7 @@
                                                     <div style="margin-left: 10px">
                                                         (
                                                         {{
-                                                            formState.refund.isOnline == 2
-                                                                ? "退款成功"
-                                                                : formState.refund.isOnline == 1
-                                                                  ? "退款中"
-                                                                  : "无需退款"
+                                                            formState.refund.isOnline == 2 ? "退款成功" : formState.refund.isOnline == 1 ? "退款中" : "无需退款"
                                                         }}
                                                         )
                                                     </div>
@@ -240,7 +166,10 @@
                             <TimelineItem v-for="(item, index) in formState.aftersalesLog">
                                 <template #dot>
                                     <div class="logo" v-if="item.userName">买</div>
-                                    <div class="logo-b" v-if="item.adminName">商</div>
+                                    <div class="logo-b" v-if="item.adminName">
+                                        <span v-if="item.shopId > 0">商</span>
+                                        <span v-if="item.vendorId > 0">供</span>
+                                    </div>
                                 </template>
                                 <div class="info-box">
                                     <div class="tit">
@@ -249,7 +178,11 @@
                                         </div>
                                         <div class="txt" v-else>
                                             <span v-if="item.userName">买家</span>
-                                            <span v-if="item.adminName">商家</span> 留言
+                                            <span v-if="item.adminName">
+                                                <span v-if="item.shopId > 0">商家</span>
+                                                <span v-if="item.vendorId > 0">供应商</span>
+                                            </span>
+                                            留言
                                         </div>
                                         <div class="time">
                                             {{ item.addTime }}
@@ -313,7 +246,9 @@ import { FormState } from "@/types/order/aftersales";
 import { getAftersales, addMessage, updataConfirmReceipt, completeAftersales } from "@/api/order/aftersales";
 import { ProductCard } from "@/components/list";
 import { priceFormat } from "@/utils/format";
-
+import { isS2b2c } from "@/utils/version";
+import InfoBtn from "./src/InfoBtn.vue";
+const adminType = ref(localStorage.getItem("adminType"));
 // 父组件回调
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 
@@ -354,7 +289,7 @@ const fetchBrand = async () => {
         formState.value.aftersalesTypeConfig = toArray(formState.value.aftersalesTypeConfig);
         formState.value.statusConfig = toArray(formState.value.statusConfig);
         formState.value.modifyNumber = formState.value.number;
-        // emit('submitCallback')
+        emit("submitCallback", "", false);
     } catch (error: any) {
         message.error(error.message);
         emit("close");
@@ -434,6 +369,7 @@ const closeOrder = async () => {
 // 表单提交
 const onFormSubmit = () => {
     // onSubmit()
+    emit("submitCallback");
 };
 
 defineExpose({ onFormSubmit });

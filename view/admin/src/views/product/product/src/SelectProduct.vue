@@ -7,8 +7,8 @@
                         <div class="list-table-tool-row" style="margin-bottom: 5px">
                             <div class="list-table-tool-col">
                                 <el-space>
-                                    <SelectCategory v-model:categoryId="filterParams.categoryId" style="width: 150px"></SelectCategory>
-                                    <!-- <SelectBrand v-model:brandId="filterParams.brandId"></SelectBrand> -->
+                                    <SelectCategory v-model:categoryId="filterParams.categoryId" style="width: 150px"> </SelectCategory>
+                                    <SelectBrand v-model:brandId="filterParams.brandId" style="width: 150px"></SelectBrand>
                                     <TigInput width="230px" v-model="filterParams.keyword" placeholder="商品名称/货号" />
                                     <el-button @click="searchSubmit">搜索</el-button>
                                 </el-space>
@@ -100,7 +100,7 @@ import { Pagination } from "@/components/list";
 import { ProductFilterParams, ProductFilterState } from "@/types/product/product";
 import { useConfigStore } from "@/store/config";
 import { getProductList } from "@/api/product/product";
-import SelectSku from "@/views/promotion/productGift/src/SelectSku.vue"
+import SelectSku from "@/views/promotion/productGift/src/SelectSku.vue";
 const props = defineProps({
     // 已选择的项，用于排除重复，禁止选择
     selectedIds: { type: Array, default: [] },
@@ -119,6 +119,11 @@ const props = defineProps({
     },
     //是否自营商品
     isSelf: {
+        type: Number,
+        default: 0
+    },
+    //是否是预约类商品
+    reservationProduct: {
         type: Number,
         default: 0
     }
@@ -141,12 +146,15 @@ const filterParams = reactive<ProductFilterParams>({
     productStatus: 1,
     checkStatus: 1,
     shopId: props.isSelf ? 0 : -1,
+    reservationProduct: props.reservationProduct ? 1 : 0,
+    brandId: "",
+    categoryId: ""
 });
 
 // 获取列表的查询结果
 const loadFilter = async () => {
     loading.value = true;
-    if(props.isSku){
+    if (props.isSku) {
         selectedIds.value = [];
     }
     try {
@@ -171,7 +179,7 @@ const skuRef: any = ref();
 
 const onSelectChange = (e: any) => {
     if (props.isMultiple) {
-        let idsSet:any = []
+        let idsSet: any = [];
         e.forEach((item: any) => {
             idsSet.push(item.productId);
         });
@@ -179,8 +187,8 @@ const onSelectChange = (e: any) => {
         emit("okType", selectedIds.value.length > 0);
     }
 };
-const rowInfo = ref<any>({})
-const skuVisible = ref<boolean>(false)
+const rowInfo = ref<any>({});
+const skuVisible = ref<boolean>(false);
 const selectRow = (selection: any, val: any) => {
     //手动触发该事件
     if (selection.includes(val)) {
@@ -188,7 +196,7 @@ const selectRow = (selection: any, val: any) => {
             rowInfo.value = val;
             skuVisible.value = true;
         }
-    }else{
+    } else {
         val.skuIds = [];
     }
     if (!props.isMultiple) {
@@ -211,30 +219,30 @@ const selectRow = (selection: any, val: any) => {
         sn: val.productSn,
         data: {
             id: val.productId,
-            sn: val.productSn,
+            sn: val.productSn
         }
     };
     emit("update:modelValue", val);
 };
 //监听权选
-const handleSelectAll = (selection:any) => {
+const handleSelectAll = (selection: any) => {
     //需要选择规格
     if (props.isSku) {
         if (selection.length != 0) {
-            filterState.value.map((item:any) => {
+            filterState.value.map((item: any) => {
                 let skuIds = [];
-                if(item.productSku.length > 1){
-                    skuIds = item.productSku.map((v:any) => v.skuId);
+                if (item.productSku && item.productSku.length > 1) {
+                    skuIds = item.productSku.map((v: any) => v.skuId);
                 }
                 item.skuIds = skuIds;
-            })
-        }else{
-            filterState.value.map((item:any) => {
+            });
+        } else {
+            filterState.value.map((item: any) => {
                 item.skuIds = [];
-            })
+            });
         }
     }
-}
+};
 const isSelectable = (row: any, index: number) => {
     // 排除重复项
     return !props.selectedIds?.includes(row.productId); // Column configuration not to be checked
@@ -244,30 +252,32 @@ const closeSku = () => {
     selectedIds.value = [];
     rowInfo.value = "";
     skuVisible.value = false;
-}
+};
 const submitSku = () => {
     console.log(skuRef.value.skuIds);
-    filterState.value.forEach(item => {
+    filterState.value.forEach((item) => {
         if (item.productId == rowInfo.value.productId) {
             item.skuIds = skuRef.value.skuIds;
         }
-    })
+    });
     rowInfo.value = "";
     skuVisible.value = false;
-}
+};
 // 弹窗回调
 const onFormSubmit = () => {
     // 弹窗确认按钮提交
     if (props.isSku) {
-        const selectes = filterState.value.filter(item => selectedIds.value.includes(item.productId)).map(item => {
-            const result:any = { productId: item.productId };
-            if (item.skuIds) {
-                result.skuIds = item.skuIds;
-            }
-            return result;
-        });
+        const selectes = filterState.value
+            .filter((item) => selectedIds.value.includes(item.productId))
+            .map((item) => {
+                const result: any = { productId: item.productId };
+                if (item.skuIds) {
+                    result.skuIds = item.skuIds;
+                }
+                return result;
+            });
         emit("submitCallback", selectes);
-    }else{
+    } else {
         emit("submitCallback", selectedIds.value);
     }
 };
@@ -283,7 +293,7 @@ defineExpose({
     background: #fff;
 }
 
-:deep .hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox {
+:deep(.hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox) {
     display: none;
 }
 </style>

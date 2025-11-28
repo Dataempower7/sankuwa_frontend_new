@@ -8,7 +8,7 @@
     </el-select>
 </template>
 <script setup lang="ts">
-import { defineModel, ref, toRefs, onMounted } from "vue"
+import { ref, toRefs, onMounted } from "vue"
 const value = defineModel('modelValue');   
 </script>
 <style lang="less" scoped></style>

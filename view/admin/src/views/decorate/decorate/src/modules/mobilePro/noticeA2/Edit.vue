@@ -134,7 +134,7 @@ import { SelectLink } from "@/components/select";
 import { SelectColor } from "@/components/select";
 import { PicSelect } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel, watch } from "vue";
+import { ref, watch } from "vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
 import { selectLabel } from "@/views/decorate/decorate/src/modules/editIndex";

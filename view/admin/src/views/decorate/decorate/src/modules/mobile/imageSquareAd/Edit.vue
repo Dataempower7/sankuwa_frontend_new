@@ -134,7 +134,7 @@
 import { SelectColor } from "@/components/select";
 import { imageFormat } from "@/utils/format";
 import { PicList, PicSelect } from "@/components/decorate";
-import { ref, defineModel, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import CommonTitleEdit from "../../src/commonTitle/Edit.vue";
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { ModuleType, ModuleImageType, ModulePicListType } from "@/types/decorate/decorate.d";

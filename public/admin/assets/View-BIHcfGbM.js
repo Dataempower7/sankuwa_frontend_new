@@ -1,0 +1,1 @@
+import{_ as s,g as e,h as c}from"./index-B52YIGC0.js";const t="/admin/assets/pc_index_tips-CC2wDREf.jpg",_={},n={class:"img",src:t};function o(r,a){return c(),e("img",n)}const m=s(_,[["render",o]]);export{m as default};

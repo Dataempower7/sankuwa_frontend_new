@@ -3,7 +3,7 @@
         <span>
             {{licensedStore.licensedData.shopCompany == 1 ? licensedStore.licensedData.defaultCopyright : licensedStore.licensedData.shopCompanyTxt}}
         </span>
-        <span v-if="licensedStore.licensedData.versionInfoHidden == 0">{{ licensedStore.licensedData.versionType }} v{{ licensedStore.licensedData.version }}</span>
+        <span v-if="licensedStore.licensedData.versionInfoHidden == 0">{{ licensedStore.licensedData.versionType }} {{ licensedStore.licensedData.version }}</span>
     </div>
 </template>
 <script setup lang="ts">

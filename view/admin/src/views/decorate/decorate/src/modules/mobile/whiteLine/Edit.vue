@@ -35,7 +35,7 @@
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { SelectColor } from "@/components/select";
 import { ModuleType } from "@/types/decorate/decorate.d";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 const module = defineModel<ModuleType>("module", { default: () => ({}) });
 const selectLabel = ref<any>({
     lineType: {

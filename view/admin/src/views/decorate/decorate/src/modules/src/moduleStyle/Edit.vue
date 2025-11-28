@@ -1,5 +1,5 @@
 <template>
-    <div class="dec-edit-title-box">
+    <div class="dec-edit-title-box" v-if="type !== 'storeNav'">
         <div class="title">模块样式设置</div>
     </div>
     <div class="dec-edit-group" v-if="type === 'noticeA2'">
@@ -66,7 +66,7 @@
             </div>
         </div>
     </div>
-    <div class="dec-edit-group" v-if="type !== 'article' && type !== 'banner' && type !== 'ComboSuggestionsEdit' && type !== 'noticeA2' && type !== 'mixedProductDisplay'">
+    <div class="dec-edit-group" v-if="type !== 'article' && type !== 'banner' && type !== 'ComboSuggestionsEdit' && type !== 'noticeA2' && type !== 'mixedProductDisplay' && type !== 'storeNav'">
         <div class="dec-edit-group-title">
             <div class="label">模块背景图片</div>
         </div>
@@ -78,7 +78,7 @@
             </div>
         </div>
     </div>
-    <div class="dec-edit-group" v-if="type !== 'article' && type !== 'banner' && type !== 'ComboSuggestionsEdit' && type !== 'noticeA2' && type !== 'mixedProductDisplay'">
+    <div class="dec-edit-group" v-if="type !== 'article' && type !== 'banner' && type !== 'ComboSuggestionsEdit' && type !== 'noticeA2' && type !== 'mixedProductDisplay' && type !== 'storeNav'">
         <div class="dec-edit-group-title">
             <div class="label">图片填充</div>
             <div class="value">{{ selectLabel.picFillType[moduleStyle.backgroundPicFillType as PicFillType] }}</div>

@@ -4,14 +4,28 @@
             <el-col :span="24">
                 <div class="info-row">
                     <div class="title flex">
-                        <div>店铺管理</div>
+                        <div>{{ getShopType() === 1 ? "店铺管理" : "门店管理" }}</div>
                         <div>
                             <DialogForm
+                                v-if="getShopType() === 1"
                                 :params="{ act: 'detail' }"
                                 isDrawer
                                 path="merchant/setting/shopInfo/Info"
                                 title="编辑店铺信息"
                                 width="600px"
+                                @okCallback="loadFilter"
+                            >
+                                <div style="text-align: center">
+                                    <el-button type="primary" link>编辑</el-button>
+                                </div>
+                            </DialogForm>
+                            <DialogForm
+                                v-if="getShopType() === 2"
+                                :params="{ act: 'detail', id: shopInfo.shopId }"
+                                isDrawer
+                                path="store/adminPages/store/Info"
+                                title="编辑门店"
+                                width="950px"
                                 @okCallback="loadFilter"
                             >
                                 <div style="text-align: center">
@@ -25,7 +39,13 @@
                             <div class="cell flex">
                                 <div class="logo">
                                     <el-image style="width: 72px; height: 72px" v-if="shopInfo.shopLogo" :src="imageFormat(shopInfo.shopLogo)" fit="cover" />
-                                    <img class="logo_img" style="width: 72px; height: 72px" v-if="shopInfo.shopLogo" src="@/assets/logo/merchant_logo.png" fit="cover" />
+                                    <img
+                                        class="logo_img"
+                                        style="width: 72px; height: 72px"
+                                        v-if="shopInfo.shopLogo"
+                                        src="@/assets/logo/merchant_logo.png"
+                                        fit="cover"
+                                    />
                                 </div>
                                 <div class="txt-content">
                                     <div class="name-box">
@@ -61,7 +81,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="label">
-                                                    <div class="tit">店铺简介：</div>
+                                                    <div class="tit">{{ getShopType() === 1 ? "店铺简介" : "门店简介" }}：</div>
                                                     <div class="txt">
                                                         {{ shopInfo.description || "--" }}
                                                     </div>
@@ -162,6 +182,7 @@
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import { getShopType } from "@/utils/storage";
 import { ref, onMounted, computed } from "vue";
 import { DialogForm } from "@/components/dialog";
 import { QuestionFilled } from "@element-plus/icons-vue";

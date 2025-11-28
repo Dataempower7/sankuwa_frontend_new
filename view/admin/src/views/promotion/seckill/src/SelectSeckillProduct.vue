@@ -60,12 +60,11 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { defineModel, onMounted, reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import { DialogForm } from "@/components/dialog";
 import { imageFormat } from "@/utils/format";
 import { getProduct } from "@/api/product/product";
 import { message } from "ant-design-vue";
-import { useConfigStore } from "@/store/config";
 import type { SeckillProductState } from "@/types/promotion/seckill";
 // 传值
 const productId = defineModel<Number>("productId", { default: () => (0) });

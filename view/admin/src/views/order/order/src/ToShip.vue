@@ -19,7 +19,7 @@
                         <!-- <el-form-item label="配送类型" prop="shippingTypeId">
                             <ShippingType v-model:id="formState.shippingTypeId" @change="onChangeShippingType"></ShippingType>
                         </el-form-item> -->
-                        <el-form-item label="物流公司" prop="logisticsId">
+                        <el-form-item label="物流公司" prop="logisticsId" :rules="[ { required: formState.shippingMethod == 4 ? true : false, message: '请选择物流公司' } ]">
                             <SelectLogisticsCompany v-model:logisticsId="formState.logisticsId"></SelectLogisticsCompany>
                         </el-form-item>
                         <el-form-item v-if="formState.shippingMethod === 1" label="快递单号" prop="trackingNo">
@@ -44,7 +44,7 @@
                         </el-table-column>
                         <el-table-column label="属性" prop="productAttr">
                             <template #default="{ row }">
-                                {{ row.skuValue || "无属性" }}
+                                {{ row.skuValue || "-" }}
                             </template>
                         </el-table-column>
                         <el-table-column label="附加规格" prop="extraSkuData">
@@ -52,7 +52,7 @@
                                 <div v-if="row.extraSkuData && row.extraSkuData.length > 0" class="extraskudata" v-for="item in row.extraSkuData" :key="item">
                                     {{ item.attrName + item.attrValue + priceFormat(item.totalAttrPrice) }}
                                 </div>
-                                <div v-else>无附加规格</div>
+                                <div v-else>-</div>
                             </template>
                         </el-table-column>
                         <el-table-column label="商品编号" prop="productSn" />
@@ -90,6 +90,7 @@ import { getOrder, orderDeliver } from "@/api/order/order";
 import { ProductCard } from "@/components/list";
 import { SelectLogisticsCompany, ShippingType } from "@/components/select";
 import { imageFormat, priceFormat } from "@/utils/format";
+import { ru } from "element-plus/es/locale";
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close", "okType"]);
 
 emit("okType", false);
@@ -181,7 +182,6 @@ const deliverDo = async () => {
     await formRef.value.validate();
     try {
         emit("update:confirmLoading", true);
-        console.log(deliverData.value);
         const result = await orderDeliver({
             id: id.value,
             deliverData: deliverData.value,

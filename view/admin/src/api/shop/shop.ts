@@ -1,7 +1,7 @@
 import request from "@/utils/request";
 import type {ShopFilterResult, ShopFormResult, ShopFormState} from "@/types/shop/shop.d";
 // 获取商家列表
-export const getShopList = (params: object) => {
+export const getShopList = (params: any) => {
     return request<ShopFilterResult>({
         url: "merchant/shop/list",
         method: "get",
@@ -27,7 +27,7 @@ export const batchSubmit = (type: string, data: object) => {
 // 商家列表页面删除项
 export const delShop = (data: object) => {
     return request({
-        url: "store/store/del",
+        url: "merchant/shop/delShop",
         method: "post",
         data,
     });
@@ -90,5 +90,24 @@ export const updateShopSettlement = (data: object) => {
         url: "order/config/save",
         method: "post",
         data
+    });
+}
+
+// 是否平台分配的商品
+export const getPlatformAllocation = (params: object) => {
+    return request<any>({
+        url: "merchant/shop/isPlatformAllocation",
+        method: "get",
+        params
+    });
+}
+
+
+// 商品id查询对应的已分配门店
+export const getStoreListByProductId = (params: object) => {
+    return request<any>({
+        url: "merchant/shop/getStoreListByProductId",
+        method: "get",
+        params
     });
 }

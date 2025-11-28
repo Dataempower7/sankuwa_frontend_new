@@ -5,8 +5,8 @@
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
                         <el-form-item label="店铺状态" prop="status">
                             <el-radio-group v-model="formState.status">
-                                <el-radio-button label="暂停运营" :value="4" />
-                                <el-radio-button label="运营中" :value="1" />
+                                <el-radio-button label="停业" :value="4" />
+                                <el-radio-button label="开业" :value="1" />
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="店铺名称" prop="shopTitle" :rules="[{ required: true, message: '店铺名称不能为空!' }]">
@@ -62,6 +62,7 @@ const id = ref<number>(props.isDialog ? props.id : Number(query.id));
 const operation = action.value === 'add' ? 'create' : 'update';
 const formRef = shallowRef();
 const formState = ref<ShopFormState>({
+    shopType: 1
 });
 const fetchShopInfo = async () => {
     try {

@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import "@/style/css/list.less";
-import { onMounted, reactive, ref } from "vue";
+import { nextTick, onMounted, reactive, ref } from "vue";
 import { message } from "ant-design-vue";
 import { Pagination } from "@/components/list";
 import { useConfigStore } from "@/store/config";
@@ -82,6 +82,10 @@ const props = defineProps({
     index: {
         type: Number,
         default: 0
+    },
+    buyShowSelectedIds: {
+        type: Array,
+        default: []
     }
 });
 const emit = defineEmits(["submitCallback", "okType", "update:modelValue"]);
@@ -106,6 +110,18 @@ const loadFilter = async () => {
         const result = await getProductGroupList({ ...filterParams });
         filterState.value = result.records;
         total.value = result.total;
+        // 如果 buyShowSelectedIds 有值，则自动勾选对应行
+        if (props.buyShowSelectedIds && props.buyShowSelectedIds.length > 0) {
+            const buyShowSelectedIds = props.buyShowSelectedIds?.map(item => item?.productGroupId || item)
+            // 等待 DOM 更新后执行勾选操作
+            nextTick(() => {
+                filterState.value.forEach(row => {
+                    if (buyShowSelectedIds.includes(row.productGroupId)) {
+                        tableRef.value.toggleRowSelection(row, true);
+                    }
+                });
+            });
+        }
     } catch (error: any) {
         message.error(error.message);
     } finally {
@@ -148,8 +164,13 @@ const selectRow = (selection: any, val: any) => {
     emit("update:modelValue", val);
 };
 const isSelectable = (row: any, index: number) => {
-    // 排除重复项
-    return !props.selectedIds?.includes(row.productGroupId); // Column configuration not to be checked
+    // 买家秀修改商品分组，回显已选择的商品，不禁用选择
+    if(props.buyShowSelectedIds?.length) {
+        return true;
+    } else {
+        // 排除重复项
+        return !props.selectedIds?.includes(row.productGroupId); // Column configuration not to be checked
+    }
 };
 
 // 弹窗回调
@@ -166,7 +187,7 @@ defineExpose({
     background: #fff;
 }
 
-:deep .hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox {
+:deep(.hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox) {
     display: none;
 }
 </style>

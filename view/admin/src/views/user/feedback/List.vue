@@ -100,6 +100,7 @@
                                 <template #default="{ row }">
                                     <p>{{ row.typeName }}</p>
                                     <DialogForm
+                                        v-if="row.orderSn"
                                         :params="{ act: 'detail', id: row.orderId }"
                                         :showClose="false"
                                         :showOnOk="false"
@@ -110,7 +111,7 @@
                                         width="880px"
                                         @callback="loadFilter"
                                     >
-                                        <a v-if="row.orderSn">
+                                        <a>
                                             {{ row.orderSn }}
                                         </a>
                                     </DialogForm>
@@ -128,7 +129,6 @@
                                 </template>
                             </el-table-column>
                             <el-table-column :width="160" label="留言时间" prop="addTime"></el-table-column>
-                            <!-- <el-table-column :width="100" label="状态" prop="statusName"></el-table-column> -->
                             <el-table-column :width="80" label="回复" prop="statusName"></el-table-column>
                             <el-table-column :width="150" fixed="right" label="操作">
                                 <template #default="{ row }">

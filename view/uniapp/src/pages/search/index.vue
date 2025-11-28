@@ -6,7 +6,7 @@
                 <view class="back-btn" @click="handleBack">
                    <image style="    width: 50rpx;    height: 50rpx;" src="/static/images/common/trolley_icon_back@3x.png" mode="aspectFit" />
                 </view>
-                <view class="search-container">
+                <view class="search-container" :class="{ 'non-wechat': !isWechatEcosystem }">
                     <view class="search-box">
                         <image class="search-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
                         <input
@@ -32,9 +32,9 @@
                     <view class="title">
                         {{ $t("热门搜索") }}
                     </view>
-                    <view class="list acea-row">
+                    <view class="list">
                         <template v-for="(item, index) in hotKeywords" :key="index">
-                            <view class="item line1" @click="handleSearch(item)">{{ item }}</view>
+                            <view class="item" @click="handleSearch(item)">{{ item }}</view>
                         </template>
                     </view>
                 </view>
@@ -49,9 +49,9 @@
                             <image src="/static/images/search/del.png" class="del-icon" />
                         </view>
                     </view>
-                    <view class="list acea-row">
+                    <view class="list">
                         <template v-for="(item, index) in searchHistory" :key="index">
-                            <view class="item line1" @click="handleSearch(item)">{{ item }}</view>
+                            <view class="item" @click="handleSearch(item)">{{ item }}</view>
                         </template>
                     </view>
                 </view>
@@ -61,13 +61,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useI18n } from "vue-i18n";
 import { redirect } from "@/utils";
 import { getHotKeywords } from "@/api/search/search";
+import { useConfigStore } from "@/store/config";
 
 const { t } = useI18n();
+const configStore = useConfigStore();
+
+// 判断是否为微信生态
+const isWechatEcosystem = computed(() => {
+    return configStore.XClientType === 'wechat' || configStore.XClientType === 'miniProgram';
+});
 
 const navbarTitle = ref("搜索商品");
 
@@ -98,6 +105,14 @@ onLoad((options: any) => {
             shopId.value = options.shopId;
             navbarTitle.value = "店铺搜索";
         }
+        // 如果有关键词参数，自动填充并搜索
+        if (options.keyword) {
+            keyWords.value = decodeURIComponent(options.keyword);
+            // 延迟执行搜索，确保页面已加载完成
+            setTimeout(() => {
+                handleSearch(keyWords.value);
+            }, 100);
+        }
     }
     if (uni.getStorageSync("searchHistory")) {
         searchHistory.value = uni.getStorageSync("searchHistory");
@@ -108,12 +123,6 @@ onLoad((options: any) => {
 });
 const searchSubmit = () => {
     if (keyWords.value) {
-        searchHistory.value.unshift(keyWords.value);
-        searchHistory.value = [...new Set(searchHistory.value)];
-        if (searchHistory.value.length > 10) {
-            searchHistory.value.splice(10, searchHistory.value.length - 10);
-        }
-        uni.setStorageSync("searchHistory", searchHistory.value);
         handleSearch(keyWords.value);
     } else {
         uni.showToast({
@@ -128,6 +137,17 @@ const clearHistory = () => {
 };
 
 const handleSearch = (item: any) => {
+    // 保存到历史搜索（去重且限制数量）
+    if (item) {
+        searchHistory.value.unshift(item);
+        searchHistory.value = [...new Set(searchHistory.value)]; // 去重
+        if (searchHistory.value.length > 10) {
+            searchHistory.value.splice(10, searchHistory.value.length - 10);
+        }
+        uni.setStorageSync("searchHistory", searchHistory.value);
+    }
+    
+    // 跳转到搜索结果页
     let url = `/pages/search/result?keyWords=${item}`;
     shopId.value && (url += `&shopId=${shopId.value}`);
     redirect({
@@ -190,6 +210,11 @@ page {
     flex: 1;
     margin-left: -5rpx;
     margin-right: 70px;
+    
+    // 非微信生态下，减少右侧 margin，让搜索框变长
+    &.non-wechat {
+        margin-right: 0;
+    }
 }
 
 .search-box {
@@ -249,7 +274,10 @@ page {
     position: relative;
 }
 .search_init_box .list {
-    padding-left: 10rpx;
+    padding: 0 30rpx;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20rpx;
 }
 .search_init_box .list .item {
     font-size: 32rpx;
@@ -258,8 +286,11 @@ page {
     height: 68rpx;
     border-radius: 34rpx;
     line-height: 68rpx;
-    margin: 0 0 24rpx 20rpx;
     background: #f6f6f6;
+    max-width: 400rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .clear_history {

@@ -9,16 +9,12 @@
                                 <div class="simple-form-field">
                                     <div class="form-group">
                                         <div class="control-container">
-                                            <TigInput
-                                                v-model="filterParams.keyword"
-                                                name="keyword"
-                                                placeholder="输入店铺名称"
-                                                @keyup.enter="onSearchSubmit"
-                                                clearable
-                                                @clear="onSearchSubmit"
-                                            >
+                                            <TigInput v-model="filterParams.keyword" name="keyword"
+                                                :placeholder="`输入${shopTypeName}名称`" @keyup.enter="onSearchSubmit"
+                                                clearable @clear="onSearchSubmit">
                                                 <template #append>
-                                                    <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span> </el-button>
+                                                    <el-button @click="onSearchSubmit"><span
+                                                            class="iconfont icon-chakan1"></span> </el-button>
                                                 </template>
                                             </TigInput>
                                         </div>
@@ -27,13 +23,9 @@
                                 <div class="simple-form-field">
                                     <div class="form-group">
                                         <label class="control-label"><span>时间范围：</span></label>
-                                        <SelectTimeInterval
-                                            v-model:end-date="filterParams.endTime"
-                                            v-model:start-date="filterParams.startTime"
-                                            :clearable="false"
-                                            type="date"
-                                            value-format="YYYY-MM-DD"
-                                        ></SelectTimeInterval>
+                                        <SelectTimeInterval v-model:end-date="filterParams.endTime"
+                                            v-model:start-date="filterParams.startTime" :clearable="false" type="date"
+                                            value-format="YYYY-MM-DD"></SelectTimeInterval>
                                     </div>
                                 </div>
                                 <div class="simple-form-field">
@@ -47,31 +39,49 @@
                     </div>
                     <div class="table-container">
                         <a-spin :spinning="loading">
-                            <el-table :data="filterState" :loading="loading" :total="total" row-key="shopId" @sort-change="onSortChange">
+                            <el-table :data="filterState" :loading="loading" :total="total" row-key="shopId"
+                                @sort-change="onSortChange">
                                 <el-table-column label="账户变动时间">
                                     <template #default="{ row }">
                                         {{ row.addTime || "--" }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="店铺名称">
+                                <el-table-column :label="`${shopTypeName}名称`">
                                     <template #default="{ row }">
                                         {{ row.shopTitle || "--" }}
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="变动资金账户">
                                     <template #default="{ row }">
-                                        <span v-if="row.type == 1" style="color: #0000ff">+{{ row.changeAmount }}</span>
+                                        <span v-if="row.newShopMoney - row.changeAmount > 0" style="color: #0000ff">+{{
+                                            (row.newShopMoney - row.changeAmount).toFixed(2) }}</span>
+                                        <span v-else-if="row.newShopMoney - row.changeAmount == 0">0</span>
+                                        <span v-else style="color: #ff0000">-{{ (row.changeAmount -
+                                            row.newShopMoney).toFixed(2) }}</span>
+                                        <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{
+                                            row.newShopMoney }}）</span>
+                                        <!-- <span v-if="(row.type == 1|| row.type == 4) && row.changeAmount > 0" style="color: #0000ff">+{{ row.changeAmount }}</span>
                                         <span v-else-if="row.type == 2" style="color: #ff0000">-{{ row.changeAmount }}</span>
                                         <span v-else>{{ row.changeAmount }}</span>
-                                        <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newShopMoney }}）</span>
+                                        <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newShopMoney }}）</span> -->
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="冻结资金账户" width="250">
                                     <template #default="{ row }">
-                                        <span v-if="row.type == 1" style="color: #0000ff">+{{ row.frozenMoney }}</span>
+                                        <span v-if="row.newFrozenMoney - row.frozenMoney > 0" style="color: #0000ff">+{{
+                                            (row.newFrozenMoney - row.frozenMoney).toFixed(2) }}</span>
+                                        <span v-else-if="row.newFrozenMoney - row.frozenMoney == 0">0</span>
+                                        <span v-else style="color: #ff0000">-{{ (row.frozenMoney -
+                                            row.newFrozenMoney).toFixed(2) }}</span>
+                                        <span v-if="row.newFrozenMoney" style="color: #999; font-size: 12px">（变更后金额:{{
+                                            row.newFrozenMoney }}）</span>
+                                        <!-- 
+                                        <span v-if="(row.type == 1 || row.type == 4) && row.frozenMoney > 0" style="color: #0000ff"
+                                            >+{{ row.frozenMoney }}</span
+                                        >
                                         <span v-else-if="row.type == 2" style="color: #ff0000">-{{ row.frozenMoney }}</span>
                                         <span v-else>{{ row.frozenMoney }}</span>
-                                        <span v-if="row.newFrozenMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newFrozenMoney }}）</span>
+                                        <span v-if="row.newFrozenMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newFrozenMoney }}）</span> -->
                                     </template>
                                 </el-table-column>
                                 <template #empty>
@@ -82,15 +92,14 @@
                             </el-table>
                         </a-spin>
                         <div v-if="total > 0" class="pagination-con">
-                            <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                            <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                                @callback="loadFilter" />
                         </div>
                     </div>
                     <div v-if="selectedIds.length > 0" class="selected-action-warp selected-warp-left">
                         <div class="selected-action">
                             <el-space>
-                                <span
-                                    >已选择：<b>{{ selectedIds.length }}</b> 项</span
-                                >
+                                <span>已选择：<b>{{ selectedIds.length }}</b> 项</span>
                                 <el-popconfirm title="您确认要批量删除所选数据吗？" @confirm="onBatchSubmit('del')">
                                     <template #reference>
                                         <el-button>批量删除</el-button>
@@ -117,6 +126,9 @@ import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { SelectTimeInterval } from "@/components/select";
 import { useListRequest } from "@/hooks/useListRequest";
+import { getShopType } from "@/utils/storage";
+import { isStore } from "@/utils/version";
+const shopTypeName = isStore() ? "门店" : "店铺";
 const query = useRouter().currentRoute.value.query;
 const props = defineProps({ shopId: { type: Number, default: 0 } });
 const config: any = useConfigStore();
@@ -142,7 +154,8 @@ const {
         keyword: "",
         shopId: props.shopId || "",
         endTime: "",
-        startTime: ""
+        startTime: "",
+        shopType: getShopType() === 1 ? 1 : 2
     }
 });
 // 批量操作
@@ -160,7 +173,7 @@ const handleSwitchChange = (params: any) => {
             const result = updateShopFiled({ ...data, id: row.shopId, val: row.status });
             message.success("修改成功");
         })
-        .catch(() => {});
+        .catch(() => { });
 };
 const okCallback = () => {
     clearUrlParams();
@@ -206,7 +219,7 @@ onMounted(() => {
     width: 150px;
 }
 
-.status-switch > div {
+.status-switch>div {
     word-break: keep-all;
     display: flex;
     flex-wrap: nowrap;
@@ -215,7 +228,8 @@ onMounted(() => {
 
 .display-col {
     display: flex;
-    align-items: center; /* 垂直居中 */
+    align-items: center;
+    /* 垂直居中 */
     gap: 8px;
 
     .image {
@@ -225,7 +239,8 @@ onMounted(() => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
@@ -238,37 +253,48 @@ onMounted(() => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
     .text {
-        flex-grow: 1; /* 占据剩余空间 */
-        white-space: nowrap; /* 不换行 */
-        overflow: hidden; /* 隐藏超出部分 */
-        text-overflow: ellipsis; /* 超出显示省略号 */
-        margin-left: 8px; /* 与左侧图片的间距 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
+        white-space: nowrap;
+        /* 不换行 */
+        overflow: hidden;
+        /* 隐藏超出部分 */
+        text-overflow: ellipsis;
+        /* 超出显示省略号 */
+        margin-left: 8px;
+        /* 与左侧图片的间距 */
     }
 
     .text_comment {
-        flex-grow: 1; /* 占据剩余空间 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
     }
 }
 
 .multiline_hiding {
-    height: 3.6em; /* 基于字体大小的高度, 3行文本高度 */
+    height: 3.6em;
+    /* 基于字体大小的高度, 3行文本高度 */
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* 限制在3行 */
+    -webkit-line-clamp: 3;
+    /* 限制在3行 */
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
-    line-height: 1.2em; /* 调整这个值以匹配你的字体大小 */
+    line-height: 1.2em;
+    /* 调整这个值以匹配你的字体大小 */
 }
 
 .green {
     margin-left: 8px;
     color: green !important;
 }
+
 .grey {
     margin-left: 8px;
     color: #999 !important;

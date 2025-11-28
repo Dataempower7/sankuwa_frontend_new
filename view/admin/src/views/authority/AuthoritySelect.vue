@@ -114,7 +114,8 @@ import { message } from "ant-design-vue";
 import { ArrowDown, SemiSelect, Select } from "@element-plus/icons-vue";
 
 const props = defineProps({
-    modelValue: { type: Array, default: [] }
+    modelValue: { type: Array, default: [] },
+    adminType: { type: String, default: "" }
 });
 const loading = ref<boolean>(true);
 const checkAll = ref(false);
@@ -296,7 +297,7 @@ const emit = defineEmits(["update:modelValue"]);
 const authorityList = ref<AuthorityFormState[]>([]);
 const getAllAuthorityList = async () => {
     try {
-        const result = await getAllAuthority({ type: 1 });
+        const result = await getAllAuthority({ type: 1, adminType: props.adminType });
         authorityList.value = result;
     } catch (error: any) {
         message.error(error.message);

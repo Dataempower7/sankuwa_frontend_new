@@ -23,6 +23,32 @@ export default {
                     component: () => import("@/views/content/articleCategory/List.vue")
                 }
             ]
+        },
+        {
+            path: "",
+            name: "protocolManagement",
+            meta: { title: "协议管理" },
+            redirect: "/content/service-agreement/list",
+            children: [
+                {
+                    path: "service-agreement/list",
+                    name: "serviceAgreement",
+                    meta: { title: "服务协议" },
+                    component: () => import("@/views/content/agreement/ServiceAgreement.vue")
+                },
+                {
+                    path: "privacy-agreement/list",
+                    name: "privacyAgreement",
+                    meta: { title: "隐私政策" },
+                    component: () => import("@/views/content/agreement/PrivacyAgreement.vue")
+                },
+                {
+                    path: "after-sale-service/list",
+                    name: "afterSaleService",
+                    meta: { title: "售后服务" },
+                    component: () => import("@/views/content/agreement/AfterSaleService.vue")
+                }
+            ]
         }
     ]
 };

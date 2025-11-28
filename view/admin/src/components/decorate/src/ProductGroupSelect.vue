@@ -125,7 +125,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import { Edit } from "@element-plus/icons-vue";
 import { PicSelect } from "@/components/decorate";
 import { SelectLink } from "@/components/select";
@@ -137,13 +137,17 @@ import { message } from "ant-design-vue";
 import { ProductGroupsType } from "@/types/decorate/decorate.d";
 import { min } from "lodash-es";
 const props = defineProps({
-    isMultiple: {
+    productIds: {
         type: Boolean,
         default: false
     },
     type: {
         type: String,
         default: "goods"
+    },
+    isMultiple: {
+        type: Boolean,
+        default: false
     }
 });
 const groupIds = ref<number[]>([]);
@@ -169,7 +173,7 @@ const loadFilter = async (ids: any[], index?: number = -1, size?: number = 6) =>
                     subTitle: "",
                     menuTitle: item.productGroupName,
                     productNumType: "number",
-                    productNum: 6,
+                    productNum: item.productIds?.length || 6,
                     bannerPic: {},
                     bannerLink: {
                         link: {},
@@ -178,7 +182,7 @@ const loadFilter = async (ids: any[], index?: number = -1, size?: number = 6) =>
                 };
                 arr.push(data);
             });
-            productGroups.value.push(...arr);
+            productGroups.value = [...productGroups.value, ...arr];
         } else {
             productGroups.value[index].productGroupId = result.records[0].productGroupId;
             productGroups.value[index].productGroupName = result.records[0].productGroupName;

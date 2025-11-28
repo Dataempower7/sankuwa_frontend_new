@@ -1,10 +1,10 @@
 <template>
     <div class="container">
         <div class="content_wrapper">
-            <el-tabs v-if="isMerchant()" v-model="activeKey" class="lyecs-tabs" tab-position="top" @tab-change="onTabChange">
+            <!-- <el-tabs v-if="isMerchant()" v-model="activeKey" class="lyecs-tabs" tab-position="top" @tab-change="onTabChange">
                 <el-tab-pane label="管理员列表" name="admin"></el-tab-pane>
                 <el-tab-pane label="店铺管理员列表" name="shop"></el-tab-pane>
-            </el-tabs>
+            </el-tabs> -->
             <div class="lyecs-table-list-warp">
                 <div class="list-table-tool lyecs-search-warp">
                     <div class="list-table-tool-row">
@@ -15,7 +15,7 @@
                                         <TigInput
                                             v-model="filterParams.keyword"
                                             name="keyword"
-                                            :placeholder="activeKey == 'shop' ? '输入员工名称' : '输入管理员名称'"
+                                            :placeholder="'输入管理员名称'"
                                             @keyup.enter="onSearchSubmit"
                                             clearable
                                             @clear="onSearchSubmit"
@@ -27,7 +27,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="simple-form-field" v-if="activeKey !== 'shop'">
+                            <div class="simple-form-field" v-if="activeKey == 'admin'">
                                 <div class="form-group">
                                     <DialogForm
                                         :params="{ act: 'add', type: action ? action : '', suppliersId: id ? id : 0, adminType: activeKey }"
@@ -69,7 +69,7 @@
                             @sort-change="onSortChange"
                         >
                             <el-table-column type="selection" width="32" />
-                            <el-table-column width="200" :label="activeKey == 'shop' ? '员工名称' : '管理员名称'" prop="username">
+                            <el-table-column width="200" :label="activeKey == 'vendor' ? '供应商' : '管理员名称'" prop="username">
                                 <template #default="{ row }">
                                     <div class="avatar-username">
                                         <template v-if="extractContent(String(row.avatar)) == 'one'">
@@ -90,7 +90,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="权限组" prop="roleName" v-if="activeKey != 'shop'">
+                            <el-table-column label="权限组" prop="roleName" v-if="activeKey == 'admin'">
                                 <template #default="{ row }">
                                     <span :class="row.roleName ? 'green' : 'gray'">{{ row.roleName || "-" }}</span>
                                 </template>
@@ -108,6 +108,11 @@
                                     <span v-else>--</span>
                                 </template>
                             </el-table-column>
+                            <el-table-column label="添加时间" prop="addTime">
+                                <template #default="{ row }">
+                                    {{ row.addTime || "--" }}
+                                </template>
+                            </el-table-column>
                             <el-table-column :width="150" fixed="right" label="操作">
                                 <template #default="{ row }">
                                     <DialogForm
@@ -122,7 +127,7 @@
                                     </DialogForm>
                                     <template>
                                         <el-divider direction="vertical" />
-                                        <a v-if="activeKey != 'shop'" class="btn-link" @click="toPage(row.adminId)">日志</a>
+                                        <a v-if="activeKey == 'admin'" class="btn-link" @click="toPage(row.adminId)">日志</a>
                                     </template>
                                     <el-divider direction="vertical" v-if="row.adminId != 1" />
                                     <DeleteRecord v-if="row.adminId != 1" :params="{ id: row.adminId }" :requestApi="delAdminUser" @afterDelete="loadFilter"

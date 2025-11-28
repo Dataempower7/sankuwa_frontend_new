@@ -17,6 +17,12 @@ export default {
                     component: () => import("@/views/authority/adminUser/List.vue")
                 },
                 {
+                    path: "admin-account-manage/list",
+                    name: "accountManage",
+                    meta: { title: "账号管理" },
+                    component: () => import("@/views/authority/accountManage/List.vue")
+                },
+                {
                     path: "admin-role/list",
                     name: "adminRoleManage",
                     meta: { title: "角色列表" },
@@ -31,20 +37,19 @@ export default {
             ]
         },
 
-        {
-            path: "",
-            name: "suppliers",
-            meta: { title: "供应商" },
-            redirect: "/authority/suppliers/list",
-            children: [
-                {
-                    path: "suppliers/list",
-                    name: "suppliersManage",
-                    meta: { title: "供应商列表" },
-                    component: () => import("@/views/authority/suppliers/List.vue")
-                }
-            ]
-        },
+        // {
+        //     path: "",
+        //     name: "suppliers",
+        //     meta: { title: "供应商" },
+        //     children: [
+        //         {
+        //             path: "suppliers/list",
+        //             name: "suppliersManage",
+        //             meta: { title: "供应商列表" },
+        //             component: () => import("@/views/authority/suppliers/List.vue")
+        //         }
+        //     ]
+        // },
 
         {
             path: "",

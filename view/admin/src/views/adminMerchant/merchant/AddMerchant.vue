@@ -16,7 +16,7 @@
         </div>
     </div>
     <el-form v-if="!loading" ref="formStateRef" :model="formState" label-width="auto">
-        <el-form-item>
+        <el-form-item v-if="action !== 'detail'">
             <template #label>
                 <span class="required">*</span>绑定账号
             </template>
@@ -32,6 +32,7 @@
                             :disabled="!adminType"
                             filterable
                             remote
+                            clearable
                             reserve-keyword
                             placeholder="可输入手机号查询绑定管理员"
                             :remote-method="remoteMethod"
@@ -56,6 +57,7 @@
                             :disabled="adminType"
                             filterable
                             remote
+                            clearable
                             reserve-keyword
                             placeholder="可输入手机号查询绑定会员"
                             :remote-method="remoteMethod"
@@ -182,7 +184,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="经营地址" prop="merchantData.businessAddress">
-                    <SelectRegion v-if="!loading" v-model="formState.merchantData.businessAddress"></SelectRegion>
+                    <SelectRegion v-if="!loading" v-model:selectedIds="formState.merchantData.businessAddress"></SelectRegion>
                 </el-form-item>
                 <el-form-item label="详细地址" prop="merchantData.detailedAddress">
                     <TigInput width="100%" v-model="formState.merchantData.detailedAddress" placeholder="请输入详细地址" type="textarea"></TigInput>
@@ -196,8 +198,6 @@
                         必须为彩色图片且小于2M，若为复印件，需加盖公司红章。
                     </div>
                 </el-form-item>
-
-
                 <el-form-item  label="联系人姓名" prop="merchantData.contactName">
                     <TigInput width="100%" v-model="formState.merchantData.contactName"></TigInput>
                     <div class="extra">
@@ -235,7 +235,7 @@
                     <TigInput width="100%" v-model="formState.baseData.companyName" ></TigInput>
                 </el-form-item>
                 <el-form-item class="form-item" label="注册地址" prop="baseData.licenseAddrProvince">
-                    <SelectRegion v-if="!loading" v-model="formState.baseData.licenseAddrProvince"></SelectRegion>
+                    <SelectRegion v-if="!loading" v-model:selectedIds="formState.baseData.licenseAddrProvince"></SelectRegion>
                 </el-form-item>
                 <el-form-item class="form-item" label="详细地址" prop="baseData.businessLicenseAddress">
                     <TigInput width="100%" :autosize="{ minRows: 2, maxRows:6 }" v-model="formState.baseData.businessLicenseAddress"  type="textarea"></TigInput>
@@ -305,14 +305,14 @@
     <a-spin :spinning="loading" style="width:100%;margin-top:100px" />
 </template>
 <script setup lang="ts">
-import { ref, shallowRef, watch } from "vue";
+import { ref, shallowRef, watch, onMounted } from "vue";
 import { RadioType } from "@/components/radio";
 
 import { MerchantFormState } from "@/types/adminMerchant/merchant";
 import { message } from "ant-design-vue";
 import { FormAddGallery } from "@/components/gallery";
 import { SelectRegion } from "@/components/select";
-import { updateMerchant } from "@/api/adminMerchant/merchant";
+import { updateMerchant, getMerchant } from "@/api/adminMerchant/merchant";
 import { useRouter } from "vue-router";
 import { getAdminUserList } from "@/api/authority/adminUser";
 import { getUserList } from "@/api/user/user";
@@ -442,7 +442,7 @@ watch(
 watch(
     () => formState.value.baseData.documentNumber,
     (val) => {
-        if (formState.value.baseData.documentType == 1 && val.length >= 18) {
+        if (formState.value.baseData.documentType == 1 && val && val.length >= 18) {
             let temp = val.substr(6, 8);
             formState.value.baseData.birthday = temp.slice(0, 4) + "-" + temp.slice(4, 6) + "-" + temp.slice(6, 8);
             let genderIndicator = parseInt(val.substr(val.length - 2, 1), 10);
@@ -475,6 +475,40 @@ const action = ref<string>(props.isDialog ? props.act : String(query.act));
 const id = ref<number>(props.isDialog ? props.id : Number(query.id));
 const operation = action.value === "add" ? "create" : "update";
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
+
+const fetchMerchant = async () => {
+    try {
+        const result = await getMerchant(action.value, { id: id.value });
+        formState.value = result;
+        if(formState.value.baseData.frontOfPhoto && formState.value.baseData.frontOfPhoto.length > 0){
+            formState.value.baseData.frontOfPhotoTemp = formState.value.baseData.frontOfPhoto[0].picUrl;
+        }
+        if(formState.value.baseData.backOfPhoto && formState.value.baseData.backOfPhoto.length > 0){
+            formState.value.baseData.backOfPhotoTemp = formState.value.baseData.backOfPhoto[0].picUrl;
+        }
+        if(formState.value.merchantData.businessLicenseImg && formState.value.merchantData.businessLicenseImg.length > 0){
+            formState.value.merchantData.businessLicenseImgTemp = formState.value.merchantData.businessLicenseImg[0].picUrl;
+        }
+        if(formState.value.merchantData.accountOpeningPermit && formState.value.merchantData.accountOpeningPermit.length > 0){
+            formState.value.merchantData.accountOpeningPermitTemp = formState.value.merchantData.accountOpeningPermit[0].picUrl;
+        }
+    } catch (error: any) {
+        message.error(error.message);
+        emit("close");
+    } finally {
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    if (action.value === "detail") {
+        // 获取详情数据
+        fetchMerchant();
+    } else {
+        adminType.value = true;
+        loading.value = false;
+    }
+});
 // 表单通过验证后提交
 const onSubmit = async () => {
     await formStateRef.value.validate();
@@ -487,14 +521,16 @@ const onSubmit = async () => {
         formState.value.merchantData.accountOpeningPermit = [{ picUrl: formState.value.merchantData.accountOpeningPermitTemp }];
         let tempData: any = {
             ...formState.value,
-            admin: {
-                type: adminType.value ? 2 : 1,
-                userId: formState.value.admin.userId,
-                adminId: formState.value.admin.adminId
-            },
             shopTitle: formState.value.merchantData.merchantName,
             type: formState.value.baseData.type
         };
+        if(action.value == "add"){
+            tempData.admin = {
+                type: adminType.value ? 2 : 1,
+                userId: formState.value.admin.userId,
+                adminId: formState.value.admin.adminId
+            };
+        }
         //处理图片
         const result = await updateMerchant(operation, { ...tempData });
         emit("submitCallback", result);

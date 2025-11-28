@@ -49,18 +49,18 @@
                                     {{ row.user?.username }}{{ (row.user?.userId)?'('+(row.user?.userId)+')':'' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="商户类型" prop="typeText" sortable="custom"></el-table-column>
-                            <el-table-column label="管理员"  sortable="custom">
+                            <el-table-column label="商户类型" prop="typeText"></el-table-column>
+                            <el-table-column label="管理员" >
                                 <template #default="{ row }">
                                     {{ row.admin?.username }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="已绑定店铺" prop="shopCount" sortable="custom">
+                            <el-table-column label="已绑定店铺" prop="shopCount" :width="100" align="center">
                                 <template #default="{ row }">
-                                    <div class="font-color">{{ row.shopCount }}</div>
+                                    <span class="font-color">{{ row.shopCount }}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="认证状态" prop="statusText" sortable="custom">
+                            <el-table-column label="认证状态" prop="statusText">
                                 <template #default="{ row }">
                                     <template v-if="row.status==1">
                                         <StatusDot color="#52c41a" :flicker="true"></StatusDot>
@@ -71,7 +71,7 @@
                                     {{ row.statusText }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="认证日期" prop="addTime" sortable="custom"></el-table-column>
+                            <el-table-column label="认证日期" prop="addTime" sortable="custom" :width="200"></el-table-column>
                             <template #empty>
                                 <div class="empty-warp">
                                     <div v-if="!loading" class="empty-bg">暂无数据</div>
@@ -204,11 +204,10 @@ defineExpose({
     gap: 4px
 }
 .font-color {
-
     color: var(--tig-primary);
     cursor: pointer;
 }
-:deep .hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox {
+:deep(.hide-checkbox .el-table__header-wrapper .el-table__header .el-checkbox) {
     display: none;
 }
 </style>

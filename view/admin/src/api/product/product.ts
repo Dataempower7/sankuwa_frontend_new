@@ -39,6 +39,16 @@ export const batchSubmit = (type: string, data: object) => {
         data: {type, ...data}
     });
 };
+
+// 商品列表页面批量导入
+export const batchImport = (data: object) => {
+    return request({
+        url: "product/product/vendorProductImport",
+        method: "post",
+        data
+    });
+};
+
 // 商品列表移至回收站
 export const recycleProduct = (data: object) => {
     return request({
@@ -126,6 +136,16 @@ export const AuditProduct = (data: any) => {
 export const AuditAgainProduct = (data: any) => {
     return request({
         url: "product/product/auditAgain",
+        method: "post",
+        data,
+    });
+};
+
+
+// 分配门店商品
+export const allocationProduct = (data: any) => {
+    return request({
+        url: "o2o/storeProduct/allocationProduct",
         method: "post",
         data,
     });

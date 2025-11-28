@@ -70,23 +70,23 @@
                                     <div v-if="row.user">
                                         <UserCard :user="row.user?.username"></UserCard>{{ row.user?.userId ? "(" + row.user?.userId + ")" : "" }}
                                     </div>
-                                    <div v-else>
-                                        --
-                                    </div>
+                                    <div v-else>--</div>
                                 </template>
                             </el-table-column>
                             <el-table-column label="商户类型" prop="typeText"></el-table-column>
                             <el-table-column label="管理员">
                                 <template #default="{ row }">
-                                    <div v-if="row.admin">
+                                    <span v-if="row.admin">
                                         <UserCard :user="row.admin?.username"></UserCard>
-                                    </div>
-                                    <div v-else>
-                                        --
-                                    </div>
+                                    </span>
+                                    <span v-else> -- </span>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="已绑定店铺" prop="shopCount">
+                            <el-table-column prop="shopCount">
+                                <template #header>
+                                    <span v-if="isStore()">已绑定门店</span>
+                                    <span v-else>已绑定店铺</span>
+                                </template>
                                 <template #default="{ row }">
                                     <el-button link @click="toPage(row)">{{ row.shopCount ? row.shopCount : "--" }}</el-button>
                                 </template>
@@ -103,7 +103,7 @@
                                 </template>
                             </el-table-column>
                             <el-table-column label="认证日期" prop="addTime" sortable="custom"></el-table-column>
-                            <el-table-column :width="80" fixed="right" label="操作">
+                            <el-table-column :width="180" fixed="right" label="操作">
                                 <template #default="{ row }">
                                     <DialogForm
                                         :params="{ act: 'detail', id: row.merchantId }"
@@ -117,6 +117,26 @@
                                     >
                                         <a class="btn-link">详情</a>
                                     </DialogForm>
+                                    <el-divider direction="vertical" />
+                                    <DialogForm
+                                        :params="{ act: 'detail', id: row.merchantId }"
+                                        isDrawer
+                                        path="adminMerchant/merchant/AddMerchant"
+                                        title="商户编辑"
+                                        width="600px"
+                                        @okCallback="loadFilter"
+                                    >
+                                        <a class="btn-link">编辑</a>
+                                    </DialogForm>
+                                    <el-divider direction="vertical" />
+                                    <DeleteRecord
+                                        :params="{ id: row.merchantId }"
+                                        title="删除后商户信息将无法恢复，请确认是否删除该商户？"
+                                        :requestApi="delMerchant"
+                                        @afterDelete="loadFilter"
+                                    >
+                                        <a class="btn-link">删除</a>
+                                    </DeleteRecord>
                                 </template>
                             </el-table-column>
                             <template #empty>
@@ -130,20 +150,6 @@
                         <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
                     </div>
                 </div>
-                <!--                <div v-if="selectedIds.length > 0" class="selected-action-warp selected-warp-left">-->
-                <!--                    <div class="selected-action">-->
-                <!--                        <el-space>-->
-                <!--                            <span-->
-                <!--                            >已选择：<b>{{ selectedIds.length }}</b> 项</span-->
-                <!--                            >-->
-                <!--                            <el-popconfirm title="您确认要批量删除所选数据吗？" @confirm="onBatchSubmit('del')">-->
-                <!--                                <template #reference>-->
-                <!--                                    <el-button>批量删除</el-button>-->
-                <!--                                </template>-->
-                <!--                            </el-popconfirm>-->
-                <!--                        </el-space>-->
-                <!--                    </div>-->
-                <!--                </div>-->
             </div>
         </div>
     </div>
@@ -154,41 +160,41 @@ import "@/style/css/list.less";
 import { DialogForm } from "@/components/dialog";
 import { onMounted, reactive, ref } from "vue";
 import { DeleteRecord, Pagination, Switch } from "@/components/list";
-import { message } from "ant-design-vue";
 import { useConfigStore } from "@/store/config";
 import { MerchantFilterParams, MerchantFilterState } from "@/types/adminMerchant/merchant";
-import { batchSubmit, getMerchantList, updateMerchantField } from "@/api/adminMerchant/merchant";
+import { batchSubmit, getMerchantList, delMerchant } from "@/api/adminMerchant/merchant";
 import { Tag } from "@/components/form";
 import StatusDot from "@/components/form/src/StatusDot.vue";
 import { updateArticleFiled } from "@/api/content/article";
+import { isMerchant, isStore } from "@/utils/version";
 const config: any = useConfigStore();
-import { useListRequest } from '@/hooks/useListRequest';
+import { useListRequest } from "@/hooks/useListRequest";
 const {
-  listData: filterState,
-  loading,
-  total,
-  selectedIds,
-  filterParams,
-  loadData: loadFilter,
-  onSearchSubmit,
-  onSortChange,
-  onSelectChange,
-  onBatchAction,
-  resetParams
+    listData: filterState,
+    loading,
+    total,
+    selectedIds,
+    filterParams,
+    loadData: loadFilter,
+    onSearchSubmit,
+    onSortChange,
+    onSelectChange,
+    onBatchAction,
+    resetParams
 } = useListRequest<MerchantFilterState, MerchantFilterParams>({
-  apiFunction: getMerchantList,
-  idKey: 'merchantId',
-  defaultParams: {
-      sortField: '',
-      sortOrder: '',
-      keyword: '',
-      page: 1,
-      size: config.get("pageSize"),
-  }
+    apiFunction: getMerchantList,
+    idKey: "merchantId",
+    defaultParams: {
+        sortField: "",
+        sortOrder: "",
+        keyword: "",
+        page: 1,
+        size: config.get("pageSize")
+    }
 });
 // 批量操作
 const onBatchSubmit = async (action: string) => {
-  await onBatchAction(action, batchSubmit);
+    await onBatchAction(action, batchSubmit);
 };
 
 // 初始化加载
@@ -199,9 +205,13 @@ import UserCard from "@/components/list/src/UserCard.vue";
 
 const router = useRouter();
 const toPage = (val: any) => {
-    router.push({ path: "/shop/list/", query: { id: val.merchantId, companyName: val.type == 2 ? val.companyName : val.corporateName } });
+    if ((isMerchant() && isStore()) || isMerchant()) {
+        router.push({ path: "/organize/shop/list/", query: { id: val.merchantId, companyName: val.type == 2 ? val.companyName : val.corporateName } });
+    }
+    if (isStore()) {
+        router.push({ path: "/organize/store/list/", query: { id: val.merchantId, companyName: val.type == 2 ? val.companyName : val.corporateName } });
+    }
 };
-
 </script>
 <style lang="less" scoped>
 .ssdw {
@@ -209,6 +219,7 @@ const toPage = (val: any) => {
     align-items: center;
     gap: 4px;
 }
+
 .font-color {
     color: var(--tig-primary);
     cursor: pointer;

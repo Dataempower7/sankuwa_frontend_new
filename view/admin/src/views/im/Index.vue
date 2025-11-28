@@ -470,7 +470,6 @@ const onOpen = (event: any) => {
 const formatMessage = (data: any) => {
     const conversationIndex = conversationList.value.findIndex((item) => item.id === data.conversationId);
     if (conversationId.value > -1) {
-        console.log("当前会话", conversationId.value, data.conversationId);
         if (data.conversationId === conversationId.value) {
             // 在当前会话
             currentNewMessage.value = data;
@@ -508,7 +507,6 @@ const creatingSession = (data: any) => {
         userFrom: data.userFrom
     };
     conversationList.value = [newConversationData, ...conversationList.value];
-    console.log("创建会话", newConversationData);
 };
 
 const onMessage = (event: any) => {
@@ -520,14 +518,12 @@ const onMessage = (event: any) => {
     const data = JSON.parse(event.data);
 
     if (data.type === "message") {
-        console.log("message", data);
         if (data.data) {
             formatMessage(data.data[0]);
         }
     }
 
     if (data.type === "read") {
-        console.log("read", data);
         if (data.data[0].shopId === currentConversationData.value.shopId) {
             ImMessageRef.value?.setReadOneself();
         }
@@ -542,7 +538,6 @@ const onError = (event: any) => {
 
 const getSocketUrl = () => {
     let url;
-    console.log(import.meta)
     if (import.meta.env.VITE_SOCKET_URL) {
         url = import.meta.env.VITE_SOCKET_URL;
     } else {

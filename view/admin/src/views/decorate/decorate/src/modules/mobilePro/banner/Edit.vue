@@ -46,7 +46,7 @@
 <script lang="ts" setup>
 import { PicSelect } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import BannerContent from "./src/BannerContent.vue";
 import BannerSearch from "./src/BannerSearch.vue";
 import BannerNav from "./src/BannerNav.vue";

@@ -11,7 +11,6 @@
 import CommonActivityFrameEdit from "../../src/commonActivityFrame/Edit.vue";
 import CommonTitleEdit from "../../src/commonTitle/Edit.vue";
 import { ModuleActivityType } from "@/types/decorate/decorate.d";
-import { defineModel } from "vue";
 const module = defineModel<ModuleActivityType>("module", { default: () => ({}) });
 </script>
 <style lang="less" scoped>

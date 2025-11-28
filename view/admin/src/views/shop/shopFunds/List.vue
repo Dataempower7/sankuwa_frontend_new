@@ -9,16 +9,12 @@
                                 <div class="simple-form-field">
                                     <div class="form-group">
                                         <div class="control-container">
-                                            <TigInput
-                                                v-model="filterParams.keyword"
-                                                name="username"
-                                                placeholder="输入店铺名称"
-                                                @keyup.enter="onSearchSubmit"
-                                                clearable
-                                                @clear="onSearchSubmit"
-                                            >
+                                            <TigInput v-model="filterParams.keyword" name="username"
+                                                :placeholder="`输入${shopTypeName}名称`" @keyup.enter="onSearchSubmit"
+                                                clearable @clear="onSearchSubmit">
                                                 <template #append>
-                                                    <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span></el-button>
+                                                    <el-button @click="onSearchSubmit"><span
+                                                            class="iconfont icon-chakan1"></span></el-button>
                                                 </template>
                                             </TigInput>
                                         </div>
@@ -26,7 +22,8 @@
                                 </div>
                                 <div class="simple-form-field">
                                     <div class="form-group">
-                                        <TigTabs v-model="filterParams.status" :tabs="shopStatus" @onTabChange="onChange"></TigTabs>
+                                        <TigTabs v-model="filterParams.status" :tabs="shopStatus"
+                                            @onTabChange="onChange"></TigTabs>
                                     </div>
                                 </div>
                             </div>
@@ -34,37 +31,36 @@
                     </div>
                     <div class="table-container">
                         <a-spin :spinning="loading">
-                            <el-table
-                                :data="filterState"
-                                :loading="loading"
-                                :total="total"
-                                row-key="shopId"
-                                @selection-change="onSelectChange"
-                                @sort-change="onSortChange"
-                            >
-                                <el-table-column label="店铺名称">
+                            <el-table :data="filterState" :loading="loading" :total="total" row-key="shopId"
+                                @selection-change="onSelectChange" @sort-change="onSortChange">
+                                <el-table-column :label="`${shopTypeName}名称`">
                                     <template #default="{ row }">
                                         {{ row.shopTitle || "--" }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="店铺LOGO">
+                                <el-table-column :label="`${shopTypeName}LOGO`">
                                     <template #default="{ row }">
                                         <Image :src="row.shopLogo" fit="contain" style="height: 25px; width: 60px" />
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="店铺状态">
+                                <el-table-column :label="`${shopTypeName}状态`">
                                     <template #default="{ row }">
                                         <template v-if="row.status == 10">
+                                            <StatusDot color="red" :flicker="true"></StatusDot>
+                                        </template>
+                                        <template v-if="row.status == 4">
                                             <StatusDot color="red" :flicker="true"></StatusDot>
                                         </template>
                                         <template v-if="row.status == 1">
                                             <StatusDot color="green" :flicker="true"></StatusDot>
                                         </template>
-                                        <span v-if="row.status === 10" style="color: red">{{ row.statusText }}</span>
-                                        <span v-else-if="row.status === 1" style="color: green">{{ row.statusText }}</span>
+                                        <span v-if="row.status === 10 || row.status === 4" style="color: red">{{
+                                            row.statusText }}</span>
+                                        <span v-else-if="row.status === 1" style="color: green">{{ row.statusText
+                                            }}</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="店铺资金" sortable="custom">
+                                <el-table-column :label="`${shopTypeName}资金`" sortable="custom">
                                     <template #default="{ row }">
                                         {{ priceFormat(row.shopMoney) || 0.0 }}
                                     </template>
@@ -86,15 +82,9 @@
                                 </el-table-column>
                                 <el-table-column :width="120" fixed="right" label="操作">
                                     <template #default="{ row }">
-                                        <DialogForm
-                                            :params="{ shopId: row.shopId }"
-                                            :showClose="false"
-                                            :showOnOk="false"
-                                            isDrawer
-                                            path="shop/financialLog/List"
-                                            title="资金日志"
-                                            width="800px"
-                                        >
+                                        <DialogForm :params="{ shopId: row.shopId }" :showClose="false"
+                                            :showOnOk="false" isDrawer path="shop/financialLog/List" title="资金日志"
+                                            width="800px">
                                             <a class="btn-link">查看资金日志</a>
                                         </DialogForm>
                                     </template>
@@ -107,15 +97,14 @@
                             </el-table>
                         </a-spin>
                         <div v-if="total > 0" class="pagination-con">
-                            <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                            <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                                @callback="loadFilter" />
                         </div>
                     </div>
                     <div v-if="selectedIds.length > 0" class="selected-action-warp selected-warp-left">
                         <div class="selected-action">
                             <el-space>
-                                <span
-                                    >已选择：<b>{{ selectedIds.length }}</b> 项</span
-                                >
+                                <span>已选择：<b>{{ selectedIds.length }}</b> 项</span>
                                 <el-popconfirm title="您确认要批量删除所选数据吗？" @confirm="onBatchSubmit('del')">
                                     <template #reference>
                                         <el-button>批量删除</el-button>
@@ -145,6 +134,10 @@ import { useRouter } from "vue-router";
 import { priceFormat } from "@/utils/format";
 import StatusDot from "@/components/form/src/StatusDot.vue";
 import { useListRequest } from "@/hooks/useListRequest";
+import { getShopType } from "@/utils/storage";
+import { isStore } from "@/utils/version";
+
+const shopTypeName = !isStore() ? "店铺" : "门店";
 const query = useRouter().currentRoute.value.query;
 const shopStatus = ref<any[]>([
     {
@@ -158,7 +151,12 @@ const shopStatus = ref<any[]>([
         isShow: true
     },
     {
-        label: "关店",
+        label: "停业",
+        value: 4,
+        isShow: true
+    },
+    {
+        label: "打烊",
         value: 10,
         isShow: true
     }
@@ -185,7 +183,8 @@ const {
         keyword: "",
         status: 0,
         page: 1,
-        size: config.get("pageSize")
+        size: config.get("pageSize"),
+        shopType: getShopType() === 1 ? 1 : 2
     }
 });
 // 批量操作
@@ -203,11 +202,11 @@ const handleSwitchChange = (params: any) => {
             const result = updateShopFiled({ ...data, id: row.shopId, val: row.status });
             message.success("修改成功");
         })
-        .catch(() => {});
+        .catch(() => { });
 };
 const onChange = (status: number) => {
     filterParams.status = status;
-    filterParams.page = 1
+    filterParams.page = 1;
     loadFilter();
 };
 const okCallback = () => {
@@ -228,7 +227,7 @@ const dialogForm = ref<any>();
 const merchantId = ref<number>(0);
 onMounted(() => {
     if (query.id) {
-        ElMessageBox.confirm(`为[${query.companyName || "--"}]立即创建店铺?`, "提示", {
+        ElMessageBox.confirm(`为[${query.companyName || "--"}]立即创建${shopTypeName}?`, "提示", {
             closeOnClickModal: false,
             showClose: false,
             confirmButtonText: "确认",
@@ -254,7 +253,7 @@ onMounted(() => {
     width: 150px;
 }
 
-.status-switch > div {
+.status-switch>div {
     word-break: keep-all;
     display: flex;
     flex-wrap: nowrap;
@@ -263,7 +262,8 @@ onMounted(() => {
 
 .display-col {
     display: flex;
-    align-items: center; /* 垂直居中 */
+    align-items: center;
+    /* 垂直居中 */
     gap: 8px;
 
     .image {
@@ -273,7 +273,8 @@ onMounted(() => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
@@ -286,37 +287,48 @@ onMounted(() => {
         .image-style {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 保持图片比例 */
+            object-fit: cover;
+            /* 保持图片比例 */
         }
     }
 
     .text {
-        flex-grow: 1; /* 占据剩余空间 */
-        white-space: nowrap; /* 不换行 */
-        overflow: hidden; /* 隐藏超出部分 */
-        text-overflow: ellipsis; /* 超出显示省略号 */
-        margin-left: 8px; /* 与左侧图片的间距 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
+        white-space: nowrap;
+        /* 不换行 */
+        overflow: hidden;
+        /* 隐藏超出部分 */
+        text-overflow: ellipsis;
+        /* 超出显示省略号 */
+        margin-left: 8px;
+        /* 与左侧图片的间距 */
     }
 
     .text_comment {
-        flex-grow: 1; /* 占据剩余空间 */
+        flex-grow: 1;
+        /* 占据剩余空间 */
     }
 }
 
 .multiline_hiding {
-    height: 3.6em; /* 基于字体大小的高度, 3行文本高度 */
+    height: 3.6em;
+    /* 基于字体大小的高度, 3行文本高度 */
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* 限制在3行 */
+    -webkit-line-clamp: 3;
+    /* 限制在3行 */
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
-    line-height: 1.2em; /* 调整这个值以匹配你的字体大小 */
+    line-height: 1.2em;
+    /* 调整这个值以匹配你的字体大小 */
 }
 
 .green {
     margin-left: 8px;
     color: green !important;
 }
+
 .grey {
     margin-left: 8px;
     color: #999 !important;

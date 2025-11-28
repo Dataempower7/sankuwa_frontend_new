@@ -1,0 +1,1 @@
+import{as as o}from"./index-B52YIGC0.js";function c(t){return typeof t!="object"||t===null?t:JSON.parse(JSON.stringify(t))}function a(t,s=c){const e=o(s(t));return[e,()=>{const n=s(t);Object.keys(e).forEach(r=>{r in n?e[r]=n[r]:delete e[r]})}]}export{a as u};

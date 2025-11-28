@@ -10,26 +10,51 @@
                         <el-form-item label="售后状态：">
                             <p>{{ formData.statusName }}</p>
                         </el-form-item>
-                        <el-form-item
-                            label="退款金额："
-                            prop="refundAmount"
-                            v-if="status == 2"
-                            :rules="[
-                                { required: true, message: '退款金额不能为空' },
-                                { validator: validateRefundAmount, trigger: 'blur' }
-                            ]"
-                        >
-                            <TigInput classType="tig-form-input" v-model="formState.refundAmount" type="decimal" placeholder="请输入退款金额" />
-                            <div class="extra">最大退款金额{{ priceFormat(formData.suggestRefundAmount) || "0" }}</div>
-                        </el-form-item>
-                        <el-form-item
-                            label="退货地址："
-                            prop="returnAddress"
-                            v-if="formData.aftersaleType == 1 && status == 2"
-                            :rules="[{ required: status == 2 ? true : false, message: '退货地址不能为空' }]"
-                        >
-                            <TigInput classType="tig-form-input" v-model="formState.returnAddress" :rows="6" type="textarea" placeholder="请输入退货地址" />
-                        </el-form-item>
+                        <template v-if="formData.vendorId && formData.vendorId > 0">
+                            <el-form-item
+                                label="退款金额："
+                                prop="refundAmount"
+                                v-if="status == 2 && formData.status == 1"
+                                :rules="[
+                                    { required: true, message: '退款金额不能为空' },
+                                    { validator: validateRefundAmount, trigger: 'blur' }
+                                ]"
+                            >
+                                <TigInput classType="tig-form-input" v-model="formState.refundAmount" type="decimal" placeholder="请输入退款金额" />
+                                <div class="extra">最大退款金额{{ priceFormat(formData.suggestRefundAmount) || "0" }}</div>
+                            </el-form-item>
+                            <el-form-item
+                                label="退货地址："
+                                prop="returnAddress"
+                                v-if="formData.aftersaleType == 1 && status == 2 && formData.status == 21"
+                                :rules="[{ required: status == 2 ? true : false, message: '退货地址不能为空' }]"
+                            >
+                                <TigInput classType="tig-form-input" v-model="formState.returnAddress" :rows="6" type="textarea" placeholder="请输入退货地址" />
+                            </el-form-item>
+                        </template>
+                        <template v-else>
+                            <el-form-item
+                                label="退款金额："
+                                prop="refundAmount"
+                                v-if="status == 2"
+                                :rules="[
+                                    { required: true, message: '退款金额不能为空' },
+                                    { validator: validateRefundAmount, trigger: 'blur' }
+                                ]"
+                            >
+                                <TigInput classType="tig-form-input" v-model="formState.refundAmount" type="decimal" placeholder="请输入退款金额" />
+                                <div class="extra">最大退款金额{{ priceFormat(formData.suggestRefundAmount) || "0" }}</div>
+                            </el-form-item>
+                            <el-form-item
+                                label="退货地址："
+                                prop="returnAddress"
+                                v-if="formData.aftersaleType == 1 && status == 2"
+                                :rules="[{ required: status == 2 ? true : false, message: '退货地址不能为空' }]"
+                            >
+                                <TigInput classType="tig-form-input" v-model="formState.returnAddress" :rows="6" type="textarea" placeholder="请输入退货地址" />
+                            </el-form-item>
+                        </template>
+
                         <el-form-item
                             label="拒绝说明："
                             prop="reply"
@@ -44,7 +69,19 @@
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <div class="btn-box">
+                            <div class="btn-box" v-if="isS2b2c()">
+                                <el-button type="primary" v-if="formData.aftersaleType == 1 && formData.status == 1" @click="onSubmit">{{
+                                    status == 2 ? "同意退货退款" : "拒绝退款"
+                                }}</el-button>
+                                <el-button type="primary" v-if="formData.aftersaleType == 1 && formData.status == 21" @click="onSubmit">{{
+                                    status == 2 ? "同意并发送退货地址" : "拒绝退款"
+                                }}</el-button>
+                                <el-button type="primary" v-if="formData.aftersaleType == 2" @click="onSubmit">{{
+                                    status == 2 ? "同意仅退款" : "拒绝仅退款"
+                                }}</el-button>
+                                <el-button @click="close">取消</el-button>
+                            </div>
+                            <div class="btn-box" v-else>
                                 <el-button type="primary" v-if="formData.aftersaleType == 1" @click="onSubmit">{{
                                     status == 2 ? "同意并发送退货地址" : "拒绝退款"
                                 }}</el-button>
@@ -66,7 +103,7 @@ import { message } from "ant-design-vue";
 import { FormState } from "@/types/order/aftersales";
 import { updateAftersales } from "@/api/order/aftersales";
 import { priceFormat } from "@/utils/format";
-
+import { isS2b2c } from "@/utils/version";
 // 父组件回调
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 

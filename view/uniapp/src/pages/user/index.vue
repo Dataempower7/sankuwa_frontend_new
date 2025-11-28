@@ -8,7 +8,7 @@
                 <!-- 个人中心标题和编辑图标 -->
                 <view class="header-nav">
                     <view class="nav-title">个人中心</view>
-                    <image src="@/static/images/member/edit.png" class="edit-icon" @click="goPages('/pages/user/profile/index')" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/17617935441Nj6rtLUrE918q1z4t.jpeg" class="edit-icon" @click="goPages('/pages/user/profile/index')" />
                 </view>
 
                 <!-- 用户基本信息 -->
@@ -16,12 +16,12 @@
                     <view class="user-avatar-section">
                         <template v-if="!hasToken">
                             <view class="avatar-wrapper" @click="handleLogin">
-                                <image class="avatar" src="@/static/images/common/avatar_empty.png" />
+                                <image class="avatar" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176173034416OBe7LxG3pY6RU3XK.jpeg" />
                             </view>
                         </template>
                         <template v-else>
                             <tig-upload class="avatar-wrapper" request-url="user/user/modifyAvatar" @change="userStore.getUserInfo()">
-                                <tig-image class="avatar" :src="imageFormat(member!.avatar)" />
+                                <tig-image class="avatar" :src="member!.avatar || 'https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176173034416OBe7LxG3pY6RU3XK.jpeg'" />
                             </tig-upload>
                         </template>
 
@@ -103,34 +103,34 @@
                         <view class="order-main-items">
                             <view class="order-item" @click="goPages('/pages/user/order/list?type=awaitPay')">
                                 <view class="order-icon-wrapper">
-                                    <image src="@/static/images/member/pending_payment.png" class="order-icon" />
+                                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793544vUxUrUNB0OKKoIb70n.jpeg" class="order-icon" />
                                     <view v-if="orderNum.awaitPay > 0" class="order-badge">{{ orderNum.awaitPay }}</view>
                                 </view>
                                 <view class="order-label">待付款</view>
                             </view>
                             <view class="order-item" @click="goPages('/pages/user/order/list?type=awaitReceived')">
                                 <view class="order-icon-wrapper">
-                                    <image src="@/static/images/member/pending_receipt.png" class="order-icon" />
+                                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793544qpYeOzELCKHo8WMgJX.jpeg" class="order-icon" />
                                     <view v-if="orderNum.awaitReceived > 0" class="order-badge">{{ orderNum.awaitReceived }}</view>
                                 </view>
                                 <view class="order-label">待收货</view>
                             </view>
                             <view class="order-item" @click="goPages('/pages/user/order/list?type=awaitComment')">
                                 <view class="order-icon-wrapper">
-                                    <image src="@/static/images/member/pending_comments.png" class="order-icon" />
+                                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793544OliZb9PA94UpS7bsg1.jpeg" class="order-icon" />
                                     <view v-if="orderNum.awaitComment > 0" class="order-badge">{{ orderNum.awaitComment }}</view>
                                 </view>
                                 <view class="order-label">待评价</view>
                             </view>
                             <view class="order-item" @click="goPages('/pages/user/afterSale/list')">
                                 <view class="order-icon-wrapper">
-                                    <image src="@/static/images/member/after-sales.png" class="order-icon" />
+                                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761793544EOBGEThdsiqTkZYPtq.jpeg" class="order-icon" />
                                 </view>
                                 <view class="order-label">退款/售后</view>
                             </view>
                         </view>
                         <view class="order-all-item" @click="goPages('/pages/user/order/list')">
-                            <view class="order-divider"> <image src="@/static/images/member/all.png " style="    width: 27px;    height: 89px;   position: relative;  right: 20px;  top: -23px;" /></view>
+                            <view class="order-divider"> <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761730490xhWyo4ek7cFipUV9Xr.jpeg" style="    width: 27px;    height: 89px;   position: relative;  right: 20px;  top: -23px;" /></view>
                             <view class="order-all-text">全部</view>
                         </view>
                     </view>
@@ -141,7 +141,7 @@
                 <decorate :modules="modules" />
             </view>
         </view>
-        <recommend />
+        <recommend ref="recommendRef" />
         <tig-copyright />
     </tig-layout>
     <tig-back-top :scroll-top="scrollTop" />
@@ -152,7 +152,7 @@ import recommend from "@/components/recommend/index.vue";
 import decorate from "./src/decorate/index.vue";
 import { useUserStore } from "@/store/user";
 import { computed, ref } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
 import type { UserItem } from "@/types/user/user";
 import type { OrderNumItem } from "@/types/user/order";
 import { getOrderNum } from "@/api/user/order";
@@ -168,6 +168,7 @@ const { scrollTop } = useScrollTop();
 const userStore = useUserStore();
 
 const layoutRef = ref();
+const recommendRef = ref();
 
 const member = computed({
     get() {
@@ -345,6 +346,13 @@ onShow(() => {
     __getOrderNum();
     __getHistoryCount();
 });
+
+// 监听页面触底，加载更多推荐商品
+onReachBottom(() => {
+    if (recommendRef.value && recommendRef.value.loadMore) {
+        recommendRef.value.loadMore();
+    }
+});
 </script>
 <style>
 page {
@@ -422,10 +430,11 @@ page {
             align-items: center;
 
             .avatar-wrapper {
-                width: 120rpx;
-                height: 120rpx;
+                width: 120rpx !important;
+                height: 120rpx !important;
                 border-radius: 50%;
                 overflow: hidden;
+                display: block;
 
                 .avatar {
                     width: 100%;

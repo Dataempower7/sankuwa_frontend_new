@@ -23,7 +23,17 @@
             <div class="main-panel">
                 <ul>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "访客数" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">根据筛选时间，在商城中访问客户数量</div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>访客数</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.visitNum }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -37,7 +47,19 @@
                         </div>
                     </li>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "浏览量" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                        根据筛选时间，商城页面被浏览的次数。每打开一个页面或每刷新一次页面都记录1次 （按访问时间）
+                                    </div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>浏览量</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.viewNum }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -49,7 +71,17 @@
                         </div>
                     </li>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "新增用户数" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">根据筛选时间，平台中的新增客户数</div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>新增用户数</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.addUserNum }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -61,7 +93,17 @@
                         </div>
                     </li>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "成交用户数" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">根据筛选时间，平台中的成交客户数</div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>成交用户数</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.dealUserNum }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -75,7 +117,19 @@
                         </div>
                     </li>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "访客-支付转化率" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                        访客支付转化率 =（支付买家数 ÷ 访客数）× 100%。例如，某商品当日访客100人，其中1人付款，转化率为1%
+                                    </div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>访客-支付转化率</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.visitToUser }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -87,7 +141,19 @@
                         </div>
                     </li>
                     <li class="main-panel-item">
-                        <div class="main-panel-item-title">{{ "充值用户数" }}</div>
+                        <div class="main-panel-item-title">
+                            <el-tooltip class="box-item" effect="light" placement="top" show-after="300" trigger="hover">
+                                <template #content>
+                                    <div style="width: 300px; padding: 10px; line-height: 24px; font-size: 14px">
+                                        根据筛选时间，统计在系统中充值的客户数量（多次充值记为一次）
+                                    </div>
+                                </template>
+                                <div class="flex flex-align-center">
+                                    <div>充值用户数</div>
+                                    <el-icon style="margin-left: 5px" size="14" color="#969799"><QuestionFilled /></el-icon>
+                                </div>
+                            </el-tooltip>
+                        </div>
                         <div class="main-panel-item-value">{{ filterState?.rechargeUserNum }}</div>
                         <div class="main-panel-item-increase">
                             环比：
@@ -107,6 +173,7 @@
 </template>
 
 <script lang="ts" setup>
+import { QuestionFilled } from "@element-plus/icons-vue";
 import { onMounted, reactive, ref } from "vue";
 import { SelectTimeInterval } from "@/components/select";
 import { getDays } from "@/utils/util";

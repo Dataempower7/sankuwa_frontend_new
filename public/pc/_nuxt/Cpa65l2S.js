@@ -1,0 +1,1 @@
+import{aL as t}from"./BjkHNVA8.js";const u=o=>t({url:"user/coupon/getList",method:"get",params:o}),s=o=>t({url:"user/coupon/list",method:"get",params:o}),r=o=>t({url:"user/coupon/claim",method:"post",data:o}),n=o=>t({url:"user/coupon/del",method:"post",data:o}),p=o=>t({url:"user/coupon/detail",method:"get",params:{id:o}});export{r as a,p as b,s as c,n as d,u as g};

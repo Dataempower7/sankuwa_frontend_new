@@ -96,7 +96,7 @@
     </perfect-scrollbar>
 </template>
 <script lang="ts" setup>
-import { ref, defineModel, reactive } from "vue";
+import { ref, reactive } from "vue";
 import CommonTitleEdit from "../../src/commonTitle/Edit.vue";
 import { SelectColor } from "@/components/select";
 import CommonProductEdit from "../../src/commonProduct/Edit.vue";

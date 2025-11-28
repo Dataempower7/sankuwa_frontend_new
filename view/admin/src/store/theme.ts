@@ -1,7 +1,5 @@
 import { defineStore } from "pinia";
-import { getConfigLayoutThemeSwitch, saveConfigLayoutThemeSwitch } from "@/api/setting/config";
-import type { BaseTheme } from "@/types/setting/config";
-import { message } from "ant-design-vue";
+import { saveConfigLayoutThemeSwitch } from "@/api/setting/config";
 
 type layoutType = "default" | "side" | "top" | "mix" | "topMenu" | undefined;
 type navThemeType = "light" | "dark" | "realDark" | undefined;
@@ -94,7 +92,7 @@ export const useThemeStore = defineStore("theme", {
     actions: {
         getThemeInfo() {
             const configString = localStorage.getItem("config");
-            const config = configString ? JSON.parse(configString).config : {};
+            const config = configString ? JSON.parse(configString) : {};
             this.themeInfo = {
                 layout: config.layout || "default",
                 navTheme: config.navTheme || "light",

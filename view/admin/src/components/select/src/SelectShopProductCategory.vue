@@ -13,7 +13,7 @@
     />
 </template>
 <script lang="ts" setup>
-import { defineModel, onMounted, ref, PropType } from "vue";
+import { onMounted, ref, PropType } from "vue";
 import { ElCascader } from "element-plus";
 import { message } from "ant-design-vue";
 

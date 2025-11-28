@@ -40,7 +40,6 @@
 </template>
 <script lang="ts" setup>
 import { PicSelect } from '@/components/decorate'
-import { ref, defineModel } from 'vue';
 import { ModuleType,PcPageHeaderType } from '@/types/decorate/decorate.d';
 const module = defineModel<ModuleType & PcPageHeaderType>('module', {default: () => ({})});
 </script>

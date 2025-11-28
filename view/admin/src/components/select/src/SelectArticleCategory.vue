@@ -13,7 +13,7 @@
     />
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, defineModel } from "vue";
+import { onMounted, ref } from "vue";
 import { getArticleCategoryTree } from "@/api/content/articleCategory";
 import { ArticleCategoryFilterState } from "@/types/content/articleCategory";
 import { message } from "ant-design-vue";

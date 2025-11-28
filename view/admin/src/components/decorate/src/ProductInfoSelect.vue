@@ -14,7 +14,7 @@
                 <div class="dec-goods-group-item dec-tip dec-goods-group-item-goods">
                     <div class="dec-goods-group-item-con">
                         <div class="item-goods-con">
-                            <a :href="urlFormat({ path: 'product', id: element.productId })" target="_blank" :title="element.productName"
+                            <a :href="urlFormat({ path: 'product', sn: element.productSn })" target="_blank" :title="element.productName"
                                 ><img class="item-goods-img" :src="imageFormat(element.picThumb)"
                             /></a>
                         </div>

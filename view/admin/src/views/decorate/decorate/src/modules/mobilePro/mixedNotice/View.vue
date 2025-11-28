@@ -115,7 +115,7 @@ const groups = [
     }
 ];
 const defaultModule = ref({
-    noticeGroups: groups, // 商品分组
+    noticeGroups: groups, // 公告分组
     moduleColor: {
         // 模块颜色设置
         titleColor: "#171B1E", // 模块大标题颜色

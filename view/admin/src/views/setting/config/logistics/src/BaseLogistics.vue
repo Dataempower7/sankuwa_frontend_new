@@ -2,7 +2,7 @@
     <div class="container">
         <a-spin :spinning="loading">
             <el-form ref="formRef" :model="formState" label-width="auto" style="display: flex; gap: 12px; flex-direction: column">
-                <div class="content_wrapper">
+                <div class="content_wrapper" v-if="!isStore()">
                     <div class="title">快递发货设置</div>
                     <el-form-item label="自定义名称" prop="defaultLogisticsName" :rules="[{ required: true, message: '自定义名称不能为空' }]">
                         <div>
@@ -61,7 +61,7 @@
                 </div>
             </el-form>
             <div style="height: 20px"></div>
-            <div v-if="!loading" class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+            <div v-if="!loading" class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
                 <div class="selected-action">
                     <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交</el-button>
                 </div>
@@ -71,6 +71,7 @@
 </template>
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import { isStore } from "@/utils/version";
 import { DialogForm } from "@/components/dialog";
 import { onMounted, ref, shallowRef } from "vue";
 import { message } from "ant-design-vue";

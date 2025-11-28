@@ -1,3 +1,5 @@
+import path from "path";
+
 export default {
     path: "/setting",
     name: "setting",
@@ -47,6 +49,12 @@ export default {
                     component: () => import("@/views/setting/config/base/src/ServiceSettings.vue")
                 },
                 {
+                    path: "personalized",
+                    name: "personalizedManage",
+                    meta: { title: "个性化设置" },
+                    component: () => import("@/views/setting/config/base/src/PersonalizedSetting.vue")
+                },
+                {
                     path: "after-sales-service",
                     name: "AfterSalesServiceManage",
                     meta: { title: "售后服务设置" },
@@ -92,8 +100,26 @@ export default {
                     name: "shippingTplManage",
                     meta: { title: "运费模板" },
                     component: () => import("@/views/setting/shippingTpl/List.vue")
-                }
-
+                },
+                {
+                    path: "pickup-setting",
+                    name: "storePickupSettingManage",
+                    meta: { title: "自提设置" },
+                    component: () => import("@/views/setting/pickupSetting/Index.vue")
+                },
+                {
+                    path: "appointment-tpl/list",
+                    name: "storeAppointmentTplManage",
+                    meta: { title: "预约模板" },
+                    component: () => import("@/views/setting/appointmentTpl/List.vue")
+                },
+                {
+                    path: "intra-city-delivery",
+                    name: "intraCityDeliveryManage",
+                    meta: { title: "同城配送" },
+                    component: () => import("@/views/setting/intraCityDelivery/Index.vue")
+                },
+                
                 // 暂未分配
                 // {
                 //     //已删除
@@ -129,18 +155,18 @@ export default {
                     meta: { title: "支付设置" },
                     component: () => import("@/views/setting/config/payment/Payment.vue")
                 },
-                {
-                    path: "mail",
-                    name: "mailManage",
-                    meta: { title: "邮箱服务器" },
-                    component: () => import("@/views/setting/config/Mail.vue")
-                },
-                {
-                    path: "mail-template",
-                    name: "mailTemplateManage",
-                    meta: { title: "邮件模板" },
-                    component: () => import("@/views/setting/config/MailTemplate.vue")
-                },
+                // {
+                //     path: "mail",
+                //     name: "mailManage",
+                //     meta: { title: "邮箱服务器" },
+                //     component: () => import("@/views/setting/config/Mail.vue")
+                // },
+                // {
+                //     path: "mail-template",
+                //     name: "mailTemplateManage",
+                //     meta: { title: "邮件模板" },
+                //     component: () => import("@/views/setting/config/MailTemplate.vue")
+                // },
                 {
                     path: "region/list",
                     name: "regionManage",
@@ -209,7 +235,7 @@ export default {
                     path: "base-notice",
                     name: "baseNoticeManage",
                     meta: { title: "通知设置" },
-                    component: () => import("@/views/setting/config/base/src/NoticeSettings.vue")
+                    component: () => import("@/views/setting/config/base/NoticeSettings/Index.vue")
                 },
                 {
                     path: "message-type/list",

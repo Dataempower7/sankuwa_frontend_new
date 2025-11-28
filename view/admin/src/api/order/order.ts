@@ -56,6 +56,15 @@ export const operationOrder = (action: string, data: object) => {
         data,
     });
 };
+
+//扫码核销
+export const writeOffOrder = (params: object) => {
+    return request<OrderFormState>({
+        url: "order/order/writeOff",
+        method: "post",
+        params,
+    });
+};
 export const getShipping = (action: string, params: object) => {
     return request<OrderFormState>({
         url: "order/order/" + action,
@@ -225,5 +234,25 @@ export const changeOrderStatus = (data: object) => {
         url: "order/order/changeOrderStatus",
         method: "post",
         data,
+    });
+};
+
+
+// 催发货
+export const remindDeliver = (params: object) => {
+    return request({
+        url: "order/order/remindDeliver",
+        method: "post",
+        params,
+    });
+};
+
+
+// 订单核销
+export const orderWriteOff = (params: object) => {
+    return request({
+        url: "o2o/storeProduct/writeOff",
+        method: "post",
+        params,
     });
 };

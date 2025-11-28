@@ -4,12 +4,15 @@
             <a-spin :spinning="loading">
                 <el-form ref="formRef" :model="formState" label-width="120px">
                     <div class="title">基本设置</div>
-                    <el-form-item label="商品审核" prop="shopProductNeedCheck">
-                        <el-radio-group v-model="formState.shopProductNeedCheck" class="itemWidth">
+                    <el-form-item label="店铺商品审核" prop="shopProductNeedCheck">
+                        <div>
+                            <!-- <el-radio-group v-model="formState.shopProductNeedCheck" class="itemWidth">
                             <el-radio :value="1">是</el-radio>
                             <el-radio :value="0">否</el-radio>
-                        </el-radio-group>
+                        </el-radio-group> -->
+                        <el-checkbox v-model="formState.shopProductNeedCheck" label="商品默认审核通过" :true-label="0" :false-label="1" />
                         <div class="extra">店铺发布商品的时候是否需要审核才能显示商品</div>
+                        </div>
                     </el-form-item>
                     <el-form-item label="推荐商品数量" prop="maxRecommendProductCount">
                         <div>

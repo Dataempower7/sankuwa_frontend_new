@@ -140,7 +140,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column :width="140" label="是否认证" prop="isCompanyAuth">
+                            <el-table-column :width="140" label="是否认证" prop="isCompanyAuth" v-if="isB2b()">
                                 <template #default="{ row }">
                                     <div>
                                         <div v-if="row.isCompanyAuth" style="color: #67c23a">已认证</div>
@@ -247,6 +247,7 @@ import { imageFormat } from "@/utils/format";
 import { Tag } from "@/components/form";
 import MobileCard from "@/components/list/src/MobileCard.vue";
 import UserCard from "@/components/list/src/UserCard.vue";
+import { isB2b } from "@/utils/version";
 const config: any = useConfigStore();
 import { useListRequest } from "@/hooks/useListRequest";
 import { getAdminType } from "@/utils/storage";

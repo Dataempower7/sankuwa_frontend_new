@@ -3,17 +3,22 @@
         <div class="content_wrapper">
             <div class="lyecs-form-table">
                 <el-form ref="formRef" :model="formState" label-width="auto">
-                    <el-tabs v-model:activeKey="activeKey" class="lyecs-tabs" tab-position="top">
-                        <el-tab-pane :key="1" label="基本信息">
-                            <el-form-item :rules="[{ required: true, message: '文章标题不能为空!' }]" extra="sfs" label="文章标题" prop="articleTitle">
-                                <BusinessData v-model:modelValue="formState.articleTitle" placeholder="请输入文章标题" :dataType="6" :dataId="id"></BusinessData>
+                    <el-tabs v-model="activeKey" class="lyecs-tabs" tab-position="top">
+                        <el-tab-pane :name="1" label="基本信息">
+                            <el-form-item :rules="[{ required: true, message: '文章标题不能为空!' }]" extra="sfs" label="文章标题"
+                                prop="articleTitle">
+                                <BusinessData v-model:modelValue="formState.articleTitle" placeholder="请输入文章标题"
+                                    :dataType="6" :dataId="id"></BusinessData>
                             </el-form-item>
                             <el-form-item label="文章编号" prop="articleSn">
                                 <TigInput classType="tig-form-input" v-model="formState.articleSn" />
                                 <div class="extra">编号用于前台调用某些指定的文章</div>
                             </el-form-item>
-                            <el-form-item label="文章分类" prop="articleCategoryId">
-                                <SelectArticleCategory v-if="!loading" v-model="formState.articleCategoryId" :min-width="'100%'"></SelectArticleCategory>
+                            <el-form-item label="文章分类" prop="articleCategoryId"
+                                :rules="[{ required: true, message: '请选择文章分类!' }]">
+                                <SelectArticleCategory v-if="!loading" v-model="formState.articleCategoryId"
+                                    :min-width="'100%'">
+                                </SelectArticleCategory>
                                 <!-- <SelectArticleCategory v-model="formState.articleCategoryId" :min-width="'100%'"></SelectArticleCategory> -->
                             </el-form-item>
                             <el-form-item label="缩略图" prop="articleThumb">
@@ -30,7 +35,8 @@
                                 <TigInput classType="tig-form-input" v-model="formState.articleTag" />
                             </el-form-item>
                             <el-form-item label="描述" prop="description">
-                                <TigInput classType="tig-form-input" v-model="formState.description" :row="2" type="textarea" />
+                                <TigInput classType="tig-form-input" v-model="formState.description" :row="2"
+                                    type="textarea" />
                             </el-form-item>
                             <el-form-item label="相关链接" prop="link">
                                 <TigInput classType="tig-form-input" v-model="formState.link" />
@@ -60,15 +66,23 @@
                                 </el-radio-group>
                             </el-form-item>
                             <el-form-item v-show="!props.isDialog" :wrapper-col="{ offset: 4, span: 16 }">
-                                <el-button ref="submitBtn" class="form-submit-btn" type="primary" @click="onSubmit">提交 </el-button>
+                                <el-button ref="submitBtn" class="form-submit-btn" type="primary" @click="onSubmit">提交
+                                </el-button>
                             </el-form-item>
                         </el-tab-pane>
-                        <el-tab-pane :key="2" label="文章内容">
-                            <Editor v-model:html="formState.content"></Editor>
+                        <el-tab-pane :name="2" label="文章内容">
+                            <template v-if="activeKey == 2">
+                                <div class="relative">
+                                    <Editor v-model:html="formState.content"></Editor>
+                                    <BusinessData v-model:modelValue="formState.content" :dataType="12" type="editor">
+                                    </BusinessData>
+                                </div>
+                            </template>
                         </el-tab-pane>
-                        <el-tab-pane :key="3" label="关联商品">
-                            <el-form-item label="" prop="productIds" :rules="[{ required: true, validator: validateValue }]">
-                                <SelectProduct v-if="!loading" v-model:ids="formState.productIds" :max="10"></SelectProduct>
+                        <el-tab-pane :name="3" label="关联商品">
+                            <el-form-item label="" prop="productIds">
+                                <SelectProduct v-if="!loading" v-model:ids="formState.productIds" :max="10">
+                                </SelectProduct>
                                 <div class="extra">最多添加10个商品，添加的商品会在结算后自动加入订单（不会计价格）</div>
                             </el-form-item>
                         </el-tab-pane>
@@ -87,7 +101,7 @@ import { ArticleFormState } from "@/types/content/article.d";
 import { getArticle, updateArticle } from "@/api/content/article";
 import { SelectArticleCategory, SelectProduct } from "@/components/select";
 import { Editor } from "@/components/editor/index";
-import BusinessData from "@/components/multilingual/BusinessData.vue"
+import BusinessData from "@/components/multilingual/BusinessData.vue";
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 
 const props = defineProps({
@@ -117,7 +131,7 @@ const formState = ref<ArticleFormState>({
     productIds: []
 });
 const validateValue = (rule: any, value: any, callback: any) => {
-    if(value.length > 10){
+    if (value.length > 10) {
         message.error("最多添加10个商品");
         callback(new Error("最多添加10个商品"));
         return;

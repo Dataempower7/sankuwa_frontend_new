@@ -1,11 +1,11 @@
 // 列表查询时筛选参数类型
-import type {SeckillProductState} from "@/types/promotion/seckill";
+import type { SeckillProductState } from "@/types/promotion/seckill";
 
 export interface ProductFilterParams {
     page?: number;
     size?: number;
-    sortField?: string,
-    sortOrder?: string,
+    sortField?: string;
+    sortOrder?: string;
     keyword?: string;
     shopId?: number | string;
     categoryId?: number | string;
@@ -15,7 +15,11 @@ export interface ProductFilterParams {
     checkStatus?: number;
     isDelete?: number;
     searchShop?: number;
+    searchStartTime?: string;
+    searchEndTime?: string;
     ids?: string;
+    reservationProduct?: number;
+    type?: number | null;
 }
 
 // 获取列表返回参数类型
@@ -43,6 +47,7 @@ export interface ProductFilterState {
     skuIds?: number[];
     check?: boolean;
     productSku: any[];
+    vendorProductId: number;
 }
 export interface ProductFilterResult {
     records: ProductFilterState[];
@@ -51,12 +56,12 @@ export interface ProductFilterResult {
     waitingCheckedCount: number;
 }
 
-
 // 获取详情返回参数类型
 export interface ProductFormState {
     productType?: number;
     snType?: number;
     shopCategoryId?: number;
+    shopId?: number;
     productId?: string;
     picThumb?: string;
     productName?: string;
@@ -67,9 +72,11 @@ export interface ProductFormState {
     productBrief?: string;
     productPrice?: number;
     marketPrice?: number;
+    purchasePrice?: number;
     productSn?: string;
     productTsn?: string;
     brandId?: number | string;
+    vendorId?: number | string;
     suppliersList?: SuppliersListType[];
     suppliersId?: number;
     shippingTplId?: number | string;
@@ -78,9 +85,12 @@ export interface ProductFormState {
     seckillMaxNum?: number;
     productStatus?: number;
     noShipping?: number;
-    fixedShippingType?:number;
+    fixedShippingType?: number;
     fixedShippingFee?: number;
-// ==
+    isShopPickup?: number;
+    isLogistics?: number;
+    isShopDelivery?: number;
+    // ==
     limitNumber?: number | string;
     isBest?: number;
     isNew?: number;
@@ -92,14 +102,14 @@ export interface ProductFormState {
     giveIntegral?: number;
     rankIntegral?: number;
     integral?: number;
-// ==
+    // ==
     productVideo?: string;
     productDescArr?: ProductDescArrItem[];
-// ==
+    // ==
     attrList: any;
     productList?: SeckillProductState[];
     attrChanged?: boolean;
-// ==
+    // ==
     virtualSales?: number;
     commentTag?: string;
     seoProductTitle?: string;
@@ -114,73 +124,80 @@ export interface ProductFormState {
     productServiceIds?: number[];
     isSupportCod?: number;
     isSupportReturn?: number;
-// ==
+    // ==
     productRelated?: number[];
     productArticleList?: number[];
     eCardList?: any[];
     cardGroupId?: number;
     virtualSample?: string;
     paidContent: ProductDescArrItem[];
+    vendorProductId: number;
+    //==
+    reservationTplId?: number | null | undefined;
+    reservationTimes?: TimePeriod[];
+    //==
+    seoIdentification?: string;
+}
+export interface TimePeriod {
+    startTime: string;
+    endTime: string;
 }
 export interface UserRankListType {
-    rankId:number;
-    rankName:string;
-    price:number;
+    rankId: number;
+    rankName: string;
+    price: number;
 }
 
-export interface SuppliersListType{
-    suppliersId?:number;
-    suppliersName?:string;
+export interface SuppliersListType {
+    suppliersId?: number;
+    suppliersName?: string;
 }
-export interface ShippingTplListType{
-    shippingTplId:number;
-    isDefault:number;
-    shippingTplName:string;
+export interface ShippingTplListType {
+    shippingTplId: number;
+    isDefault: number;
+    shippingTplName: string;
 }
 
-export interface ImgListItem{
-    picDesc:string;
-    picLarge:string;
-    picOriginal:string;
-    picThumb:string;
-    picUrl:string;
-    picId:number;
-    productId:number;
-    sortOrder:number;
+export interface ImgListItem {
+    picDesc: string;
+    picLarge: string;
+    picOriginal: string;
+    picThumb: string;
+    picUrl: string;
+    picId: number;
+    productId: number;
+    sortOrder: number;
 }
 
 export interface ProductDescArrItem {
-    type:string;
-    pic:string;
-    html:string;
+    type: string;
+    pic: string;
+    html: string;
 }
 
 export interface ServiceList {
-    check:number;
-    productServiceId:number;
-    productServiceName:string;
+    check: number;
+    productServiceId: number;
+    productServiceName: string;
 }
 export interface ProductFormResult {
-    attrTplList:Object[];
-    serviceList:ServiceList[];
+    attrTplList: Object[];
+    serviceList: ServiceList[];
     shippingTplList?: ShippingTplListType[];
     suppliersList?: SuppliersListType[];
     eCardList?: any[];
     item: {
-        userRankList:Object[];
-        productServiceIds:number[];
-    }
+        userRankList: Object[];
+        productServiceIds: number[];
+    };
 }
 
 export interface ProductParticipleFormResult {
-    keywords:string
+    keywords: string;
 }
-
 
 export interface AuditProductFormState {
     id: number;
     checkStatus: number;
     checkReason: string;
 }
-
-

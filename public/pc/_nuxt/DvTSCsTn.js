@@ -1,0 +1,1 @@
+import{aL as t}from"./BjkHNVA8.js";const s=e=>t({url:"user/aftersales/getRecord",method:"get",params:e}),a=e=>t({url:"user/aftersales/detail",method:"get",params:e}),o=e=>t({url:"user/aftersales/feedback",method:"post",data:e}),c=e=>t({url:"user/aftersales/cancel",method:"post",data:e});export{a,c,s as g,o as u};

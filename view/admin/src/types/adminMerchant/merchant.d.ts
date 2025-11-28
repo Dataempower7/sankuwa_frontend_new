@@ -97,7 +97,7 @@ interface BaseData {
 }
 
 interface User {
-    userId: number;
+    userId: number | null;
     username: string;
 }
 // 获取详情返回参数类型

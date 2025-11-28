@@ -4,14 +4,11 @@
             <div class="top-bar-left flex flex-align-center">
                 <div class="info-bar" v-if="screenWidth >= 900">
                     <div class="head_logo" v-if="adminType === 'admin' && isLogoLoaded">
-                        <img
-                            v-if="licensedData.adminLightLogo && licensedData.adminLightLogo !== null"
-                            class="logo_img"
-                            :src="imageFormat(licensedData.adminLightLogo)"
-                        />
+                        <img v-if="licensedData.adminLightLogo && licensedData.adminLightLogo !== null" class="logo_img"
+                            :src="imageFormat(licensedData.adminLightLogo)" />
                         <img v-else class="logo_img" :src="logoWhite" />
                     </div>
-                    <div class="head_shop_logo" v-if="adminType === 'shop'" @click="$router.push('/')">
+                    <div class="head_shop_logo" v-if="adminType === 'shop'" @click="$router.push('/setting')">
                         <div class="flex flex-align-center">
                             <template v-if="shopInfo.shopLogo">
                                 <template v-if="extractContent(String(shopInfo.shopLogo)) == 'def'">
@@ -26,7 +23,24 @@
                             </template>
                             <div class="shop-tit line1">{{ shopInfo.shopTitle }}</div>
                         </div>
-                        <i class="iconfont-admin icon-image_hotarea" @click.stop="$router.push('/setting')"></i>
+                        <i class="iconfont-admin icon-image_hotarea"></i>
+                    </div>
+                    <div class="head_shop_logo" v-if="adminType === 'vendor'" @click="$router.push('/setting')">
+                        <div class="flex flex-align-center">
+                            <template v-if="vendorInfo.vendorLogo">
+                                <template v-if="extractContent(String(vendorInfo.vendorLogo)) == 'def'">
+                                    <img class="logo_img" :src="returnAvatar(vendorInfo.vendorLogo)" />
+                                </template>
+                                <template v-else>
+                                    <img class="logo_img" :src="imageFormat(vendorInfo.vendorLogo)" />
+                                </template>
+                            </template>
+                            <template v-else>
+                                <img class="logo_img" src="@/assets/logo/supplier_logo.png" />
+                            </template>
+                            <div class="shop-tit line1">{{ vendorInfo.vendorName }}</div>
+                        </div>
+                        <i class="iconfont-admin icon-image_hotarea"></i>
                     </div>
                 </div>
                 <div v-else class="top-bar-item wap-show" @click="menusStore.menuActive = !menusStore.menuActive">
@@ -62,6 +76,7 @@ const menusStore = useMenusStore();
 const { themeInfo } = useThemeStore();
 const adminType = ref(localStorage.getItem("adminType"));
 const shopInfo = computed(() => useUserStore().shopInfo);
+const vendorInfo = computed(() => useUserStore().vendorInfo);
 const licensedStore = useLicensedStore();
 const licensedData = licensedStore.licensedData;
 const screenWidth = ref(window.innerWidth);
@@ -106,17 +121,21 @@ onBeforeUnmount(() => {
 
 .top-bar-left {
     margin-left: 10px;
+
     .info-bar {
         width: 230px;
         margin-right: 15px;
+
         .head_logo {
             display: flex;
             align-items: center;
             height: 100%;
+
             .logo_img {
                 width: 110px;
             }
         }
+
         .head_shop_logo {
             display: flex;
             align-items: center;
@@ -124,6 +143,7 @@ onBeforeUnmount(() => {
             padding: 5px 10px;
             cursor: pointer;
             color: var(--tig-menu-text-color);
+
             img {
                 width: 30px;
                 height: 30px;
@@ -131,17 +151,22 @@ onBeforeUnmount(() => {
                 background-color: #fff;
                 object-fit: contain;
             }
+
             .shop-tit {
                 width: 160px;
                 margin-left: 10px;
+                overflow: visible;
             }
+
             i {
                 font-size: 12px;
                 display: none;
             }
+
             &:hover {
                 background-color: #9c9c9c2e;
                 border-radius: 2px;
+
                 i {
                     display: block;
                 }
@@ -155,6 +180,7 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
 }
+
 .wap-show {
     display: none;
 }
@@ -163,6 +189,7 @@ onBeforeUnmount(() => {
     .wap-show {
         display: block;
     }
+
     .open-menu-btn {
         padding: 0 20px;
         display: block;
@@ -170,6 +197,7 @@ onBeforeUnmount(() => {
         cursor: pointer;
         color: var(--tig-menu-text-color);
     }
+
     .top-bar-item .top-bar-btn {
         word-break: keep-all;
         margin: 0;

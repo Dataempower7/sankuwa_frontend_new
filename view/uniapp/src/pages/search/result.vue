@@ -4,12 +4,19 @@
         <view class="custom-navbar">
             <view class="navbar-content">
                 <view class="back-btn" @click="handleBack">
-                    <text class="iconfont-h5 icon-zuojiantou" />
+                    <image style="    width: 50rpx;    height: 50rpx;" src="/static/images/common/trolley_icon_back@3x.png" mode="aspectFit" />
                 </view>
                 <view class="search-container">
-                    <view class="search-box" @click.stop="toSearch">
-                        <text class="iconfont-h5 icon-sousuo search-icon" />
-                        <view class="search-text">{{ filterParams.keyword || $t("点击搜索商品") }}</view>
+                    <view class="search-box">
+                        <image class="search-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758778963QMciIVS0zkhfhjYBdM.jpeg" mode="aspectFit" />
+                        <input
+                            class="search-input"
+                            type="text"
+                            :value="filterParams.keyword"
+                            :placeholder="$t('点击搜索商品')"
+                            placeholder-class="placeholder"
+                            @focus="toSearch"
+                        />
                     </view>
                 </view>
                 <view class="refresh-btn" @click="handleRefresh">
@@ -90,7 +97,13 @@
                 </view>
             </template>
             <template v-if="!isLoading && total === 0">
-                <empty-box mode="search" background="#f5f5f5" />
+                <view class="empty-search-container">
+                    <view class="empty-content">
+                        <image class="empty-image" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202509/1758705880vZYp8jdsXtbPshx9B6.jpeg" mode="aspectFit" />
+                        <text class="empty-text">{{ $t("暂无相关商品") }}</text>
+                        <text class="empty-desc">{{ $t("换个关键词试试吧") }}</text>
+                    </view> 
+                </view>
             </template>
 
             <loading-box v-model="isLoadMore" :page="filterParams.page" :length="productList.length" />
@@ -610,14 +623,20 @@ const handleRefresh = () => {
     gap: 15rpx;
 
     .search-icon {
-        font-size: 45rpx;
+        font-size: 35rpx;
         color: #999;
+        width: 32rpx;
+        height: 32rpx;
     }
 
-    .search-text {
+    .search-input {
         flex: 1;
         font-size: 28rpx;
         color: #333;
+        
+        .placeholder {
+            color: #999;
+        }
     }
 }
 
@@ -878,6 +897,40 @@ const handleRefresh = () => {
     }
 
 .pageMain {
+    /* 搜索结果空状态样式 */
+    .empty-search-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        padding: 40rpx;
+
+        .empty-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            .empty-image {
+                width: 300rpx;
+                height: 300rpx;
+                margin-bottom: 40rpx;
+            }
+
+            .empty-text {
+                font-size: 32rpx;
+                color: #333;
+                font-weight: 500;
+                margin-bottom: 16rpx;
+            }
+
+            .empty-desc {
+                font-size: 28rpx;
+                color: #999;
+                line-height: 1.5;
+            }
+        }
+    }
 }
 
 .goods-container {
@@ -928,7 +981,6 @@ const handleRefresh = () => {
 
                     .detail {
                         margin: 0 16rpx 10rpx;
-                        display: block;
                         line-height: 40rpx;
                         height: 80rpx;
                         overflow: hidden;
@@ -936,12 +988,11 @@ const handleRefresh = () => {
                         font-weight: bold;
                         color: #2a3145;
                         text-overflow: ellipsis;
-                        display: -webkit-box;
-                        display: -moz-box;
+                        display: -webkit-box !important;
                         -webkit-line-clamp: 2;
-                        -moz-line-clamp: 2;
+                        line-clamp: 2;
                         -webkit-box-orient: vertical;
-                        -moz-box-orient: vertical;
+                        word-break: break-all;
                     }
 
                     .action {
@@ -986,6 +1037,8 @@ const handleRefresh = () => {
         }
     }
 }
+
+
 .sousuo {
     color: $tig-color-grey !important;
 }

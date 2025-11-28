@@ -7,14 +7,13 @@
             <div class="title">添加图片</div>
         </div>
         <div class="dec-edit-group-con">
-            <PicList v-model:photo="module.bannerList" decorateType="mobile"></PicList>
+            <PicList v-model:photo="module.bannerList" decorateType="mobile" pageType="overseas" :dataType="14"></PicList>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
 import "@/views/decorate/decorate/src/css/decorate.less";
 import { DecorateUserBanner } from "@/types/decorate/decorateDiscrete.d";
-import { ref } from "vue";
 import { PicList } from "@/components/decorate";
 const module = defineModel<DecorateUserBanner>("module", {
     type: Object as () => DecorateUserBanner,

@@ -27,7 +27,7 @@
     </perfect-scrollbar>
 </template>
 <script lang="ts" setup>
-import { ref, defineModel, reactive } from "vue";
+import { ref } from "vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
 import { ModuleType, ModuleCategoryA1Type } from "@/types/decorate/decorate.d";

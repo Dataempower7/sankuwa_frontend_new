@@ -22,7 +22,7 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from "@/components/decorate";
-import { ref, defineComponent, defineModel } from 'vue';
+import { ref, defineComponent } from 'vue';
 import { SelectLink } from '@/components/select';
 import { BannerNavContent } from "@/types/decorate/decorate.d";
 const navContent = defineModel<BannerNavContent>("modelValue", { default: () => ({}) });

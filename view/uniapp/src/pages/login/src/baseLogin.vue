@@ -123,7 +123,7 @@
 
                 <!-- 底部区域 -->
                 <view class="bottom-section" :class="{ flex: loginType === 'password' }">
-                    <view class="agreement-section">
+                    <view class="agreement-section" :class="{ 'shake-animation': showShake }">
                         <tig-checkbox v-model:checked="isChecked" color="#2F3B50" />
                         <text class="agreement-text">登录即为同意</text>
                         <text class="agreement-link" @click.stop="showAgreement">《商城用户服务协议》</text>
@@ -210,6 +210,7 @@ const verifyToken = ref("");
 const loginLoading = ref(false);
 const verifyRef = ref();
 const mobileAreaCode = ref("86");
+const showShake = ref(false);
 
 const isloginDisabled = computed(() => {
     if (loginType.value === "password") {
@@ -229,11 +230,11 @@ const mobileErrorCallback = (msg: string) => {
 };
 const mobileLogin = () => {
     if (!isChecked.value) {
-        return uni.showToast({
-            title: t("请先同意用户协议"),
-            duration: 1500,
-            icon: "none"
-        });
+        showShake.value = true;
+        setTimeout(() => {
+            showShake.value = false;
+        }, 500);
+        return;
     }
 
     signin();
@@ -758,5 +759,22 @@ checkbox {
 .custom-input :deep(.uni-easyinput__content) {
     background-color: #f5f7fa !important;
     border: none !important;
+}
+
+/* 抖动动画 */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10rpx);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10rpx);
+    }
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
 }
 </style>

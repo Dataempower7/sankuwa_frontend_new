@@ -14,7 +14,6 @@ export const useRegionStore = defineStore('region', {
             if (this.allRegion === null) {
                 try {
                     const result = await getRegionTreeList();
-                    console.log(result)
                     this.allRegion = result
                 } catch (error) {
                 } finally {

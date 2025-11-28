@@ -121,13 +121,13 @@
                                     <image
                                         v-if="item.status === 4"
                                         class="status-image"
-                                        src="/static/images/common/expired.png"
+                                        src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761274296vJNFTPT5IJSuOuzj3K.jpeg"
                                         mode="aspectFit"
                                     />
                                     <image
                                         v-if="item.status === 5"
                                         class="status-image"
-                                        src="/static/images/common/used.png"
+                                        src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/17612742966KxAy8y4n4Uol7BQ2U.jpeg"
                                         mode="aspectFit"
                                     />
                                 </view>

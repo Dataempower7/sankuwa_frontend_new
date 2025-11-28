@@ -1,11 +1,12 @@
 import NotFound from "@/layouts/blank/blank.vue";
+import { getShopType } from "@/utils/storage";
 
 export default {
     path: "/",
     name: "panel",
     redirect: "/",
     component: () => import("@/layouts/base/index.vue"),
-    meta: { title: "店铺" },
+    meta: { title: getShopType() === 2 ? "门店" : "店铺" },
     children: [
         {
             path: "/",
@@ -134,6 +135,13 @@ export default {
                     name: "productInventoryLogManage",
                     meta: { title: "库存日志" },
                     component: () => import("@/views/product/productInventoryLog/List.vue")
+                },
+                ,
+                {
+                    path: "inventory-calendar/list",
+                    name: "storeInventoryCalendarManage",
+                    meta: { title: "库存日历" },
+                    component: () => import("@/views/product/inventoryCalendar/List.vue")
                 }
             ]
         },
@@ -152,7 +160,7 @@ export default {
                 {
                     path: "balance/list",
                     name: "balanceManage",
-                    meta: { title: "店铺资金" },
+                    meta: { title: getShopType() === 1 ? "店铺资金" : "门店资金" },
                     component: () => import("@/views/merchant/capitalfund/balance/List.vue")
                 },
                 {
@@ -162,16 +170,28 @@ export default {
                     component: () => import("@/views/merchant/capitalfund/withdraw/Index.vue")
                 },
                 {
+                    path: "account/list",
+                    name: "accountListManage",
+                    meta: { title: "账户管理" },
+                    component: () => import("@/views/merchant/capitalfund/account/List.vue")
+                },
+                {
+                    path: "statement-download/list",
+                    name: "statementDownload",
+                    meta: { title: "对账单下载" },
+                    component: () => import("@/views/finance/shopFunds/statementDownload/List.vue")
+                },
+                {
+                    path: "statement-details/list",
+                    name: "statementDetails",
+                    meta: { title: "对账单明细" },
+                    component: () => import("@/views/finance/shopFunds/statementDetails/List.vue")
+                },
+                {
                     path: "financial-log/list",
                     name: "financialLogManage",
                     meta: { title: "资金明细" },
                     component: () => import("@/views/shop/financialLog/List.vue")
-                },
-                {
-                    path: "account/list",
-                    name: "accountManage",
-                    meta: { title: "账户列表" },
-                    component: () => import("@/views/merchant/capitalfund/account/List.vue")
                 }
             ]
         },

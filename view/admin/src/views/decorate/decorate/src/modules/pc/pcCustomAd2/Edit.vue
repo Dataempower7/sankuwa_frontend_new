@@ -55,7 +55,6 @@
 </template>
 <script lang="ts" setup>
 import { PicList, LinkList } from '@/components/decorate'
-import { ref, defineModel } from 'vue';
 import { ModuleType, PcCustomAd2Type } from '@/types/decorate/decorate.d';
 const module = defineModel<ModuleType & PcCustomAd2Type>('module', {default: () => ({})});
 </script>

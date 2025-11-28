@@ -17,7 +17,6 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from "@/components/decorate";
-import { ref, defineModel } from "vue";
 import { ModuleType, PcSeckillType } from "@/types/decorate/decorate.d";
 const module = defineModel<ModuleType & PcSeckillType>("module", { default: () => ({}) });
 </script>

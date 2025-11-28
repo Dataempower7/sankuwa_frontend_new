@@ -41,6 +41,8 @@ export interface MessageTypeFormState {
     isMsg?: number;
     isApp?: number;
     isDing?: number;
+    isMail?: number;
+    isWxWork?: number;
     addTime?: number;
     templateMessage:TemplateMessageState;
 }
@@ -51,6 +53,8 @@ export interface TemplateMessageState{
     messageData: TemplateMessageStateItem;
     miniProgramData: TemplateMessageStateItem;
     msgData: TemplateMessageStateItem;
+    emailData: TemplateMessageStateItem;
+    wxWorkData: TemplateMessageStateItem;
 
 }
 

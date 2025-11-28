@@ -7,8 +7,8 @@
                     <el-form-item label="服务商" required>
                         <div>
                             <el-radio-group v-model="value" class="itemWidth">
-                            <el-radio :value="1">阿里云</el-radio>
-                        </el-radio-group>
+                                <el-radio :value="1">阿里云</el-radio>
+                            </el-radio-group>
                         </div>
                     </el-form-item>
                     <el-form-item label="短信帐户用户名" prop="smsKeyId">
@@ -52,14 +52,66 @@
                     </el-form-item>
                 </div>
                 <div class="content_wrapper">
-                    <div class="title">邮箱通知</div>
+                    <div class="title">邮件通知</div>
+                    <div class="notice-warp">
+                        <p>提示：推荐使用QQ的域名邮箱（免费），设置流程请看Tigshop教程，另外请确保服务器防火墙未拦截邮箱发送，且对应的端口开放。</p>
+                    </div>
+                    <el-form-item label="邮件服务" prop="mailService">
+                        <el-radio-group v-model="formState.mailService" class="itemWidth">
+                            <el-radio :value="0">本地邮件服务器</el-radio>
+                            <el-radio :value="1">SMTP服务</el-radio>
+                        </el-radio-group>
+                        <div class="extra">如果您选择了采用服务器内置的 Mail 服务，您不需要填写下面的内容。</div>
+                    </el-form-item>
+                    <el-form-item label="是否加密连接(SSL)" prop="smtpSsl">
+                        <el-radio-group v-model="formState.smtpSsl" class="itemWidth">
+                            <el-radio :value="1">是</el-radio>
+                            <el-radio :value="0">否</el-radio>
+                        </el-radio-group>
+                        <div class="extra">SMTP一般要求加密</div>
+                    </el-form-item>
+                    <el-form-item label="发送邮件服务器地址(SMTP)" prop="smtpHost">
+                        <div>
+                            <TigInput classType="tig-form-input" v-model="formState.smtpHost" type="text" />
+                            <div class="extra">邮件服务器主机地址。如果本机可以发送邮件则设置为localhost</div>
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="服务器端口" prop="smtpPort">
+                        <TigInput classType="tig-form-input" TigInput type="integer" v-model="formState.smtpPort" />
+                    </el-form-item>
+                    <el-form-item label="邮件发送帐号" prop="smtpUser">
+                        <div>
+                            <TigInput classType="tig-form-input" v-model="formState.smtpUser" type="text" />
+                            <div class="extra">发送邮件所需的认证帐号，如果没有就为空着</div>
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="帐号密码" prop="smtpPass">
+                        <TigInput classType="tig-form-input" v-model="formState.smtpPass" type="password" />
+                    </el-form-item>
+                    <el-form-item label="邮件回复地址" prop="smtpMail">
+                        <TigInput classType="tig-form-input" v-model="formState.smtpMail" type="text" />
+                    </el-form-item>
+                    <el-form-item label="邮件编码" prop="mailCharset">
+                        <el-radio-group v-model="formState.mailCharset">
+                            <el-radio label="UTF8">国际编码(UTF8)</el-radio>
+                            <el-radio label="GB2312">简体中文(GB2312)</el-radio>
+                            <el-radio label="BIG5">繁体中文(BIG5)</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="测试邮件地址" prop="testMailAddress">
+                        <TigInput classType="tig-form-input" v-model="formState.testMailAddress" type="text">
+                            <template #append>
+                                <el-button :loading="confirmLoading" @click="onSendTestEmail">发送测试邮件 </el-button>
+                            </template>
+                        </TigInput>
+                    </el-form-item>
                     <el-form-item label="客服收件地址" prop="serviceEmail">
                         <div>
                             <TigInput classType="tig-form-input" v-model="formState.serviceEmail" />
                             <div class="extra">该客服邮件地址可用于接收下面所设置的通知</div>
                         </div>
                     </el-form-item>
-                    <el-form-item label="提交订单发送邮件" prop="sendConfirmEmail">
+                    <!-- <el-form-item label="提交订单发送邮件" prop="sendConfirmEmail">
                         <el-radio-group v-model="formState.sendConfirmEmail" class="itemWidth">
                             <el-radio :value="1">是</el-radio>
                             <el-radio :value="0">否</el-radio>
@@ -86,13 +138,13 @@
                             <el-radio :value="0">否</el-radio>
                         </el-radio-group>
                         <div class="extra">提示：该邮件是发给客户</div>
-                    </el-form-item>
+                    </el-form-item> -->
                 </div>
             </el-form>
             <div style="height: 20px"></div>
         </a-spin>
     </div>
-    <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '370px' : '270px' }">
+    <div class="selected-action-warp selected-warp-left" :style="{ left: themeInfo.layout !== 'topMenu' ? '369px' : '270px' }">
         <div class="selected-action">
             <el-button :loading="confirmLoading" class="form-submit-btn" size="large" type="primary" @click="onSubmit">提 交</el-button>
         </div>
@@ -106,12 +158,13 @@ import { onMounted, ref, shallowRef, nextTick, watch } from "vue";
 import { message } from "ant-design-vue";
 import { BaseNotice } from "@/types/setting/config";
 import { getConfigNotify, saveConfigNotify } from "@/api/setting/config";
+import { sendTestEmail } from "@/api/setting/mail";
 import { useRoute } from "vue-router";
 import { convertNullsToEmptyStrings } from "@/utils/format";
 import { useThemeStore } from "@/store/theme";
 const { themeInfo } = useThemeStore();
 const route = useRoute();
-const value = 1;
+const value = ref<number>(1);
 const formRef = shallowRef();
 // 基本参数定义
 const confirmLoading = ref<boolean>(false);
@@ -121,10 +174,13 @@ const formState = ref<Partial<BaseNotice>>({
     smsSignName: "",
     smsShopMobile: "",
     serviceEmail: "",
-    sendConfirmEmail: undefined,
-    orderPayEmail: undefined,
-    sendServiceEmail: undefined,
-    sendShipEmail: undefined
+    mailService: undefined,
+    smtpSsl: undefined,
+    mailCharset: undefined
+    // sendConfirmEmail: undefined,
+    // orderPayEmail: undefined,
+    // sendServiceEmail: undefined,
+    // sendShipEmail: undefined
 });
 
 // 加载列表
@@ -148,6 +204,20 @@ const onSubmit = async () => {
     try {
         const result = await saveConfigNotify(formState.value);
         message.success("修改成功");
+    } catch (error: any) {
+        message.error(error.message);
+    } finally {
+        confirmLoading.value = false;
+    }
+};
+
+const onSendTestEmail = async () => {
+    confirmLoading.value = true;
+    try {
+        const result = await sendTestEmail({
+            testMailAddress: formState.value.testMailAddress
+        });
+        message.success("操作成功");
     } catch (error: any) {
         message.error(error.message);
     } finally {
@@ -185,5 +255,13 @@ const onSubmit = async () => {
 }
 .error {
     color: red;
+}
+
+.notice-warp {
+    background-color: #eef2ff;
+    border-radius: 9px;
+    padding: 15px;
+    margin-bottom: 20px;
+    line-height: 24px;
 }
 </style>

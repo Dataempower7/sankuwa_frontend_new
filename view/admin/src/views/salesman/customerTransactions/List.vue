@@ -151,9 +151,9 @@
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.items.length">
                                         <div class="displayColumn textL">
-                                            <div>
+                                            <div v-if="item.user">
                                                 <DialogForm
-                                                    :params="{ act: 'detail', id: item.user.userId }"
+                                                    :params="{ act: 'detail', id: item.user?.userId }"
                                                     isDrawer
                                                     path="user/user/Detail"
                                                     title="用户信息"

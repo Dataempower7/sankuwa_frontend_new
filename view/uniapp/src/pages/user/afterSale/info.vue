@@ -4,19 +4,19 @@
             <template v-if="Object.keys(infoData).length">
                 <!-- 审核状态显示 -->
                 <view class="audit-status" v-if="infoData.status === 1">
-                    <image src="/static/images/after_sale/one@3x.png" class="audit-icon" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877qG31rxqGNrfwTdCbzB.jpeg" class="audit-icon" />
                     <text class="audit-text">客服审核中</text>
                 </view>
 
                 <!-- 审核状态显示 -->
                 <view class="audit-status" v-if="infoData.status === 3">
-                    <image src="/static/images/after_sale/three@3x.png" class="audit-icon" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176179287761z0ELO4OYHiLpVYGz.jpeg" class="audit-icon" />
                     <text class="audit-text">审核不通过</text>
                 </view>
 
                 <!-- 审核状态显示 -->
                 <view class="audit-status" v-if="infoData.status === 6">
-                    <image src="/static/images/after_sale/two@3x.png" class="audit-icon" />
+                    <image src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877wcww1joTmWPNalWfAi.jpeg" class="audit-icon" />
                     <text class="audit-text">售后已完成</text>
                 </view>
 
@@ -574,7 +574,9 @@ const getPicUrls = (pics: any[]) => {
 .negotiate {
     display: flex;
     justify-content: space-between;
-    padding: 20rpx;
+    padding: 25rpx;
+    margin: 20rpx;
+    border-radius: 20rpx;
     background-color: #fff;
     .negotiate-text {
         font-weight: 500;

@@ -94,47 +94,6 @@ page {
 .ad-goods-title_style__3 .image-ad-title {
     padding-bottom: 56rpx !important;
 }
-@font-face {
-    font-family: "module_ico"; /* Project id 3395830 */
-    src:
-        url("https://at.alicdn.com/t/font_3395830_c22lq8k1fbj.woff2?t=1654497555770") format("woff2"),
-        url("https://at.alicdn.com/t/font_3395830_c22lq8k1fbj.woff?t=1654497555770") format("woff"),
-        url("https://at.alicdn.com/t/font_3395830_c22lq8k1fbj.ttf?t=1654497555770") format("truetype");
-}
-.module_ico {
-    font-family: "module_ico" !important;
-    font-size: 32rpx;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.module-ico-youjiantou:before {
-    content: "\e735";
-}
-
-.module-ico-sousuo:before {
-    content: "\e679";
-}
-
-.module-ico-gouwuche:before {
-    content: "\e611";
-}
-
-.module-ico-jia:before {
-    content: "\e74a";
-}
-
-.module-ico-gouwuche1:before {
-    content: "\e664";
-}
-
-.module-ico-jia1:before {
-    content: "\e620";
-}
-.module-ico-31shoucangxuanzhong:before {
-    content: "\e600";
-}
 
 /*首页 - 首页分类栏*/
 .bannerBox {

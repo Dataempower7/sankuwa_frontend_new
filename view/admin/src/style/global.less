@@ -6,13 +6,16 @@
 // @import "https://at.alicdn.com/t/c/font_4441878_yhhbx075z7a.css";
 // @import "https://at.alicdn.com/t/c/font_4441878_hf2c0g6n3s5.css";
 // @import "https://at.alicdn.com/t/c/font_4441878_cu9efkftfii.css";
-@import "https://at.alicdn.com/t/c/font_4441878_6uywpat8x72.css";
+// @import "https://at.alicdn.com/t/c/font_4441878_6uywpat8x72.css";
+// @import "https://at.alicdn.com/t/c/font_4441878_vtxe8auq6sc.css";
+@import "https://at.alicdn.com/t/c/font_4441878_2rp6xtukhnh.css";
 
 // 后台图标
-@import "https://at.alicdn.com/t/c/font_4375017_0h7u5hlskf4r.css";
+// @import "https://at.alicdn.com/t/c/font_4375017_qm78ketv4rh.css";
+@import "https://at.alicdn.com/t/c/font_4375017_eki3un8tjph.css";
 
 // 移动端图标
-@import "https://at.alicdn.com/t/c/font_4483982_phx7ehmq44.css";
+@import "https://at.alicdn.com/t/c/font_4483982_kfv3p9tq5ue.css";
 
 :root {
   --tig-primary: #1456f0;
@@ -41,7 +44,6 @@
   --el-color-primary-light-5: var(--tig-button-disabled-bg);
   --el-color-primary-dark-2: var(--tig-primary);
   --el-button-hover-bg-color: var(--tig-item-active-bg);
-
 }
 
 
@@ -151,6 +153,11 @@ td {
   display: flex;
 }
 
+.flex-column{
+    display: flex;
+    flex-direction: column;
+}
+
 .flex-wrap {
   flex-wrap: wrap;
 }
@@ -161,6 +168,9 @@ td {
 
 .flex-justify-between {
   justify-content: space-between;
+}
+.flex-justify-end {
+  justify-content: flex-end;
 }
 
 /* 左右结构 */
@@ -709,6 +719,10 @@ body {
     top: -16px;
   }
 
+  .el-button--primary{
+      border-color: var(--tig-primary);
+  }
+
   // .el-button--primary.is-text:not(.is-disabled).is-has-bg:hover {
   //   color: var(--tig-primary);
   //   background-color: var(--tig-button-text-hover-bg);
@@ -771,6 +785,7 @@ body {
   //   background-color: #f89898;
   //   border-color: #f89898;
   // }
+  
 }
 
 // 分页

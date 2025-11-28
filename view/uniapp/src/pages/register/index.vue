@@ -102,7 +102,7 @@
 
                 <!-- 协议和登录链接 -->
                 <view class="bottom-section">
-                    <view class="agreement-section">
+                    <view class="agreement-section" :class="{ 'shake-animation': showShake }">
                         <tig-checkbox v-model:checked="isChecked" color="#2F3B50" />
                         <text class="agreement-text">同意</text>
                         <text class="agreement-link" @click.stop="handleLink('/pages/register/agreement')">《注册协议》</text>
@@ -152,8 +152,9 @@ const { t } = useI18n();
 const isChecked = ref(false);
 const verifyToken = ref("");
 const loginLoading = ref(false);
+const showShake = ref(false);
 const isRegisterDisabled = computed(() => {
-    return !formState.value.mobile || !formState.value.mobileCode || !formState.value.password || !verifyToken.value || !isChecked.value;
+    return !formState.value.mobile || !formState.value.mobileCode || !formState.value.password || !verifyToken.value;
 });
 
 const validateMobile = (rule: any, value: any, data: any, callback: any) => {
@@ -256,6 +257,14 @@ const formRules = {
 };
 const formRef = shallowRef();
 const onRegister = async () => {
+    if (!isChecked.value) {
+        showShake.value = true;
+        setTimeout(() => {
+            showShake.value = false;
+        }, 500);
+        return;
+    }
+    
     formRef.value
         .validate()
         .then(async () => {
@@ -726,5 +735,22 @@ checkbox {
     font-size: 24rpx;
     margin-top: 10rpx;
     margin-left: 20rpx;
+}
+
+/* 抖动动画 */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10rpx);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10rpx);
+    }
+}
+
+.shake-animation {
+    animation: shake 0.5s ease-in-out;
 }
 </style>

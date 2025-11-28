@@ -6,7 +6,7 @@
                     <div class="notice-warp">
                         <p> 提示：</p>
                         <p> 1、导出的文件可编辑后进行修改后再通过“商品批量上传”或“商品批量修改修改”功能完成批量导入或修改</p>
-                        <p> 2、Tigshop系统解决了CSV导入导出时的','号和'"'号的问题，所以商品描述和商品介绍处可以不用再对这些符合进行额外处理！</p>
+                        <p> 2、SANKUWA系统解决了CSV导入导出时的','号和'"'号的问题，所以商品描述和商品介绍处可以不用再对这些符合进行额外处理！</p>
                     </div>
                     <div class="lyecs-form-table">
                         <el-form :model="formState" label-width="auto">
@@ -35,7 +35,9 @@ import requestExport from "@/utils/export";
 const rangeIds = ref<number[]>([]);
 watch(rangeIds, (newVal, oldVal) => {
     if(newVal.length > 0){
-        formState.rangeIds = newVal.join(',')  ;
+        formState.rangeIds = newVal.join(',');
+    } else {
+        formState.rangeIds = "";
     }
 },{deep: true})
 const formState = reactive<ProductBatchExportFormState>({   //初使化用于查询的参数
@@ -53,7 +55,7 @@ const onSubmit = async () => {
         message.error('请选择品牌');
         return;
     }
-    if(formState.dealRange != 0 && formState.rangeIds.length < 1){
+    if((formState.dealRange == 3 || formState.dealRange == 4) && formState.rangeIds.length < 1){
         message.error('请选择商品');
         return;
     }

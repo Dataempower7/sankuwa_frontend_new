@@ -16,3 +16,12 @@ export const createShop = (data: object) => {
         data
     });
 };
+
+
+export const chooseShop = (data: object) => {
+    return request<any>({
+        url: "merchant/shop/choose",
+        method: "post",
+        data
+    });
+};

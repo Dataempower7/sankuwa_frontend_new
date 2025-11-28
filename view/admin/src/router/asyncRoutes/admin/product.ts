@@ -97,6 +97,12 @@ export default {
                     name: "productInventoryLogManage",
                     meta: { title: "库存日志" },
                     component: () => import("@/views/product/productInventoryLog/List.vue")
+                },
+                {
+                    path: "inventory-calendar/list",
+                    name: "storeInventoryCalendarManage",
+                    meta: { title: "库存日历" },
+                    component: () => import("@/views/product/inventoryCalendar/List.vue")
                 }
             ]
         },

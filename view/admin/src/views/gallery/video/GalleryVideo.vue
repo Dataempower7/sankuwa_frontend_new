@@ -3,13 +3,13 @@
         <div class="lyecs_gallery_box">
             <div class="gallery-folder-warp">
                 <div class="gallery-folder-list">
-                    <div :class="'gallery-folder-item ' + (galleryStore.topGalleryId == 0 ? 'current' : '')" v-if="gallery" @click="folderChange(0)">
+                    <div :class="'gallery-folder-item ' + (galleryStore.topVideoGalleryId == 0 ? 'current' : '')" v-if="gallery" @click="folderChange(0)">
                         <div class="folder-item-con">
                             <i class="item-ico"></i>
                             <div class="item-name">全部</div>
                         </div>
                     </div>
-                    <div :class="'gallery-folder-item ' + (galleryStore.topGalleryId == item.id ? 'current' : '')" v-for="(item, key) in gallery">
+                    <div :class="'gallery-folder-item ' + (galleryStore.topVideoGalleryId == item.id ? 'current' : '')" v-for="(item, key) in gallery">
                         <div :class="'folder-item-con'" @click="folderChange(item.id)">
                             <i class="item-ico"></i>
                             <div class="item-name">{{ item.name }}</div>
@@ -58,10 +58,10 @@
                             <el-space>
                                 <DialogForm
                                     width="700px"
-                                    @okCallback="galleryChange(galleryStore.galleryId, galleryStore.page)"
+                                    @okCallback="galleryChange(galleryStore.videoGalleryId, galleryStore.page)"
                                     title="上传视频"
                                     path="gallery/video/VideoEdit"
-                                    :params="{ act: 'add' }"
+                                    :params="{ act: 'add', galleryId: galleryStore.videoGalleryId }"
                                     @callback="addGalleryCallback(0)"
                                 >
                                     <el-button type="primary">上传视频</el-button>
@@ -73,7 +73,7 @@
                                     >返回上一级</el-button
                                 >
                                 <DialogForm
-                                    v-if="galleryInfo && galleryStore.galleryId > 0"
+                                    v-if="galleryInfo && galleryStore.videoGalleryId > 0"
                                     width="400px"
                                     @okCallback="addGalleryCallback(galleryInfo.id)"
                                     title="添加子相册"
@@ -94,14 +94,16 @@
                     </div>
                     <a-spin :spinning="loading">
                         <div class="gallery-list" :suppressScrollX="false">
-                            <ul v-if="childGalleryList.length > 0 && galleryStore.galleryId > 0">
+                            <ul class="gallery-list-item" v-if="childGalleryList.length > 0 && galleryStore.videoGalleryId > 0">
                                 <template v-for="(gallery, key) in childGalleryList" :key="gallery.id">
                                     <li class="gallery-video-item">
                                         <div class="video-item-box" @click="galleryChange(gallery.id)">
                                             <span class="video-empty" v-if="gallery.galleryVideoInfoList.length == 0">相册为空</span>
-                                            <template v-for="(galleryPic, k) in gallery.galleryVideoInfoList">
-                                                <el-image fit="cover" class="gallery_pics" :src="imageFormat(galleryPic.videoCover)" />
-                                            </template>
+                                            <div class="flex" style="padding: 5px; gap: 5px">
+                                                <template v-for="(galleryPic, k) in gallery.galleryVideoInfoList">
+                                                    <el-image fit="cover" class="gallery_pics" :src="imageFormat(galleryPic.videoCover)" />
+                                                </template>
+                                            </div>
                                         </div>
                                         <p class="video-actions">
                                             <DialogForm
@@ -117,9 +119,7 @@
                                                 <a class="btn-del ico-font" title="删除">&#xe60a;</a>
                                             </a-popconfirm>
                                         </p>
-                                        <div class="desc">
-                                            {{ gallery.name }}
-                                        </div>
+                                        <div class="desc">{{ gallery.name }} - 子相册</div>
                                     </li>
                                 </template>
                             </ul>
@@ -202,7 +202,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, toRefs, computed, onMounted } from "vue";
+import { ref, toRefs, computed, onMounted, watch } from "vue";
 import { DialogForm } from "@/components/dialog";
 import { message, Modal } from "ant-design-vue";
 import { imageFormat } from "@/utils/format";
@@ -254,17 +254,26 @@ const loadGallery = async (galleryId: number) => {
         message.error(error.message);
     }
 };
+watch(
+    () => galleryStore.isRefresh,
+    (newVal) => {
+        if(newVal){
+            galleryStore.isRefresh = false;
+            loadGallery(galleryStore.videoGalleryId);
+        }
+    }
+);
 onMounted(() => {
     galleryStore.page = 1;
-    galleryStore.galleryId = 0;
-    galleryStore.topGalleryId = 0;
+    galleryStore.videoGalleryId = 0;
+    galleryStore.topVideoGalleryId = 0;
     loadTopGallery();
 });
 const loadTopGallery = async () => {
     try {
         const result = await getGalleryVideoList({ galleryId: 0 });
         gallery.value = result.records;
-        galleryChange(galleryStore.galleryId, galleryStore.page);
+        galleryChange(galleryStore.videoGalleryId, galleryStore.page);
     } catch (error: any) {
         message.error(error.message);
     }
@@ -272,10 +281,11 @@ const loadTopGallery = async () => {
 const folderChange = (galleryId: number) => {
     galleryChange(galleryId);
     galleryStore.page = 1;
-    galleryStore.topGalleryId = galleryId;
+    galleryStore.videoGalleryId = galleryId;
+    galleryStore.topVideoGalleryId = galleryId;
 };
 const pageChange = (curPage: number) => {
-    galleryChange(galleryStore.galleryId, curPage);
+    galleryChange(galleryStore.videoGalleryId, curPage);
 };
 // 加载相册，仅改变图片选择区域
 const galleryChange = async (id: number, pageId: number = 1) => {
@@ -287,7 +297,7 @@ const galleryChange = async (id: number, pageId: number = 1) => {
         galleryPicList.value = result.galleryVideoInfoPage.records;
         childGalleryList.value = result.childGalleryList;
         picTotal.value = result.galleryVideoInfoPage.total;
-        galleryStore.galleryId = id;
+        galleryStore.videoGalleryId = id;
         galleryInfo.value = result.galleryVideo;
     } catch (error: any) {
         message.error(error.message);
@@ -298,23 +308,23 @@ const galleryChange = async (id: number, pageId: number = 1) => {
 
 const changeSort = (value: any) => {
     galleryStore.sortOrder = value;
-    galleryChange(galleryStore.galleryId);
+    galleryChange(galleryStore.videoGalleryId);
 };
 //  编辑相册
 const editRecordCallback = (id: number, isMain: Boolean) => {
     if (isMain == true) {
-        loadGallery(galleryStore.galleryId);
+        loadGallery(galleryStore.videoGalleryId);
     } else {
-        galleryChange(galleryStore.galleryId);
+        galleryChange(galleryStore.videoGalleryId);
     }
 };
 // 添加相册
 const addGalleryCallback = (parentId: number) => {
     // console.log(parentId);/
     if (parentId == 0) {
-        loadGallery(galleryStore.galleryId);
+        loadGallery(galleryStore.videoGalleryId);
     } else {
-        galleryChange(galleryStore.galleryId);
+        galleryChange(galleryStore.videoGalleryId);
     }
 };
 // 删除图片
@@ -322,9 +332,9 @@ const delPic = async (picId: number) => {
     try {
         const result = await delVideoInfoField({ id: picId });
         message.success("操作成功");
-        galleryStore.topGalleryId = 0;
-        galleryStore.galleryId = 0;
-        loadGallery(galleryStore.galleryId);
+        galleryStore.topVideoGalleryId = 0;
+        galleryStore.videoGalleryId = 0;
+        loadGallery(galleryStore.videoGalleryId);
     } catch (error: any) {
         message.error(error.message);
     }
@@ -336,11 +346,11 @@ const delGallery = async (galleryId: number, key: number) => {
         const result = await delGalleryVideoInfo({ id: galleryId });
         message.success("操作成功");
         childGalleryList.value.splice(<any>key, 1);
-        if (galleryStore.galleryId == galleryId) {
-            galleryStore.topGalleryId = 0;
-            galleryStore.galleryId = 0;
+        if (galleryStore.topVideoGalleryId == galleryId) {
+            galleryStore.topVideoGalleryId = 0;
+            galleryStore.videoGalleryId = 0;
         }
-        loadGallery(galleryStore.galleryId);
+        loadGallery(galleryStore.videoGalleryId);
     } catch (error: any) {
         message.error(error.message);
     }
@@ -412,21 +422,48 @@ defineExpose({
 }
 .video-item-box {
     background-color: rgba(0, 0, 0, 1);
+    overflow: hidden;
+    .gallery_pics {
+        width: 40px;
+        // margin: 6px 0 0 6px;
+        height: 40px;
+        border: 1px solid #eee;
+        cursor: pointer;
+    }
 }
 .gallery-list-ul {
     gap: 10px;
     .gallery-video-item {
         margin-right: 0 !important;
         margin-bottom: 5px !important;
-        .desc{
+        .desc {
             width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
     }
-    .img-selected-box{
+    .img-selected-box {
         height: 111px !important;
+    }
+}
+
+.gallery-list-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    .gallery-video-item {
+        margin-right: 0 !important;
+        margin-bottom: 5px !important;
+        .desc {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+    .video-item-box {
+        background-color: #f3f3f3;
     }
 }
 </style>

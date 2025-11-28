@@ -57,7 +57,7 @@
 import CommonFrameEdit from "../../src/commonFrame/Edit.vue";
 import { PicSelect } from "@/components/decorate";
 import { ModuleType, backgroundDefault, ModuleTypeStyle } from "@/types/decorate/decorate.d";
-import { ref, defineModel, watch } from "vue";
+import { ref, watch } from "vue";
 import img1 from "@/views/decorate/decorate/src/img/bg/1.jpg";
 import img2 from "@/views/decorate/decorate/src/img/bg/2.jpg";
 import img3 from "@/views/decorate/decorate/src/img/bg/3.jpg";

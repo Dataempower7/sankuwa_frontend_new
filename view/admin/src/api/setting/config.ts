@@ -64,7 +64,7 @@ export const getAdminBase = () => {
 };
 
 
-import type { BaseConfig, BaseTheme, LoginConfig, OrderConfig,GlobalConfig, PaymentFormState, BaseThemeStyle, BaseCategoryDecorate, BaseAuthenticationSettings,BaseInterfactSettings, BaseKefuConfig, BasicProductConfig, BaseShoppingConfig, BaseNotice, BaseDisplayConfig } from "@/types/setting/config";
+import type { BaseConfig, AmapAllResponse, BaseTheme, LoginConfig, OrderConfig,  GlobalConfig, PaymentFormState, BaseThemeStyle, BaseCategoryDecorate, BaseAuthenticationSettings,  BaseInterfactSettings, BaseKefuConfig, BasicProductConfig, BaseShoppingConfig, BaseNotice, BaseDisplayConfig, PersonalizedFormState } from "@/types/setting/config";
 //获取基础配置
 export const getConfigBasic = () => {
     return request<BaseConfig>({
@@ -304,6 +304,46 @@ export const getConfigMerchantSetting = () => {
 export const saveConfigMerchantSetting = (data: PaymentFormState) => {
     return request({
         url: "setting/config/saveMerchant",
+        method: "post",
+        data
+    });
+};
+
+
+//获取地图配置
+export const getConfigAmapAllSettings = (params?: object) => {
+    return request<AmapAllResponse>({
+        url: "setting/config/amapAllSettings",
+        method: "get",
+        params
+    });
+};
+export const saveAllAmapSettings = (data: AmapAllResponse) => {
+    return request({
+        url: "setting/config/saveAllAmapSettings",
+        method: "post",
+        data
+    });
+};
+
+//全量初始化到 ES
+export const InitAllToEsProduct = () => {
+    return request({
+        url: "product/product/initAllToEs",
+        method: "post"
+    });
+};
+
+//个性化设置
+export const getPersonalizedSetting = () => {
+    return request<PersonalizedFormState>({
+        url: "setting/config/getPersonalizedSetting",
+        method: "get"
+    });
+};
+export const savePersonalizedSetting = (data: PersonalizedFormState) => {
+    return request({
+        url: "setting/config/savePersonalizedSetting",
         method: "post",
         data
     });

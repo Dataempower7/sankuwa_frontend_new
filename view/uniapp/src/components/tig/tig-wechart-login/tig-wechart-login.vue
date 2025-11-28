@@ -139,11 +139,11 @@ const mobileLogin = () => {
         setTimeout(() => {
             showShake.value = false;
         }, 500);
-        return uni.showToast({
-            title: t("请先同意用户协议"),
-            duration: 1500,
-            icon: "none"
-        });
+        // return uni.showToast({
+        //    // title: t("请先同意用户协议"),
+        //     duration: 1500,
+        //     icon: "none"
+        // });
     }
 };
 
@@ -185,11 +185,11 @@ const getPhoneNumber = async (e: any) => {
         setTimeout(() => {
             showShake.value = false;
         }, 500);
-        return uni.showToast({
-            title: t("请先同意用户协议"),
-            duration: 1500,
-            icon: "none"
-        });
+        // return uni.showToast({
+        //     title: t("请先同意用户协议"),
+        //     duration: 1500,
+        //     icon: "none"
+        // });
     }
     try {
         const result = await getWechartMobile({ code: e.detail.code });

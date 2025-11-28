@@ -84,10 +84,12 @@ interface GlobalConfig {
     adminDomain: string;
     autoRedirect: number;
     uploadMaxSize: number;
+    clientDefaultUse: number;
     searchKeywords: string;
     msgHackWord: string;
     isOpenPscws: string;
     shopDefaultRegions: string;
+    selectSearchType: string;
     defaultCountry: number;
     countries?: Regions[];
     icoDefinedCss: string;
@@ -113,11 +115,14 @@ interface GlobalConfig {
     layout: string;
     adminLightLogo: string | null;
     versionInfoHidden: number;
+    seoCategoryEnable: number;
+    seoProductEnable: number;
 }
 
 interface LoginConfig {
     openWechatRegister: number;
     wechatRegisterBindPhone: number;
+    openWechatPcLogin: number;
     openWechatOauth: number;
     usernamePrefix: string;
     openEmailRegister: number;
@@ -257,6 +262,9 @@ interface BasicProductConfig {
     snPrefix: string;
     showSelledCount: number | null;
     showMarketprice: number | null;
+    isEnquiry: number | null;
+    bulkPurchase: number | null;
+    enableAttributeFilter: number | null;
     marketPriceRate: number;
 }
 
@@ -404,7 +412,9 @@ export interface AdminConfigState {
     dollarSign: string;
     storageType: number;
     uploadMaxSize: number;
+    clientDefaultUse: number;
     storageUrl: string;
+    version: string;
     pcDomain: string;
     h5Domain: string;
     imDomain: string;
@@ -417,6 +427,11 @@ export interface AdminConfigState {
     poweredByStatus: number;
     defaultTechSupport: string;
     defaultCopyright: string;
+    withdrawSettingVO: any;
+    searchSettings: {
+        enableAttributeFilter?: number | null;
+        selectSearchType?: string;
+    };
 }
 
 export interface YaBandPayCurrency {
@@ -454,6 +469,15 @@ export interface BaseNotice {
     orderPayEmail: number;
     sendServiceEmail: number;
     sendShipEmail: number;
+    mailService?: number;
+    smtpSsl?: number;
+    smtpHost?: string;
+    smtpPort?: string;
+    smtpUser?: string;
+    smtpPass?: string;
+    smtpMail?: string;
+    mailCharset?: string;
+    testMailAddress?: string;
 }
 
 export interface BaseInterfactSettings {
@@ -471,6 +495,8 @@ export interface BaseAuthenticationSettings {
     tips: string;
     isIdentity: number;
     isEnquiry: number;
+    closeAuth: number;
+    bulkPurchase: number;
 }
 
 
@@ -496,4 +522,41 @@ export interface BaseTheme {
     primaryColor: ColorType;
     // uniqueOpened: boolean;
     // isMultiLabel: boolean;
+}
+
+export interface PersonalizedFormState {
+    guestLikeGoodsName: string;
+    isGuestLikeGoods: number;
+    defaultAvatar: string;
+}
+
+/**
+ * AmapAllVO，地图设置参数
+ */
+export interface AmapAllResponse {
+    /**
+     * 高德地图Key
+     */
+    amapJsKey?: string;
+    /**
+     * 高德地图SECRET
+     */
+    amapJsSecret?: string;
+    /**
+     * 高德地图Key
+     */
+    amapMiniKey?: string;
+    /**
+     * 高德地图SECRET
+     */
+    amapMiniSecret?: string;
+    /**
+     * 高德地图Key
+     */
+    amapWebKey?: string;
+    /**
+     * 高德地图SECRET
+     */
+    amapWebSecret?: string;
+    [property: string]: any;
 }

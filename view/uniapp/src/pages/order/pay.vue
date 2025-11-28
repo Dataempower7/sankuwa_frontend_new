@@ -113,6 +113,26 @@ const loadOrderPayInfo = async (id: number) => {
         const result = await orderPayInfo(id);
         order.value = result.order;
         paymentList.value = result.paymentList;
+        
+        // 在 H5/APP 环境下，确保包含微信和支付宝支付选项
+        if (configStore.XClientType === 'h5' || configStore.XClientType === 'app') {
+            const hasWechat = paymentList.value.includes('wechat') || 
+                             paymentList.value.includes('yunpayWechat') || 
+                             paymentList.value.includes('yabanpayWechat');
+            const hasAlipay = paymentList.value.includes('alipay') || 
+                             paymentList.value.includes('yunpayAlipay') || 
+                             paymentList.value.includes('yabanpayAlipay');
+            
+            // 如果没有微信支付，添加微信支付
+            if (!hasWechat && !paymentList.value.includes('wechat')) {
+                paymentList.value.unshift('wechat');
+            }
+            // 如果没有支付宝，添加支付宝支付
+            if (!hasAlipay && !paymentList.value.includes('alipay')) {
+                paymentList.value.push('alipay');
+            }
+        }
+        
         paymentType.value = paymentList.value[0];
         offlinePaymentList.value = result.offlinePaymentList;
         orderId.value = result.order.orderId;
@@ -140,6 +160,26 @@ const getRechargeOrderPay = async (id: number) => {
         const result = await rechargeOrderPay({ orderId: id });
         order.value = result.order;
         paymentList.value = result.paymentList;
+        
+        // 在 H5/APP 环境下，确保包含微信和支付宝支付选项
+        if (configStore.XClientType === 'h5' || configStore.XClientType === 'app') {
+            const hasWechat = paymentList.value.includes('wechat') || 
+                             paymentList.value.includes('yunpayWechat') || 
+                             paymentList.value.includes('yabanpayWechat');
+            const hasAlipay = paymentList.value.includes('alipay') || 
+                             paymentList.value.includes('yunpayAlipay') || 
+                             paymentList.value.includes('yabanpayAlipay');
+            
+            // 如果没有微信支付，添加微信支付
+            if (!hasWechat && !paymentList.value.includes('wechat')) {
+                paymentList.value.unshift('wechat');
+            }
+            // 如果没有支付宝，添加支付宝支付
+            if (!hasAlipay && !paymentList.value.includes('alipay')) {
+                paymentList.value.push('alipay');
+            }
+        }
+        
         paymentType.value = paymentList.value[0];
         orderId.value = result.order.orderId;
     } catch (error: any) {

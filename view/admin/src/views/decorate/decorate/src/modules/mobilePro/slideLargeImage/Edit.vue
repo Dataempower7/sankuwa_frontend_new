@@ -105,7 +105,7 @@
 <script lang="ts" setup>
 import { PicList } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import TitleDescEdit from "./src/TitleDescEdit.vue";
 import SlidingLargeImageTitle from "./src/SlidingLargeImageTitle.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";

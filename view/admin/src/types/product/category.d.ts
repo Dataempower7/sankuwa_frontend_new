@@ -44,6 +44,7 @@ export interface CategoryFormState {
     sortOrder?: number;
     isHot?: number;
     isShow?: number;
+    seoIdentification?: string;
 }
 
 export interface CategoryMoveState {

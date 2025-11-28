@@ -28,7 +28,8 @@
                                 </span>
                                 <div class="im-message-item__content" v-if="item.messageType == 'text'">
                                     <div class="im-message-item__content-value" v-if="item.content && item.content.content">
-                                        <emojiHtml :content="item.content.content" />
+                                        <span v-if="!replaceText(item.content.content)" v-html="item.content.content"></span>
+                                        <emojiHtml v-else :content="item.content.content" />
                                     </div>
                                 </div>
                                 <div class="im-message-item__content" v-if="item.content && item.messageType == 'image'">
@@ -463,6 +464,12 @@ const setReadOneself = () => {
             item.isRead = 1;
         }
     });
+};
+
+// 判断文字是否被[]包裹，如果被包裹则返回true
+const replaceText = (text: string) => {
+    const reg = /\[(.*?)\]/g;
+    return reg.test(text);
 };
 
 const serversUpdated = () => {

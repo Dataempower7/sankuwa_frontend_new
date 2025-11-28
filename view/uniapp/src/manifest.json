@@ -3,12 +3,12 @@
     "appid" : "__UNI__E11FFCF",
     "description" : "森酷玩 SANKUWA--让「玩」不止于买，而是共玩、共创、共燃森酷玩是一家垂直于“玩”的多商户体验电商平台，聚焦手游电竞、户外探险、3D 打印、无人机、RC遥控、EDC装备等硬核圈层，为玩家提供“买-学-改-秀-赛\"全链路场景。",
     "versionName" : "1.0.0",
-    "versionCode" : "100",
+    "versionCode" : 100,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
         "usingComponents" : true,
-        "nvueStyleCompiler" : "tig-shop",
+        "nvueStyleCompiler" : "uni-app",
         "compilerVersion" : 3,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
@@ -60,7 +60,7 @@
                     "request" : "none",
                     "prompt" : "为保证您正常、安全地使用，需要获取设备识别码（部分手机提示为获取手机号码）使用权限，请允许。"
                 },
-                "schemes" : "tigshop",
+                "schemes" : "sankuwa",
                 "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ],
                 "minSdkVersion" : 21,
                 "targetSdkVersion" : 30
@@ -185,14 +185,14 @@
         "template" : "index.html",
         "router" : {
             "mode" : "history",
-            "base" : "/mobile"
+            "base" : "/h5"
         },
         "optimization" : {
             "treeShaking" : {
                 "enable" : true
             }
         },
-        "title" : ""
+        "title" : "sankuwa"
     },
     "vueVersion" : "3",
     "locale" : "auto",

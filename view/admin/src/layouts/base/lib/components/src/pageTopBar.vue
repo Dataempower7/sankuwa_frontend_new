@@ -3,7 +3,8 @@
         <div class="page-top-warp" :class="{ dark: themeInfo.navTheme === 'dark' }">
             <div class="top-bar-left">
                 <div class="main-menu-logo" :class="{ light: themeInfo.navTheme === 'light' }">
-                    <div class="logo-box" v-if="licensedData && licensedData.adminLightLogo && licensedData.adminLightLogo !== null">
+                    <div class="logo-box"
+                        v-if="licensedData && licensedData.adminLightLogo && licensedData.adminLightLogo !== null">
                         <img v-if="showAdminLogo" :src="imageFormat(licensedData.adminLightLogo)" key="admin-logo" />
                         <img v-if="showDefaultLogo" :src="logoWhite" key="default-logo" />
                     </div>
@@ -12,7 +13,8 @@
                     <span class="open-menu-btn icon-zhankai iconfont"></span>
                 </div>
                 <div class="top-bar-item wap-show">
-                    <a class="wap-refresh-btn icon-shuaxin iconfont" href="javascript:;" onclick="location.reload();"></a>
+                    <a class="wap-refresh-btn icon-shuaxin iconfont" href="javascript:;"
+                        onclick="location.reload();"></a>
                 </div>
                 <div class="top-bar-item wap-show" style="display: none">
                     <a class="wap-openShop-btn icon-wangdianwaibao iconfont" :href="urlFormat('/')" target="_blank"></a>
@@ -29,21 +31,15 @@
                 <div v-else v-click-outside="onClickOut">
                     <div class="top-bar-item top-bar-search-warp">
                         <div class="top-bar-search">
-                            <TigInput
-                                v-model="keyword"
-                                style="width: 300px"
-                                placeholder="在这里查找功能，一键直达"
-                                :prefix-icon="Search"
-                                @input="onInput"
-                                @blur="onBlur"
-                            />
+                            <TigInput v-model="keyword" style="width: 300px" placeholder="在这里查找功能，一键直达"
+                                :prefix-icon="Search" @input="onInput" @blur="onBlur" />
                         </div>
                     </div>
                     <div class="search-menu-con" v-show="isShow">
                         <div class="search-menu-title">搜索结果</div>
                         <div class="search-menu-list">
                             <div class="menu-item" v-for="item in searchMenu" @click="toPage(item.authoritySn)">
-                                <p>{{ item.authorityName }}</p>
+                                <p>{{ item.authorityNames.join(" / ") }}</p>
                             </div>
                             <div class="empty" v-if="searchMenu.length < 1">没有搜索到栏目！</div>
                         </div>
@@ -90,8 +86,9 @@ const menusStore = useMenusStore();
 
 interface searchFrom {
     authorityName: string;
-    routeLink: string;
     authoritySn: string;
+    routeLink: string;
+    authorityNames: string[];
 }
 
 const showAdminLogo = computed(() => {
@@ -159,6 +156,7 @@ const onClickOut = () => {
 const { logout, updateUserInfo } = useUserStore();
 const userInfo = computed(() => useUserStore().userInfo);
 const shopInfo = computed(() => useUserStore().shopInfo);
+const vendorInfo = computed(() => useUserStore().vendorInfo);
 const unreadMsg = ref(0);
 // 清除缓存
 const clearCache = async () => {
@@ -398,8 +396,10 @@ onMounted(() => {
             max-width: 100%;
             max-height: 100%;
         }
+
         &.light {
             background-color: #eef2ff;
+
             &:after {
                 background-color: #eef2ff;
             }
@@ -457,8 +457,8 @@ onMounted(() => {
 
 .search-menu-con {
     right: auto !important;
-    left: 30px !important;
-    top: 40px;
+    left: 115px !important;
+    top: 55px;
     background-clip: padding-box;
     background-color: #ffffff;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.12);
@@ -477,12 +477,12 @@ onMounted(() => {
 
     .search-menu-list {
         padding: 20px;
-        width: 350px;
+        width: 500px;
         display: flex;
         flex-wrap: wrap;
+        gap: 15px;
 
         .menu-item {
-            margin: 0 12px 12px 0;
             padding: 10px 18px;
             border-radius: 9px;
             background: #f7f8fa;
@@ -575,6 +575,7 @@ onMounted(() => {
     .shop-tit {
         display: none;
     }
+
     .main-menu-logo {
         display: none !important;
     }

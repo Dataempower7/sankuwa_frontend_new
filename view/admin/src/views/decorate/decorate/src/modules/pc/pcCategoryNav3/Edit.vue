@@ -85,7 +85,7 @@
 <script lang="ts" setup>
 import { SelectColor } from "@/components/select";
 import { PicList } from "@/components/decorate";
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import CommonSubTitleEdit from "../../src/commonSubTitle/Edit.vue";
 import ContentStyleEdit from "../../src/contentStyle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";

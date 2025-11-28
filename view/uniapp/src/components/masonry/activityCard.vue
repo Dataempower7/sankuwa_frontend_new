@@ -29,7 +29,7 @@ const props = defineProps({
     }
 });
 
-//1秒杀2优惠券3满减4折扣5满赠6限时折扣
+//1秒杀2优惠券3满减4折扣5满赠6限时折扣7拼团
 type ActivityInfo = {
     [key: number]: string;
 };
@@ -39,7 +39,8 @@ const activitType: ActivityInfo = {
     3: "满减",
     4: "折扣",
     5: "满赠",
-    6: "限时折扣"
+    6: "限时折扣",
+    7: "拼团"
 };
 const getActivityText = (type: number) => {
     return activitType[type];
@@ -109,7 +110,7 @@ const getActivityText = (type: number) => {
         }
         .ticket-content {
             padding: 0 8rpx;
-            max-width: 200rpx;
+            // max-width: 200rpx;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -124,9 +125,9 @@ const getActivityText = (type: number) => {
             color: #ffffff;
             font-weight: 500;
             border: none;
-            padding: 0 6rpx 0 0;
+            padding: 0 6rpx 0 6rpx;
             border-radius: 5rpx;
-            font-size: 26rpx;
+            font-size: 23rpx;
         }
         
         .ticket {

@@ -1,6 +1,6 @@
 <template>
     <div class="lyecs-product-select-group">
-        <el-space>
+        <el-space v-if="['add', 'edit'].includes(props.act)">
             <DialogForm
                 v-if="!disabled"
                 :params="{ selectedIds: ids, isMultiple: props.isMultiple, isSku: props.isSku, isSelf: props.isSelf }"
@@ -18,6 +18,11 @@
             >
             <el-button v-if="isMultiple && ids?.length > 0" :disabled="disabled" @click="clear">清空</el-button>
         </el-space>
+        <div v-else>
+            <span v-if="isMultiple && ids?.length > 0" class="ml10"
+            >已选择 <b>{{ ids?.length }}</b> 个商品</span
+            >
+        </div>
         <div v-if="productList.length > 0 && !loading" class="lyecs-product-selected-con">
             <div class="product-selected-list">
                 <div class="product-selected-list-tr product-selected-list-th">
@@ -25,7 +30,7 @@
                     <div class="col col4">商品信息</div>
                     <div class="col col3">商品库存</div>
                     <div class="col col3" v-if="isSku && isGift">赠品库存</div>
-                    <div class="col col3">操作</div>
+                    <div class="col col3" v-if="['add', 'edit'].includes(props.act)">操作</div>
                 </div>
                 <template v-for="(item, key) in productList" :key="key">
                     <div class="product-selected-list-tr">
@@ -51,7 +56,7 @@
                             <TigInput v-if="item.productSku !== null" :disabled="disabled" :min="0" type="integer" :max="item.productSku.find(item => item.skuId == skuId)?.skuStock" v-model="skuStock" width="100%" />
                             <TigInput v-else :disabled="disabled" :min="0" type="integer" :max="item.productStock" v-model="skuStock" width="100%" />
                         </div>
-                        <div class="col col3">
+                        <div class="col col3" v-if="['add', 'edit'].includes(props.act)">
                             <el-button link type="primary" class="del-btn" @click="del(key)" :disabled="disabled">删除</el-button>
                         </div>
                     </div>
@@ -80,7 +85,7 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { onMounted, reactive, ref, defineModel } from "vue";
+import { onMounted, reactive, ref, defineModel, watch } from "vue";
 import { DialogForm } from "@/components/dialog";
 import { imageFormat } from "@/utils/format";
 import { getProductList } from "@/api/product/product";
@@ -91,6 +96,10 @@ import { Pagination } from "@/components/list";
 import SelectSku from "@/views/promotion/productGift/src/SelectSku.vue"
 // 传值
 const props = defineProps({
+    act: {
+        type: String,
+        default: "add"
+    },
     // 传入需要显示的商品list
     max: { type: Number, default: -1 },
     // 单选还是多选
@@ -120,11 +129,12 @@ const ids = defineModel<number[]>("ids", { type: Array, default: [] });
 const skuId = defineModel("skuId", {type: String, default: ''});
 const skuStock = defineModel("skuStock", {type: Number, default: 0});
 
-onMounted(async () => {
-    if (ids.value && ids.value.length > 0) {
-        await loadList(ids.value);
-    }
-});
+const emit = defineEmits(["update:ids"])
+// onMounted(async () => {
+//     if (ids.value && ids.value.length > 0) {
+//         await loadList(ids.value);
+//     }
+// });
 // 商品列表
 const productList = ref<ProductFilterState[]>([]);
 const total = ref(0);
@@ -143,7 +153,7 @@ const loadList = async (id: number[]) => {
     loading.value = true;
     try {
         //id是数组，现在用,号分割成字符串
-        productIds.value = Array.isArray(id) ? id.join(",") : "";
+        productIds.value = Array.isArray(id) ? id.join(",") : (ids?.value?.join(",") || '');
         const result = await getProductList({ ids: productIds.value, ...filterParams });
         productList.value = result.records;
         total.value = result.total;
@@ -154,7 +164,7 @@ const loadList = async (id: number[]) => {
     }
 };
 const onOk = (e: any) => {
-    let _list = ids.value;
+    let _list = ids.value || [];
     skuId.value = '';
     skuStock.value = 0;
     if (props.isMultiple == false) {
@@ -171,8 +181,14 @@ const onOk = (e: any) => {
         }
     }
     ids.value = _list;
+    emit("update:ids", _list);
     loadList(_list);
 };
+watch(ids, async (val) => {
+    if (val && val.length > 0) {
+        await loadList(val);
+    }
+}, { deep: true, immediate: true})
 // 清空
 const clear = () => {
     productList.value = [];

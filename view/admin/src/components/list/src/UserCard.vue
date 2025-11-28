@@ -48,7 +48,6 @@ const userValue = computed(() => {
 
 .user {
     width: 100px;
-    line-height: 12px;
 }
 </style>
 

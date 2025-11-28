@@ -1,7 +1,7 @@
 <template>
     <div class="select-shop-warp">
         <div class="head-box flex flex-justify-between flex-align-center">
-            <div class="title">选择店铺</div>
+            <div class="title">选择组织</div>
             <div class="close" @click="close">
                 <i class="iconfont icon-cha1"></i>
             </div>
@@ -11,12 +11,14 @@
                 <div class="warp-info" v-if="!loading">
                     <el-scrollbar style="height: 100%">
                         <div class="list-box">
-                            <div class="info-item admin" @click="toIndex(0)" v-if="userinfo.adminType == 'admin'">
+                            <div class="info-item admin" @click="toIndex(0, 'admin')"
+                                v-if="userinfo.adminType == 'admin'">
                                 <div class="logo">
                                     <img src="@/assets/logo/admin_logo.png" alt="" />
                                 </div>
                                 <div>
-                                    管理后台 <span v-if="userinfo && userinfo.username && userinfo.username !== ''">（{{ userinfo?.username }}）</span>
+                                    管理后台 <span v-if="userinfo && userinfo.username && userinfo.username !== ''">（{{
+                                        userinfo?.username }}）</span>
                                 </div>
                             </div>
                             <!-- <div class="info-item supplier" @click="toIndex(0)">
@@ -26,19 +28,39 @@
                             <div>供应商后台</div>
                         </div> -->
                             <template v-if="myShopList.length > 0">
-                                <div class="info-item" v-for="item in myShopList" :key="item.shopId" @click="toIndex(item.shopId)">
+                                <div class="info-item" v-for="item in myShopList" :key="item.shopId"
+                                    @click="toIndex(item.shopId, 'shop')">
                                     <div class="logo">
-                                        <img v-if="item.shopLogo" :src="imageFormat(item.shopLogo)" alt="" />
+                                        <el-image v-if="item.shopLogo" class="shop-img"
+                                            :src="imageFormat(item.shopLogo)" fit="cover" />
                                         <img v-else src="@/assets/logo/merchant_logo.png" alt="" />
                                     </div>
-                                    <div class="shop-name line1">{{ item.shopTitle }}</div>
+                                    <div class="shop-name">
+                                        <p class="label shop" v-if="item.shopType === 1">店铺</p>
+                                        <p class="label store" v-if="item.shopType === 2">门店</p>
+                                        <p class="label pickup" v-if="item.shopType === 3">自提点</p>
+                                        <p class="line1">{{ item.shopTitle }}</p>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-if="vendorList.length > 0">
+                                <div class="info-item" v-for="item in vendorList" :key="item.vendorId"
+                                    @click="toIndex(item.vendorId, 'vendor')">
+                                    <div class="logo">
+                                        <img v-if="item.gysLogo" :src="imageFormat(item.gysLogo)" alt="" />
+                                        <img v-else src="@/assets/logo/supplier_logo.png" alt="" />
+                                    </div>
+                                    <div class="shop-name line1">
+                                        <p class="label vendor">供应商</p>
+                                        <p class="line1">{{ item.vendorName }}</p>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                     </el-scrollbar>
                 </div>
             </a-spin>
-            <div class="btn-box" v-if="adminType === 'shop'">
+            <div class="btn-box" v-if="getAdminType() === 'shop' && getShopType() === 1">
                 <el-button type="primary" @click="createShopFlag = true" style="width: 130px">新建店铺</el-button>
             </div>
         </div>
@@ -60,11 +82,10 @@
 <script setup lang="ts">
 import { ref, shallowRef } from "vue";
 import { createShop } from "@/api/merchant/shop";
-import { useUserStore } from "@/store/user";
 import { urlFormat, imageFormat } from "@/utils/format";
 import { message } from "ant-design-vue";
-import { getAdminType } from "@/utils/storage";
-const adminType = getAdminType();
+import { getAdminType, getShopType } from "@/utils/storage";
+import gysLogo from "@/assets/logo/gys.png";
 const props = defineProps({
     selectShopFlag: {
         type: Boolean,
@@ -74,13 +95,17 @@ const props = defineProps({
         type: Array as () => any[],
         default: () => []
     },
+    vendorList: {
+        type: Array as () => any[],
+        default: () => []
+    },
     loading: {
         type: Boolean,
         default: false
     },
     userinfo: {
         type: Object,
-        default: () => {}
+        default: () => { }
     },
     adminType: {
         type: String,
@@ -113,33 +138,39 @@ const onSubmit = async () => {
 };
 const formRef = shallowRef();
 const createShopFlag = ref(false);
-const toIndex = async (shopId: number) => {
-    emit("callBack", shopId);
+const toIndex = async (id: number, type: string) => {
+    emit("callBack", { id, type });
 };
 </script>
 <style scoped lang="less">
 .select-shop-warp {
     padding: 0px 20px;
+
     .head-box {
         padding: 10px 0 10px 0;
         font-size: 16px;
+
         .title {
             color: #1f2026;
             font-weight: 500;
         }
     }
+
     .btn-box {
         margin-top: 20px;
         text-align: center;
     }
+
     .warp-info {
         height: 470px;
         overflow-y: auto;
+
         .list-box {
             padding: 20px 10px;
             display: flex;
             flex-wrap: wrap;
             gap: 25px;
+
             .info-item {
                 width: 200px;
                 height: 200px;
@@ -154,6 +185,7 @@ const toIndex = async (shopId: number) => {
                 color: #1f2026;
                 font-size: 16px;
                 transition: all 0.2s;
+
                 &:hover {
                     margin-top: -5px;
                     box-shadow: 0 20px 40px 0 rgba(2, 31, 65, 0.1);
@@ -161,6 +193,7 @@ const toIndex = async (shopId: number) => {
                     border-color: var(--tig-primary);
                     background: #fff;
                 }
+
                 .logo {
                     img {
                         width: 90px;
@@ -168,9 +201,56 @@ const toIndex = async (shopId: number) => {
                         border-radius: 50px;
                         margin-bottom: 20px;
                     }
+
+                    .shop-img {
+                        width: 85px;
+                        height: 85px;
+                        border-radius: 50px;
+                        margin-bottom: 20px;
+                    }
                 }
+
                 .shop-name {
                     max-width: 80%;
+                    display: flex;
+                    align-items: center;
+                    line-height: 22px;
+
+                    .label {
+                        height: 15px;
+                        line-height: 15px;
+                        border: 1px solid red;
+                        padding: 0 2px;
+                        font-size: 10px;
+                        margin-right: 5px;
+                        border-radius: 2px;
+                        margin-top: 3px;
+                        text-align: center;
+                    }
+
+                    .shop {
+                        min-width: 25px;
+                        color: #1456F0;
+                        border-color: #1456F0;
+                    }
+
+                    .vendor {
+                        min-width: 35px;
+                        color: #A203FC;
+                        border-color: #A203FC;
+                    }
+
+                    .pickup {
+                        min-width: 45px;
+                        color: #ff6104;
+                        border-color: #ff6104;
+                    }
+
+                    .store {
+                        min-width: 25px;
+                        color: #52C41A;
+                        border-color: #52C41A;
+                    }
                 }
             }
         }

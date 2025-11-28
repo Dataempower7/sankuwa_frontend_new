@@ -30,8 +30,8 @@ import { useRoute } from "vue-router";
 import { ElScrollbar } from "element-plus";
 
 const themeStore = useThemeStore();
-const themeInfo: any = themeStore.themeInfo;
 themeStore.getThemeInfo();
+const themeInfo: any = themeStore.themeInfo;
 const ScrollBar = ref<InstanceType<typeof ElScrollbar>>();
 const route = useRoute();  // 获取当前路由
 onMounted(() => {

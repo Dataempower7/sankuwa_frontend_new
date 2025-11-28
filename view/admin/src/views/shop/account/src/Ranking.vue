@@ -1,18 +1,18 @@
 <template>
     <div class="tit-box">
         <div class="tit">
-            <span>店铺余额排行</span>
+            <span>{{shopTypeName}}余额排行</span>
         </div>
     </div>
     <div class="lyecs-table-list-warp">
         <div class="table-container">
             <el-table :data="filterState" :loading="loading" :total="total" row-key="logId" v-loading="loading">
-                <el-table-column label="店铺名称">
+                <el-table-column :label="`${shopTypeName}名称`">
                     <template #default="{ row }">
                         {{ row.shopTitle || "--" }}
                     </template>
                 </el-table-column>
-                <el-table-column label="店铺LOGO">
+                <el-table-column :label="`${shopTypeName}LOGO`">
                     <template #default="{ row }">
                         <Image :src="row.shopLogo" fit="contain" style="height: 25px; width: 60px" />
                     </template>
@@ -37,20 +37,20 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="店铺余额(元)">
+                <el-table-column :label="`${shopTypeName}余额(元)`">
                     <template #default="{ row }">
                         {{ priceFormat(row.shopMoney) || 0.0 }}
                     </template>
                 </el-table-column>
-                <el-table-column label="店铺状态" sortable="custom">
+                <el-table-column :label="`${shopTypeName}状态`" sortable="custom">
                     <template #default="{ row }">
-                        <template v-if="row.status == 10">
+                        <template v-if="row.status == 10 || row.status == 4">
                             <StatusDot color="red" :flicker="true"></StatusDot>
                         </template>
                         <template v-if="row.status == 1">
                             <StatusDot color="green" :flicker="true"></StatusDot>
                         </template>
-                        <span v-if="row.status === 10" style="color: red">{{ row.statusText }}</span>
+                        <span v-if="row.status === 10 || row.status == 4" style="color: red">{{ row.statusText }}</span>
                         <span v-else-if="row.status === 1" style="color: green">{{ row.statusText }}</span>
                     </template>
                 </el-table-column>
@@ -68,6 +68,7 @@
 </template>
 <script lang="ts" setup>
 import "@/style/css/list.less";
+import StatusDot from "@/components/form/src/StatusDot.vue";
 import { onMounted, reactive, ref } from "vue";
 import { Pagination } from "@/components/list";
 import { message } from "ant-design-vue";
@@ -77,6 +78,8 @@ import { DialogForm } from "@/components/dialog";
 import { priceFormat } from "@/utils/format";
 import { OrderFilterParams } from "@/types/order/order.d";
 import { getShopList } from "@/api/shop/shop";
+import { isMerchant, isStore } from "@/utils/version";
+const shopTypeName = isStore() ? '门店' : isMerchant() ? '店铺' : '店铺'
 const config: any = useConfigStore();
 import { useListRequest } from '@/hooks/useListRequest';
 const {
@@ -88,8 +91,9 @@ const {
   loadData: loadFilter,
 } = useListRequest<any, OrderFilterParams>({
   apiFunction: getShopList,
-  idKey: 'logId',
+  idKey: 'shopId',
   defaultParams: {
+      shopType: isStore() ? 2 : isMerchant() ? 1 : 1,
       sortField: 'shopMoney',
       sortOrder: 'desc',
       page: 1,

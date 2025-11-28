@@ -155,7 +155,7 @@
 import { SelectColor } from "@/components/select";
 import { PicList } from "@/components/decorate";
 import Tabs from "@/components/tabs/Index.vue";
-import { ref, defineModel, reactive } from "vue";
+import { ref, reactive } from "vue";
 import CommonSubTitleEdit from "../../src/commonSubTitle/Edit.vue";
 import ModuleStyleEdit from "../../src/moduleStyle/Edit.vue";
 import { ModuleType, ModuleSlidingImageType } from "@/types/decorate/decorate.d";

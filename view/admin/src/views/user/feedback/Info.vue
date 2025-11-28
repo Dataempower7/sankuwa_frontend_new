@@ -10,6 +10,11 @@
         <div class="lyecs-form-table">
              <p>主题:{{formData.title}} </p>
             <p>内容: {{ formData.content }}</p>
+            <div class="pic-list flex" v-if="formData.feedbackPics && formData.feedbackPics.length > 0">
+                <div class="item mr10" v-for="item in formData.feedbackPics">
+                    <Image :src="item" fit="contain" style="height: 120px; width: 120px" />
+                </div>
+            </div>
             <p style="text-align: end;">【 留言板 】{{ formData.username }} @ {{ formData.addTime }}</p>
         </div>
         <el-divider />
@@ -30,6 +35,7 @@ import {useRouter} from 'vue-router'
 import {message} from "ant-design-vue";
 import {FeedbackFormState} from '@/types/user/feedback';
 import {getFeedback, updateFeedback} from "@/api/user/feedback";
+import { Image } from "@/components/image";
 // 父组件回调
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 const props = defineProps({

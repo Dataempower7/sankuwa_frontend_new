@@ -144,7 +144,7 @@
                                 <!-- 操作按钮区域 -->
                                 <view class="pay-actions">
                                     <view class="action-left">
-                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @tap="toggleMoreActions(item.orderId, index)" @click="toggleMoreActions(item.orderId, index)">
+                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @click.stop="toggleMoreActions(item.orderId, index)">
                                             <text class="more-text">更多</text>
                                         </view>
                                     </view>
@@ -180,7 +180,7 @@
                                 <!-- 操作按钮区域 -->
                                 <view class="pay-actions">
                                     <view class="action-left">
-                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @tap="toggleMoreActions(item.orderId, index)" @click="toggleMoreActions(item.orderId, index)">
+                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @click.stop="toggleMoreActions(item.orderId, index)">
                                             <text class="more-text">更多</text>
                                         </view>
                                     </view>
@@ -223,7 +223,7 @@
                                 <!-- 操作按钮区域 -->
                                 <view class="pay-actions">
                                     <view class="action-left">
-                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @tap="toggleMoreActions(item.orderId, index)" @click="toggleMoreActions(item.orderId, index)">
+                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @click.stop="toggleMoreActions(item.orderId, index)">
                                             <text class="more-text">更多</text>
                                         </view>
                                     </view>
@@ -305,7 +305,7 @@
                                 <!-- 操作按钮区域 -->
                                 <view class="pay-actions">
                                     <view class="action-left">
-                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @tap="toggleMoreActions(item.orderId, index)" @click="toggleMoreActions(item.orderId, index)">
+                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @click.stop="toggleMoreActions(item.orderId, index)">
                                             <text class="more-text">更多</text>
                                         </view>
                                     </view>
@@ -357,7 +357,7 @@
                                 <!-- 操作按钮区域 -->
                                 <view class="pay-actions">
                                     <view class="action-left">
-                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @tap="toggleMoreActions(item.orderId, index)" @click="toggleMoreActions(item.orderId, index)">
+                                        <view class="more-btn" :id="`more-btn-${item.orderId}`" @click.stop="toggleMoreActions(item.orderId, index)">
                                             <text class="more-text">更多</text>
                                         </view>
                                     </view>
@@ -578,20 +578,61 @@
                 </template>
             </view>
         </view>
+        
+        <!-- 支付方式选择弹窗 -->
+        <view v-if="showPaymentModal" class="payment-modal-overlay" @tap="closePaymentModal">
+            <view class="payment-modal" @tap.stop="">
+                <view class="modal-header">
+                    <text class="modal-title">选择支付方式</text>
+                    <text class="modal-close" @tap="closePaymentModal">✕</text>
+                </view>
+                <view class="modal-content">
+                    <!-- 微信支付 -->
+                    <view class="payment-option" @tap="selectPaymentAndPay('wechat')">
+                        <view class="option-left">
+                            <image src="/static/images/common/wechatpay.png" class="option-icon" />
+                            <text class="option-name">微信支付</text>
+                        </view>
+                        <image v-if="selectedPaymentMethod === 'wechat'" src="/static/images/common/check.png" class="option-check" />
+                    </view>
+                    <!-- 支付宝支付 -->
+                    <view class="payment-option" @tap="selectPaymentAndPay('alipay')">
+                        <view class="option-left">
+                            <image src="/static/images/common/alipay.png" class="option-icon" />
+                            <text class="option-name">支付宝支付</text>
+                        </view>
+                        <image v-if="selectedPaymentMethod === 'alipay'" src="/static/images/common/check.png" class="option-check" />
+                    </view>
+                </view>
+            </view>
+        </view>
     </tig-layout>
 </template>
 
 <script setup lang="ts">
 
-import { reactive, ref, onUnmounted, nextTick } from "vue";
+import { reactive, ref, onUnmounted, nextTick, computed } from "vue";
 import { getOrderList, cancelOrder, delOrder, orderBuyAgain, confirmReceipt } from "@/api/user/order";
 import type { OrderListFilterParams, OrderListFilterResult } from "@/types/user/order";
 import { onLoad } from "@dcloudio/uni-app";
 import { redirect } from "@/utils";
 import { useList } from "@/hooks";
 import { useI18n } from "vue-i18n";
+import { useConfigStore } from "@/store/config";
+import { creatPay } from "@/api/order/pay";
 
 const { t } = useI18n();
+const configStore = useConfigStore();
+
+// 判断是否为微信生态
+const isWechatEcosystem = computed(() => {
+    return configStore.XClientType === 'wechat' || configStore.XClientType === 'miniProgram';
+});
+
+// 支付相关状态
+const showPaymentModal = ref(false);
+const selectedPaymentMethod = ref<'wechat' | 'alipay'>('wechat');
+const currentPayOrderId = ref<number | null>(null);
 
 interface MenuType {
     type: string;
@@ -726,10 +767,210 @@ const handleAddToCart = async (id: number) => {
     }
 };
 
+// 立即支付 - 智能处理
 const handlePay = (id: number) => {
-    uni.navigateTo({
-        url: `/pages/order/pay?orderId=${id}`
+    currentPayOrderId.value = id;
+    
+    // 如果是微信生态，直接调起微信支付
+    if (isWechatEcosystem.value) {
+        directPay('wechat');
+    } else {
+        // H5/APP 显示支付方式选择弹窗
+        showPaymentModal.value = true;
+    }
+};
+
+// 关闭支付方式选择弹窗
+const closePaymentModal = () => {
+    showPaymentModal.value = false;
+    selectedPaymentMethod.value = 'wechat';
+};
+
+// 选择支付方式并支付
+const selectPaymentAndPay = (method: 'wechat' | 'alipay') => {
+    selectedPaymentMethod.value = method;
+    showPaymentModal.value = false;
+    directPay(method);
+};
+
+// 直接调起支付
+const directPay = async (paymentType: 'wechat' | 'alipay') => {
+    if (!currentPayOrderId.value) return;
+    
+    try {
+        uni.showLoading({
+            title: t("支付中..."),
+            mask: true
+        });
+        
+        let payResult;
+        
+        // 微信小程序需要先获取 code
+        // #ifdef MP-WEIXIN
+        if (paymentType === 'wechat') {
+            payResult = await new Promise((resolve, reject) => {
+                // @ts-ignore
+                wx.login({
+                    success: async (res: any) => {
+                        try {
+                            const result = await creatPay({
+                                id: currentPayOrderId.value!,
+                                type: 'wechat',
+                                code: res.code
+                            });
+                            resolve(result);
+                        } catch (err) {
+                            reject(err);
+                        }
+                    },
+                    fail: (err: any) => {
+                        reject(err);
+                    }
+                });
+            });
+        } else {
+            payResult = await creatPay({
+                id: currentPayOrderId.value,
+                type: paymentType
+            });
+        }
+        // #endif
+        
+        // #ifndef MP-WEIXIN
+        // 其他平台直接创建支付订单
+        payResult = await creatPay({
+            id: currentPayOrderId.value,
+            type: paymentType
+        });
+        // #endif
+        
+        uni.hideLoading();
+        
+        if (payResult && payResult.payInfo) {
+            // 根据平台调起对应的支付
+            if (configStore.XClientType === 'miniProgram') {
+                // 微信小程序支付
+                miniProgramPay(payResult.payInfo, currentPayOrderId.value);
+            } else if (configStore.XClientType === 'wechat') {
+                // 微信公众号支付
+                if (paymentType === 'wechat') {
+                    window.open(payResult.payInfo.url, '_blank');
+                }
+            } else if (configStore.XClientType === 'h5') {
+                // H5支付
+                if (paymentType === 'wechat') {
+                    window.open(payResult.payInfo.url, '_blank');
+                } else if (paymentType === 'alipay' && payResult.payInfo.html) {
+                    // 支付宝 H5 支付
+                    const div = document.createElement('div');
+                    div.innerHTML = payResult.payInfo.html;
+                    document.body.appendChild(div);
+                    const form = div.querySelector('form');
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            } else if (configStore.XClientType === 'app') {
+                // APP 支付
+                appPay(payResult.payInfo, paymentType);
+            }
+            
+            // 支付后跳转到支付状态页面或返回
+            setTimeout(() => {
+                uni.redirectTo({
+                    url: '/pages/user/order/list?type=awaitPay'
+                });
+            }, 2000);
+        }
+    } catch (error: any) {
+        uni.hideLoading();
+        uni.showToast({
+            title: error.message || t("支付失败"),
+            icon: 'none',
+            duration: 2000
+        });
+    }
+};
+
+// 微信小程序支付
+const miniProgramPay = (payInfo: any, orderId: number) => {
+    // @ts-ignore
+    wx.requestPayment({
+        timeStamp: String(payInfo.timeStamp),
+        nonceStr: payInfo.nonceStr,
+        package: payInfo.package,
+        signType: payInfo.signType,
+        paySign: payInfo.paySign,
+        success: () => {
+            uni.showToast({
+                title: t("支付成功"),
+                duration: 1500
+            });
+            setTimeout(() => {
+                uni.redirectTo({
+                    url: '/pages/user/order/list'
+                });
+            }, 1500);
+        },
+        fail: () => {
+            uni.showToast({
+                title: t("支付失败"),
+                duration: 1500,
+                icon: 'none'
+            });
+        }
     });
+};
+
+// APP 支付
+const appPay = (payInfo: any, paymentType: 'wechat' | 'alipay') => {
+    if (paymentType === 'wechat') {
+        // 微信APP支付
+        uni.requestPayment({
+            provider: 'wxpay',
+            orderInfo: {
+                appid: payInfo.appId,
+                noncestr: payInfo.nonceStr,
+                package: payInfo.package,
+                partnerid: String(payInfo.partnerId),
+                prepayid: payInfo.prepayId,
+                timestamp: payInfo.timeStamp,
+                sign: payInfo.sign
+            },
+            success() {
+                uni.showToast({
+                    title: t("支付成功"),
+                    duration: 1500
+                });
+            },
+            fail() {
+                uni.showToast({
+                    title: t("支付失败"),
+                    duration: 1500,
+                    icon: 'none'
+                });
+            }
+        });
+    } else {
+        // 支付宝APP支付
+        uni.requestPayment({
+            provider: payInfo.provider || 'alipay',
+            orderInfo: payInfo.orderInfo,
+            success() {
+                uni.showToast({
+                    title: t("支付成功"),
+                    duration: 1500
+                });
+            },
+            fail() {
+                uni.showToast({
+                    title: t("支付失败"),
+                    duration: 1500,
+                    icon: 'none'
+                });
+            }
+        });
+    }
 };
 
 // 处理申请开票
@@ -871,25 +1112,42 @@ const toggleMoreActions = (orderId: number, orderIndex?: number) => {
 
         // 使用 uni.createSelectorQuery 获取更多按钮的精确位置
         nextTick(() => {
+            // #ifdef H5
+            // H5环境下使用 DOM API
+            const element = document.querySelector(`#more-btn-${orderId}`) as HTMLElement;
+            if (element) {
+                const rect = element.getBoundingClientRect();
+                dropdownPosition.value = {
+                    top: rect.bottom + window.scrollY + 10,
+                    left: rect.left + window.scrollX
+                };
+            } else {
+                // 降级方案：使用估算位置
+                dropdownPosition.value = {
+                    top: 200 + (orderIndex || 0) * 300,
+                    left: 40
+                };
+            }
+            // #endif
+            
+            // #ifndef H5
+            // 小程序环境下使用 uni.createSelectorQuery
             const query = uni.createSelectorQuery();
             query.select(`#more-btn-${orderId}`).boundingClientRect((rect) => {
                 if (rect && !Array.isArray(rect)) {
                     dropdownPosition.value = {
-                        top: (rect.bottom || 0) + 10, // 在按钮下方10px
-                        left: rect.left || 40 // 与按钮左对齐，默认40px
+                        top: (rect.bottom || 0) + 10,
+                        left: rect.left || 40
                     };
                 } else {
                     // 降级方案：使用估算位置
-                    const baseTop = 200;
-                    const orderHeight = 300;
-                    const calculatedTop = baseTop + (orderIndex || 0) * orderHeight;
-
                     dropdownPosition.value = {
-                        top: calculatedTop,
+                        top: 200 + (orderIndex || 0) * 300,
                         left: 40
                     };
                 }
             }).exec();
+            // #endif
         });
     }
 };
@@ -1374,20 +1632,23 @@ onUnmounted(() => {
         .action-left {
             .more-btn {
                 padding: 12rpx 24rpx;
-                // border: 1rpx solid #e0e0e0;
-                // border-radius: 30rpx;
-                // background-color: #fff;
-                // min-width: 80rpx;
-                // text-align: center;
+                min-width: 80rpx;
+                min-height: 60rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
 
                 .more-text {
                     font-size: 30rpx;
                     color: #666;
+                    user-select: none;
+                    pointer-events: auto;
+                    display: inline-block;
                 }
 
                 &:active {
                     background-color: #f8f8f8;
-                    border-color: #d0d0d0;
                 }
             }
         }
@@ -1681,5 +1942,97 @@ onUnmounted(() => {
     color: #969799;
     margin: 8rpx 0 ;
     padding: 0rpx 0rpx;
+}
+
+/* 支付方式选择弹窗样式 */
+.payment-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-end;
+}
+
+.payment-modal {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 40rpx 40rpx 0 0;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40rpx 40rpx 20rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+    font-size: 36rpx;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    font-size: 48rpx;
+    color: #999;
+    padding: 0 10rpx;
+}
+
+.modal-content {
+    padding: 20rpx 40rpx 60rpx;
+}
+
+.payment-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30rpx 0;
+    border-bottom: 1rpx solid #f8f8f8;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+    
+    &:active {
+        background-color: #f8f8f8;
+    }
+}
+
+.option-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.option-icon {
+    width: 70rpx;
+    height: 70rpx;
+    margin-right: 25rpx;
+}
+
+.option-name {
+    font-size: 32rpx;
+    color: #333;
+    font-weight: 500;
+}
+
+.option-check {
+    width: 40rpx;
+    height: 40rpx;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 </style>

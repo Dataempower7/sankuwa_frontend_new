@@ -231,11 +231,11 @@ const mobileErrorCallback = (msg: string) => {
 };
 const mobileLogin = () => {
     if (!isChecked.value) {
-        return uni.showToast({
-            title: t("请先同意用户协议"),
-            duration: 1500,
-            icon: "none"
-        });
+        // return uni.showToast({
+        //    // title: t("请先同意用户协议"),
+        //     duration: 1500,
+        //     icon: "none"
+        // });
     }
 
     signin();

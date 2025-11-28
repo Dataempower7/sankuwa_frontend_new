@@ -9,12 +9,12 @@
                             <div class="item-name">全部</div>
                         </div>
                     </div>
-                    <div :class="'gallery-folder-item ' + (galleryStore.topGalleryId == -1 ? 'current' : '')" v-if="gallery" @click="folderChange(-1)">
+                    <!-- <div :class="'gallery-folder-item ' + (galleryStore.topGalleryId == -1 ? 'current' : '')" v-if="gallery" @click="folderChange(-1)">
                         <div class="folder-item-con">
                             <i class="item-ico"></i>
                             <div class="item-name">我的服务</div>
                         </div>
-                    </div>
+                    </div> -->
                     <div :class="'gallery-folder-item ' + (galleryStore.topGalleryId == item.galleryId ? 'current' : '')" v-for="(item, key) in gallery">
                         <div :class="'folder-item-con'" @click="folderChange(item.galleryId)">
                             <i class="item-ico"></i>

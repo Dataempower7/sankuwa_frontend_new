@@ -16,7 +16,7 @@ export const getChildRegionList = (params: RegionFilterParams) => {
 }
 
 export const getRegionTreeList = (params?: RegionFilterParams) => {
-    return request<RegionFilterResult>({
+    return request<any>({
         url: "setting/region/getAllRegionTree",
         method: "get",
         params,

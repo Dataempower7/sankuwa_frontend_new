@@ -4,7 +4,7 @@
             <div class="item-img add-photo-btn">
                 <template v-if="video.length > 0">
                     <div class="video-item-box-icon">
-                        <DialogForm type="galleryVideo" class="item item-edit" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }"
+                        <DialogForm type="galleryVideo" :disabled="disabled" class="item item-edit" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }"
                             ><i class="iconfont-admin icon-shipin"></i>
                         </DialogForm>
                     </div>
@@ -17,6 +17,7 @@
                     type="galleryVideo"
                     class="item-bg"
                     @okCallback="onEdit"
+                    :disabled="disabled"
                     :params="{ isMultiple: props.isMultiple }"
                     width="850px"
                     v-if="video.length == 0 && !disabled"
@@ -37,14 +38,14 @@
                 </div>
             </div>
             <div class="item-action" v-if="video.length > 0 && type == 1">
-                <DialogForm type="galleryVideo" class="item item-edit" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }"
+                <DialogForm type="galleryVideo" :disabled="disabled" class="item item-edit" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }"
                     ><span class="iconfont icon-bianji1"></span>
                 </DialogForm>
                 <span @click="removeGallery" class="item item-remove iconfont icon-shanchu"></span>
             </div>
         </div>
         <div>
-            <DialogForm type="galleryVideo" @okCallback="onEdit" :params="{ isMultiple: props.isMultiple }" width="850px" v-if="type == 2">
+            <DialogForm type="galleryVideo" :disabled="disabled" @okCallback="onEdit" :params="{ isMultiple: props.isMultiple }" width="850px" v-if="type == 2">
                 <div>
                     <slot></slot>
                 </div>
@@ -65,7 +66,7 @@
                     <template #item="{ element, index }">
                         <div class="item" data-id="img.imgId">
                             <div class="img flex flex-justify-center">
-                                <DialogForm type="galleryVideo" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }">
+                                <DialogForm type="galleryVideo" :disabled="disabled" @okCallback="onEdit" width="850px" :params="{ isMultiple: props.isMultiple }">
                                     <a class="lyecs-dialogImage">
                                         <div class="video-item-box-icon">
                                             <i class="iconfont-admin icon-shipin"></i>
@@ -83,7 +84,7 @@
                         <div v-if="disabled" class="item gallery-add-item add-gallery-photo-btn" draggable="false">
                             <i class="iconfont icon-tianjiatupian"></i>
                         </div>
-                        <DialogForm v-else type="galleryVideo" class="" @okCallback="onEdit" :params="{ isMultiple: props.isMultiple }" width="850px">
+                        <DialogForm v-else type="galleryVideo" :disabled="disabled" class="" @okCallback="onEdit" :params="{ isMultiple: props.isMultiple }" width="850px">
                             <div class="item gallery-add-item add-gallery-photo-btn" draggable="false">
                                 <el-icon size="25"><Plus /></el-icon>
                             </div>

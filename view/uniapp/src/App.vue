@@ -351,7 +351,6 @@ uni-toast {
 
     .sku-item {
         display: inline-block;
-        max-width: 130rpx;
     }
 
     .sku-item::before {

@@ -6,7 +6,20 @@ export function imageFormat(path: string) {
     if (!path) {
         return "";
     }
-    return path.includes("http") !== false ? path : configStore.storageUrl + path;
+    // 如果是完整的 http/https 链接，直接返回
+    if (path.includes("http")) {
+        return path;
+    }
+    // 如果是本地静态资源路径（/static/ 开头），直接返回
+    if (path.startsWith("/static/") || path.startsWith("static/")) {
+        return path;
+    }
+    // 如果是相对路径（@/ 开头），直接返回（uni-app 会自动处理）
+    if (path.startsWith("@/")) {
+        return path;
+    }
+    // 其他情况拼接 storageUrl
+    return configStore.storageUrl + path;
 }
 
 // 基础页面列表
@@ -25,6 +38,11 @@ const baseList = [
         name: "限时秒杀",
         link: "seckill/list",
         url: "/pages/seckill/list"
+    },
+    {
+        name: "买家秀",
+        link: "buyerShow",
+        url: "/pages/buyerShow/index"
     },
     {
         name: "购物车",
@@ -193,4 +211,39 @@ export function formatTimestamp(timestamp: string | number, format = "yyyy-MM-dd
     };
 
     return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (match) => formatDate[match[0]]);
+}
+
+/**
+ * 将px转换为rpx
+ * @param px - 需要转换的像素值
+ * @returns 转换后的rpx值
+ */
+export function pxToRpx(px: number): number {
+    // 获取设备屏幕宽度（单位：px）
+    const deviceWidth = uni.getSystemInfoSync().screenWidth;
+    // 设计稿基准宽度（单位：rpx），通常为750rpx
+    const designWidth = 750;
+    // 计算转换比例
+    const ratio = deviceWidth / designWidth;
+    // 返回转换后的rpx值
+    return Math.round(px / ratio);
+}
+
+/**
+ * 隐藏用户名
+ * @param username - 用户名
+ * @returns 隐藏后的用户名
+ */
+export function hideUserName(username: string): string {
+    if (!username) {
+        return '';
+    }
+    if (username.length === 1) {
+        return username;
+    }
+    if (username.length === 2) {
+        // 隐藏最后一位
+        return username[0] + '*'
+    }
+    return username.replace(/^(.).*?(.)$/, "$1**$2");
 }

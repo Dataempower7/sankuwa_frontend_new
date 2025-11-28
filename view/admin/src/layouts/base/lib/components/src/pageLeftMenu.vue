@@ -1,9 +1,11 @@
 <template>
-    <div :class="{ active: menusStore.menuActive, 'shop-admin': adminType === 'shop', dark: themeInfo.navTheme === 'dark' }" class="body-menu">
+    <div :class="{ active: menusStore.menuActive, 'shop-admin': adminType === 'shop', dark: themeInfo.navTheme === 'dark' }"
+        class="body-menu">
         <el-scrollbar v-if="themeInfo.layout == 'default' || screenWidth < 900" class="main-menu">
             <ul v-if="menus" class="main-menu-ul">
                 <template v-for="(menu, key) in menus" :key="menu.meta.authoritySn">
-                    <li v-if="menu.meta.isShow" :class="'main-menu-item menu_' + menu.meta.authoritySn + ' ' + (menu.meta.current ? 'current' : '')">
+                    <li v-if="menu.meta.isShow"
+                        :class="'main-menu-item menu_' + menu.meta.authoritySn + ' ' + (menu.meta.current ? 'current' : '')">
                         <a :href="'/' + menu.path" class="menu-tit" @click.prevent="actionPush(menu, true)">
                             <i :class="menu.meta.authorityIco"></i>
                             <span class="nav-tit">{{ menu.meta.authorityName }}</span>
@@ -31,7 +33,8 @@
                                     <div v-if="child.meta.current" class="menu-chider">
                                         <ul class="menu-list">
                                             <template v-for="(childer, mCkey) in child.children">
-                                                <li v-if="childer.meta.isShow" :class="'menu-item menu-chider-item ' + (childer.meta.current ? 'current' : '')">
+                                                <li v-if="childer.meta.isShow"
+                                                    :class="'menu-item menu-chider-item ' + (childer.meta.current ? 'current' : '')">
                                                     <a class="" @click.prevent="actionPush(childer, false, menu)">
                                                         <span class="nav-title">{{ childer.meta.authorityName }}</span>
                                                     </a>
@@ -42,8 +45,10 @@
                                 </li>
                             </template>
                             <template v-else>
-                                <li v-if="child.meta.isShow" :class="'menu-item ' + (routerMatched[1].name == `${child.meta.authoritySn}` ? 'current' : '')">
-                                    <a :target="child.blank ? '_blank' : ''" class="menu-item-a" @click.prevent="actionPush(child)">
+                                <li v-if="child.meta.isShow"
+                                    :class="'menu-item ' + (routerMatched[1].name == `${child.meta.authoritySn}` ? 'current' : '')">
+                                    <a :target="child.blank ? '_blank' : ''" class="menu-item-a"
+                                        @click.prevent="actionPush(child)">
                                         <div class="menu-item-title">
                                             <i :class="child.meta.authorityIco" class="tit-ico"></i>
                                             <span class="nav-title">{{ child.meta.authorityName }}</span>
@@ -56,7 +61,8 @@
                     </ul>
                 </el-scrollbar>
             </template>
-            <div v-if="false" id="menu-bar-btn" class="menu-bar-btn ng-scope" @click="menusStore.childMenuShow = !menusStore.childMenuShow">
+            <div v-if="false" id="menu-bar-btn" class="menu-bar-btn ng-scope"
+                @click="menusStore.childMenuShow = !menusStore.childMenuShow">
                 <div class="menu-bar-inner">
                     <div class="menu-bar-bg"></div>
                     <div class="product-navbar-collapse">
@@ -67,7 +73,8 @@
             </div>
         </div>
     </div>
-    <div :class="{ active: menusStore.menuActive }" class="body-menu-mask" @click="menusStore.menuActive = !menusStore.menuActive"></div>
+    <div :class="{ active: menusStore.menuActive }" class="body-menu-mask"
+        @click="menusStore.menuActive = !menusStore.menuActive"></div>
 </template>
 <script lang="ts" setup>
 import { ref, watchEffect, nextTick, computed, onBeforeUnmount, onMounted } from "vue";
@@ -105,7 +112,10 @@ interface RouteItem {
 }
 
 const menus = computed<RouteItem[]>(() => {
+    //判断isStore,筛选路由
+
     return store.routers ? store.routers : [];
+
 });
 
 const updateCurrentStatus = (menuItems: any, level = 0, route = false, current = true) => {
@@ -577,7 +587,7 @@ onBeforeUnmount(() => {
     right: -7px;
 }
 
-.child-menu-show .menu-bar-btn .product-navbar-collapse > span {
+.child-menu-show .menu-bar-btn .product-navbar-collapse>span {
     color: #7a8599;
 }
 

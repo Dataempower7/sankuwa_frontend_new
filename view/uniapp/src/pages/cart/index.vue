@@ -61,7 +61,7 @@
                                                                 <template v-if="goods.skuData && goods.skuData.length > 0">
                                                                     <view class="sku-card">
                                                                         <template v-for="(skuItem, skuIndex) in goods.skuData" :key="skuItem">
-                                                                            <view class="sku-item line1">{{ skuItem.value }}</view>
+                                                                            <view class="sku-item line1" style="display: inline-block;  max-width: 330rpx;">{{ skuItem.value }}</view>
                                                                         </template>
                                                                     </view>
                                                                 </template>
@@ -284,7 +284,7 @@
             <template v-if="cartList.length === 0 && !isLoad">
                 <cartEmpty :isLoggedIn="!showLogin" />
             </template>
-            <recommend @callback="getCartList" />
+            <recommend ref="recommendRef" @callback="getCartList" />
         </view>
 
         <discountInfo v-model="showDiscountInfo" :total="total" />
@@ -299,7 +299,7 @@ import discountInfo from "@/components/product/discountInfo.vue";
 import recommend from "@/components/recommend/index.vue";
 import detail from "./src/detail.vue";
 import cartEmpty from "./src/cartEmpty.vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow, onReachBottom } from "@dcloudio/uni-app";
 import { useConfigStore } from "@/store/config";
 import { useTabbarStore } from "@/store/tabbar";
 import { getCart, updateCartItemData, updateCartCheck, clearCart, removeCartItemData } from "@/api/cart/cart";
@@ -310,6 +310,9 @@ import { useI18n } from "vue-i18n";
 import { imageFormat } from "@/utils/format";
 
 const { t } = useI18n();
+
+// 好物推荐组件引用
+const recommendRef = ref();
 
 const configStore = useConfigStore();
 
@@ -568,6 +571,13 @@ const checkOutBarStyle = computed(() => {
         paddingBottom: tabbarStore.currentActiveValue > -1 ? "0" : "var(--safe-bottom)",
         height: "80px"
     };
+});
+
+// 监听页面触底，加载更多推荐商品
+onReachBottom(() => {
+    if (recommendRef.value && recommendRef.value.loadMore) {
+        recommendRef.value.loadMore();
+    }
 });
 </script>
 <style lang="scss" scoped>
@@ -1042,6 +1052,8 @@ const checkOutBarStyle = computed(() => {
     width: calc(100% - 200rpx);
     .activity-box {
         display: flex;
+        flex-wrap: wrap;
+        gap: 8rpx;
     }
 }
 .goods-list-cart .cart_item .cart-row .line2 {
@@ -1052,6 +1064,7 @@ const checkOutBarStyle = computed(() => {
     word-break: break-all;
     display: -webkit-box;
     -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
 }
 
@@ -1071,8 +1084,8 @@ const checkOutBarStyle = computed(() => {
         margin: 0;
 
         .sku-item {
-            display: inline-block;
-            max-width: 130rpx;
+            // display: inline-block;
+            // max-width: 180rpx;
         }
 
         .sku-item::before {
@@ -1090,6 +1103,7 @@ const checkOutBarStyle = computed(() => {
     justify-content: space-between;
     align-items: center;
     position: relative;
+    margin-top: 15rpx;
 }
 .origin-price {
     font-size: 21rpx;

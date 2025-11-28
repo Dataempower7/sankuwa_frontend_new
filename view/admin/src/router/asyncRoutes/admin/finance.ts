@@ -1,3 +1,5 @@
+import { isMerchant, isStore } from "@/utils/version";
+const shopTypeName = isStore() ? '门店' : isMerchant() ? '店铺' : '店铺'
 export default {
     path: "/finance",
     name: "finance",
@@ -7,7 +9,7 @@ export default {
         {
             path: "",
             name: "userfundsManagement",
-            meta: { title: "资金管理" },
+            meta: { title: "会员资金管理" },
             redirect: "/finance/account-panel/list",
             children: [
                 {
@@ -29,10 +31,124 @@ export default {
                     component: () => import("@/views/finance/userRechargeOrder/List.vue")
                 },
                 {
+                    path: "distribution-commission/list",
+                    name: "distributionCommissionManage",
+                    meta: { title: "分销佣金" },
+                    component: () => import("@/views/salesman/performanceSettlement/performanceSettlement/List.vue")
+                },
+                {
                     path: "integral-log/list",
                     name: "integralLogManage",
                     meta: { title: "积分日志" },
                     component: () => import("@/views/user/integralLog/List.vue")
+                }
+            ]
+        },
+        {
+            path: "",
+            name: "profitsharingManage",
+            meta: { title: "分账管理" },
+            redirect: "/finance/profitsharing-setting",
+            children: [
+                {
+                    path: "profitsharing-setting",
+                    name: "profitsharingSettingManage",
+                    meta: { title: "分账设置" },
+                    component: () => import("@/views/finance/profitsharingSetting/Index.vue")
+                },
+                {
+                    path: "withdrawal-setting",
+                    name: "withdrawalSettingManage",
+                    meta: { title: "提现设置" },
+                    component: () => import("@/views/finance/withdrawalSetting/Index.vue")
+                }
+            ]
+        },
+        {
+            path: "",
+            name: "shopUserfundsManagement",
+            meta: { title: shopTypeName + "资金管理" },
+            redirect: "/finance/statement-download/list",
+            children: [
+                {
+                    path: "shop-account/list",
+                    name: "shopAccountManage",
+                    meta: { title: "资金概览" },
+                    component: () => import("@/views/shop/account/List.vue")
+                },
+                {
+                    path: "shop-funds/list",
+                    name: "shopFundsManage",
+                    meta: { title: shopTypeName + "资金" },
+                    component: () => import("@/views/shop/shopFunds/List.vue")
+                },
+                {
+                    path: "statement-download/list",
+                    name: "statementDownload",
+                    meta: { title: "对账单下载" },
+                    component: () => import("@/views/finance/shopFunds/statementDownload/List.vue")
+                },
+                {
+                    path: "statement-details/list",
+                    name: "statementDetails",
+                    meta: { title: "对账单明细" },
+                    component: () => import("@/views/finance/shopFunds/statementDetails/List.vue")
+                },
+                {
+                    path: "shop-withdraw-apply/list",
+                    name: "shopWithdrawApplyManage",
+                    meta: { title: "提现管理" },
+                    component: () => import("@/views/finance/shopFunds/shopAccountRaply/List.vue")
+                },
+                {
+                    path: "shop-financial-log/list",
+                    name: "financialLogManage",
+                    meta: { title: "资金日志" },
+                    component: () => import("@/views/shop/financialLog/List.vue")
+                }
+            ]
+        },
+        {
+            path: "",
+            name: "vendorUserfundsManagement",
+            meta: { title: "供应商资金管理" },
+            redirect: "/finance/vendor-statement-download/list",
+            children: [
+                {
+                    path: "vendor-account/list",
+                    name: "vendorAccountManage",
+                    meta: { title: "资金概览" },
+                    component: () => import("@/views/vendor/adminFunds/account/List.vue")
+                },
+                {
+                    path: "vendor-funds/list",
+                    name: "vendorFundsManage",
+                    meta: { title: "供应商资金" },
+                    component: () => import("@/views/vendor/adminFunds/shopFunds/List.vue")
+                },
+                {
+                    path: "vendor-statement-download/list",
+                    name: "vendorStatementDownload",
+                    meta: { title: "对账单下载" },
+                    component: () => import("@/views/finance/vendorFunds/statementDownload/List.vue")
+                },
+                {
+                    path: "vendor-statement-details/list",
+                    name: "vendorStatementDetails",
+                    meta: { title: "对账单明细" },
+                    component: () => import("@/views/finance/vendorFunds/statementDetails/List.vue")
+                },
+                {
+                    path: "vendor-withdraw-apply/list",
+                    name: "vendorWithdrawApplyManage",
+                    meta: { title: "提现管理" },
+                    component: () => import("@/views/vendor/adminFunds/shopAccountRaply/List.vue")
+                },
+                {
+                    path: "vendor-financial-log/list",
+                    name: "vendorFinancialLogManage",
+                    meta: { title: "资金日志" },
+                    component: () => import("@/views/vendor/adminFunds/financialLog/List.vue")
                 }
             ]
         },

@@ -17,16 +17,19 @@
     </a-config-provider>
 </template>
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import { RouterView, useRoute } from "vue-router";
 import zhCnAnt from "ant-design-vue/es/locale/zh_CN";
 import zhLocale from "element-plus/dist/locale/zh-cn.mjs";
 import { useConfigStore } from "@/store/config";
-import { useLoadCss } from '@/utils/domUtils'
+import { useLoadCss } from "@/utils/domUtils";
+import { useVersionConfigManager } from "./utils/versionConfigManager";
+if (localStorage.getItem("accessToken")) {
+    useVersionConfigManager();
+}
 
 const configStore = useConfigStore();
 if (configStore.config.icoDefinedCss) {
-    useLoadCss(configStore.config.icoDefinedCss)
+    useLoadCss(configStore.config.icoDefinedCss);
 }
 // 获取当前路由对象
 const route = useRoute();

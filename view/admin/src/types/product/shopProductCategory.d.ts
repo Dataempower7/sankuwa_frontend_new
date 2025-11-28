@@ -29,6 +29,7 @@ export interface ShopProductCategoryFilterResult {
 export interface ShopProductCategoryFormState {
     categoryId?: number;
     parentId?: number;
+    categoryPic?: string;
     categoryName?: string;
     sortOrder?: number;
     isShow?: number;

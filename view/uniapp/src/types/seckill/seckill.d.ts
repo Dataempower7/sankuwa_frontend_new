@@ -1,3 +1,14 @@
+// 秒杀数据
+export interface SeckkillData {
+    seckillId: number;
+    seckillName: string;
+    seckillStartTime: string;
+    seckillEndTime: string;
+    seckillLimitNum: number;
+    productId: number;
+    seckillItem?: any[];
+}
+
 // 获取列表返回参数类型
 export interface SeckillFilterState {
     productId: number;
@@ -10,6 +21,10 @@ export interface SeckillFilterState {
     seckillPrice: string;
     seckillStock: number;
     skuId: number;
+    seckkillData?: SeckkillData;
+    isBest?: number;
+    isHot?: number;
+    isNew?: number;
 }
 
 export interface SeckillFilterResult {

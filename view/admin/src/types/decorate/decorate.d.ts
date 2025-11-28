@@ -103,6 +103,9 @@ export interface ModuleActivityType {
     boxPaddingBottom?: number;
     title?: ModuleTitleType;
     waterfall?: number;
+    groupType?: number;
+    crossedOutPrice?: number;
+    grouponActivityItem?: any;// 活动内容
 }
 // 结构
 export interface ModuleFrameType {
@@ -577,6 +580,7 @@ export interface BannerContentType {
     gradientType?: GradientType;
     picPageType?: PicPageType;
     swiperPageColor?: string;
+    indicatorColor?: string;
 }
 type menuIcon = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 'custom'
 type signIcon = 0 | 1 | 2 | 3 | 4 | 'custom'
@@ -609,6 +613,7 @@ type ProductListStyleType = 1 | 2 | 3 | 4 | 5
 export interface BannerStyleType {
     effectType?: EffectType;
     searchBackgroundColor?: string;
+    searchIconColor?: string;
     searchFontColor?: string;
     searchText?: string;
     searchHeight?: number;
@@ -1125,6 +1130,18 @@ export interface ModuleImageTextComponentType {
     titMarginBottom?: number;
     titColor?: string;
     descTextAlignment?: TextAlignmentType;
+    descColor?: string;
+    moduleStyle?: ModuleStyleType;
+    contentStyle?: ContentStyleType;
+}
+
+
+export interface ModulestoreNavType {
+    borderRadius?: number;
+    subTitle?: ModuleSubTitleType;
+    showDesc?: number;
+    showFollow?: number;
+    showRating?: number;
     descColor?: string;
     moduleStyle?: ModuleStyleType;
     contentStyle?: ContentStyleType;

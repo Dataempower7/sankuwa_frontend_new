@@ -102,9 +102,15 @@
                 </el-dialog>
                 <div class="table-container">
                     <a-spin :spinning="loading">
-                        <el-table :data="filterState" :total="total" row-key="productId" @selection-change="onSelectChange" @sort-change="onSortChange">
-                            <el-table-column type="selection" width="32" fixed="left" />
-                            <el-table-column label="订单号" prop="orderId" :width="190" fixed="left">
+                        <el-table
+                            :data="filterState"
+                            :total="total"
+                            row-key="orderUserInfo.orderId"
+                            @selection-change="onSelectChange"
+                            @sort-change="onSortChange"
+                        >
+                            <!-- <el-table-column type="selection" width="32" fixed="left" /> -->
+                            <el-table-column label="订单号" prop="orderId" :minWidth="190" fixed="left">
                                 <template #default="{ row }">
                                     <DialogForm
                                         :params="{ act: 'detail', id: row.orderUserInfo.orderId }"
@@ -141,7 +147,7 @@
                             </el-table-column>
                             <el-table-column label="客户" :width="140">
                                 <template #default="{ row }">
-                                    {{ row.orderUserInfo.user.nickname || '-' }}
+                                    {{ row.orderUserInfo.user.nickname || "-" }}
                                 </template>
                             </el-table-column>
                             <el-table-column label="收益类型" :width="140">
@@ -154,7 +160,7 @@
                             </el-table-column>
                             <el-table-column label="所属分组" :width="240">
                                 <template #default="{ row }">
-                                    {{ row.salesman.groupInfo.groupName || '-' }}
+                                    {{ row.salesman.groupInfo.groupName || "-" }}
                                 </template>
                             </el-table-column>
                             <el-table-column label="收益" :width="240">
@@ -164,7 +170,10 @@
                             </el-table-column>
                             <el-table-column label="结算方式" :width="140">
                                 <template #default="{ row }">
-                                    {{ row.salesmanSettlementData?.settlementType == 1 ? "系统结算" : "人工结算" }}
+                                    <span v-if="row.salesmanSettlementData && row.salesmanSettlementData !== null">{{
+                                        row.salesmanSettlementData?.settlementType == 1 ? "系统结算" : "人工结算"
+                                    }}</span>
+                                    <span v-else>--</span>
                                 </template>
                             </el-table-column>
                             <el-table-column label="结算状态" :width="140" fixed="right">
@@ -188,7 +197,7 @@
                         <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
                     </div>
                 </div>
-                <div v-if="selectedIds.length > 0" class="selected-action-warp selected-warp-left">
+                <!-- <div v-if="selectedIds.length > 0" class="selected-action-warp selected-warp-left">
                     <div class="selected-action">
                         <el-space>
                             <span
@@ -199,7 +208,7 @@
                             <el-button>清退</el-button>
                         </el-space>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

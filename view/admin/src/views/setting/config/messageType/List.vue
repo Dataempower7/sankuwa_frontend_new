@@ -19,13 +19,13 @@
                     <el-tab-pane label="发送给用户" :name="1"></el-tab-pane>
                     <el-tab-pane label="发送给商家" :name="2"></el-tab-pane>
                     <div class="table-action">
-                        <el-button type="primary" @click="generate()">生成小程序消息模板</el-button>
-                        <el-button type="warning" @click="generateWechat()">生成公众号模板消息</el-button>
                         <TigInput v-model="filterParams.keyword" placeholder="输入关键字" @keyup.enter="onSearchSubmit" clearable @clear="onSearchSubmit">
                             <template #append>
                                 <el-button @click="onSearchSubmit"><span class="iconfont icon-chakan1"></span></el-button>
                             </template>
                         </TigInput>
+                        <el-button plain @click="generate()">生成小程序消息模板</el-button>
+                        <el-button plain @click="generateWechat()">生成公众号模板消息</el-button>
                     </div>
                 </el-tabs>
                 <div class="table-container">
@@ -52,7 +52,41 @@
                                 </template>
                             </el-table-column>
                             <el-table-column label="消息描述" prop="describe"></el-table-column>
-                            <el-table-column label="站内信" width="100">
+                            <template v-if="activeKey == 1">
+                                <el-table-column label="邮件" width="100">
+                                    <template #default="{ row }">
+                                        <Switch
+                                            v-if="row.isMail > -1"
+                                            v-model:checked="row.isMail"
+                                            :params="{ id: row.messageId, field: 'isMail' }"
+                                            :requestApi="updateMessageTypeFiled"
+                                        />
+                                    </template>
+                                </el-table-column>
+                            </template>
+                            <template v-if="activeKey == 2">
+                                <el-table-column label="钉钉" width="100">
+                                    <template #default="{ row }">
+                                        <Switch
+                                            v-if="row.isDing > -1"
+                                            v-model:checked="row.isDing"
+                                            :params="{ id: row.messageId, field: 'isDing' }"
+                                            :requestApi="updateMessageTypeFiled"
+                                        />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="企业微信" width="100">
+                                    <template #default="{ row }">
+                                        <Switch
+                                            v-if="row.isWxWork > -1"
+                                            v-model:checked="row.isWxWork"
+                                            :params="{ id: row.messageId, field: 'isWxWork' }"
+                                            :requestApi="updateMessageTypeFiled"
+                                        />
+                                    </template>
+                                </el-table-column>
+                            </template>
+                            <el-table-column label="站内信" width="100" v-if="activeKey == 1">
                                 <template #default="{ row }">
                                     <Switch
                                         v-if="row.isMessage > -1"
@@ -72,7 +106,7 @@
                                     />
                                 </template>
                             </el-table-column>
-                            <el-table-column label="公众号" width="100">
+                            <el-table-column label="公众号" width="100" v-if="activeKey == 1">
                                 <template #default="{ row }">
                                     <Switch
                                         v-if="row.isWechat > -1"
@@ -82,7 +116,7 @@
                                     />
                                 </template>
                             </el-table-column>
-                            <el-table-column label="小程序" width="100">
+                            <el-table-column label="小程序" width="100" v-if="activeKey == 1">
                                 <template #default="{ row }">
                                     <Switch
                                         v-if="row.isMiniProgram > -1"
@@ -108,7 +142,7 @@
                                         :params="{ act: 'detail', id: row.messageId }"
                                         isDrawer
                                         path="setting/config/messageType/Info"
-                                        title="编辑消息设置"
+                                        :title="row.name + '消息编辑'"
                                         width="700px"
                                         @okCallback="loadFilter"
                                     >
@@ -260,11 +294,11 @@ const synchronizationWechat = async () => {
     margin-bottom: 20px;
     line-height: 24px;
 }
-.table-action{
+.table-action {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    .el-button + .el-button{
+    .el-button + .el-button {
         margin-left: 0;
     }
 }

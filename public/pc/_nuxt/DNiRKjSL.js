@@ -1,0 +1,1 @@
+import{aw as m,r as o}from"./BjkHNVA8.js";const r=m("join",()=>{const e=o(!1),d=o(!1),s=o(!1),t=o(!1),n=o({}),a=o([]),l=o([]),u=o([]);return{module1Loaded:e,module2Loaded:d,module3Loaded:s,module4Loaded:t,module1:n,module2:a,module3:l,module4:u}});export{r as u};

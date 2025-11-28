@@ -62,7 +62,7 @@
                                         isDrawer
                                         path="promotion/productActivity/limitdiscount/Info"
                                         title="新增限时折扣活动"
-                                        width="900px"
+                                        width="1000px"
                                         @okCallback="loadFilter"
                                     >
                                         <el-button type="primary">新增限时折扣活动</el-button>
@@ -107,7 +107,7 @@
                                         isDrawer
                                         @okCallback="loadFilter"
                                         title="编辑限时折扣"
-                                        width="900px"
+                                        width="1000px"
                                         path="promotion/productActivity/limitdiscount/Info"
                                         :params="{ act: 'detail', id: row.discountId }"
                                     >

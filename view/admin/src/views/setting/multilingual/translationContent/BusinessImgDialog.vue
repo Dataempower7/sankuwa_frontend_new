@@ -6,7 +6,7 @@
                     <el-form-item prop="translationName" label="原图：">
                         <div>
                             <div class="item-image-src">
-                                <el-image class="item-image" :src="imageFormat(translationName)" fit="scale-down" />
+                                <Image :src="imageFormat(translationName)" fit="contain" style="height: 300px; width: 300px" />
                             </div>
                             <div class="extra">如果未设置单独语言图片，则默认使用原图。</div>
                         </div>
@@ -34,6 +34,7 @@ import { FormAddGallery } from "@/components/gallery";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 import { imageFormat } from "@/utils/format";
+import { Image } from "@/components/image";
 
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 import type { LocalesFilterState } from "@/types/multilingual/languagesList.d";
@@ -164,11 +165,8 @@ defineExpose({ onFormSubmit });
 </script>
 <style lang="less" scoped>
 .item-image-src {
-    max-width: 600px;
-    max-height: 250px;
-    overflow: auto;
-    .item-image{
-        border: 1px double #ddd;
-    }
+    width: 300px;
+    height: 300px;
+    border: 1px double #ddd;
 }
 </style>

@@ -9,13 +9,9 @@
                                 <el-space>
                                     <div class="simple-form-field">
                                         <div class="form-group">
-                                            <SelectTimeInterval
-                                                v-model:end-date="filterParams.searchEndDate"
-                                                v-model:start-date="filterParams.searchStartDate"
-                                                :clearable="false"
-                                                type="date"
-                                                value-format="YYYY-MM-DD"
-                                            ></SelectTimeInterval>
+                                            <SelectTimeInterval v-model:end-date="filterParams.searchEndDate"
+                                                v-model:start-date="filterParams.searchStartDate" :clearable="false"
+                                                type="date" value-format="YYYY-MM-DD"></SelectTimeInterval>
                                         </div>
                                     </div>
                                     <div class="simple-form-field">
@@ -70,7 +66,7 @@
                                 </div>
                             </div>
                             <div class="label">
-                                <div class="txt">积分使用余额</div>
+                                <div class="txt">交易使用积分</div>
                                 <div class="num">
                                     {{ priceFormat(filterState.usePoints) }}
                                 </div>
@@ -142,12 +138,14 @@ const onSearchSubmit = () => {
 .list-table-tool {
     margin-bottom: 0;
 }
+
 .table-container {
     .tit-box {
         padding: 10px 0;
         display: flex;
         align-items: center;
         margin-bottom: 15px;
+
         .xian {
             width: 3px;
             height: 13px;
@@ -155,6 +153,7 @@ const onSearchSubmit = () => {
             margin-right: 5px;
         }
     }
+
     .content {
         display: flex;
         align-items: center;
@@ -162,13 +161,16 @@ const onSearchSubmit = () => {
         background-color: #f7f8fa;
         padding: 20px;
         margin-bottom: 30px;
-        gap: 10px;
+        gap: 40px;
+
         .label {
-            width: 300px;
+            min-width: 260px;
+
             .txt {
                 font-size: 15px;
                 margin-bottom: 15px;
             }
+
             .num {
                 font-size: 30px;
             }

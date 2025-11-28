@@ -2,10 +2,12 @@
     <link :href="icoDefinedCss" rel="stylesheet"/>
     <div class="container">
         <div class="content_wrapper">
-            <el-tabs v-if="isMerchant()" v-model="activeKey" class="lyecs-tabs" tab-position="top" @tab-change="onTabChange">
-                <!-- <el-tab-pane label="全部" name="-1"></el-tab-pane> -->
+            <el-tabs v-model="activeKey" class="lyecs-tabs" tab-position="top" @tab-change="onTabChange">
                 <el-tab-pane label="管理后台" name="admin"></el-tab-pane>
-                <el-tab-pane label="店铺后台" name="shop"></el-tab-pane>
+                <el-tab-pane label="店铺后台" name="shop" v-if="isMerchant()"></el-tab-pane>
+                <el-tab-pane label="门店后台" name="store" v-if="isStore()"></el-tab-pane>
+                <el-tab-pane label="自提点后台" name="pickup" v-if="isStore()"></el-tab-pane>
+                <el-tab-pane label="供应商后台" name="vendor" v-if="isS2b2c()"></el-tab-pane>
             </el-tabs>
             <div v-if="activeKey!=null" class="lyecs-table-list-warp">
                 <div class="list-table-tool lyecs-search-warp">
@@ -219,7 +221,7 @@ import {batchSubmit, delAuthority, getAuthorityList, updateAuthorityFiled} from 
 import {useMenusStore} from "@/store/menu";
 import { updateMenu } from "@/utils/menus";
 import type { MainMenu } from "@/types/common/common.d";
-import { isMerchant } from "@/utils/version";
+import { isMerchant, isS2b2c, isStore } from "@/utils/version";
 const menusStore = useMenusStore();
 //获取来自路由的参数
 const {currentRoute} = useRouter();
@@ -387,9 +389,6 @@ const onSelectChange = (e: AuthorityFilterState[]) => {
     margin-right: 18px !important;
 }
 
-// :deep(.table-container) .el-table__expand-icon {
-//     display: none;
-// }
 .el-table__expand-icon--expanded {
     transform: none;
 }

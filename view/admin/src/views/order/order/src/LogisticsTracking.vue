@@ -1,11 +1,13 @@
 <template>
     <div v-if="!loading" class="track-list-date">
         <div class="bold" v-if="shippingMethod == 1">快递公司：【{{ logisticsName }}】，快递单号：【{{ trackingNo }}】</div>
+        <div class="bold" v-else-if="shippingTypeId === 3">快递类型：同城配送</div>
         <div class="bold" v-else>快递类型：{{ logisticsName }}</div>
         <template v-if="filterState?.length > 0">
             <div class="node-to-change" v-show="!loading">
                 <ul>
-                    <li v-for="(item, index) in filterState" :class="{ first: index === 0 && item.checkpointStatus === 'delivered' }">
+                    <li v-for="(item, index) in filterState"
+                        :class="{ first: index === 0 && item.checkpointStatus === 'delivered' }">
                         <i class="status status-first status-check"></i>
                         <span :class="{ 'first-color': index === 0 }">{{ item.acceptStation }}</span>
                         <span :class="{ 'first-color': index === 0 }" class="date">{{ item.acceptTime }}</span>
@@ -45,6 +47,10 @@ const props = defineProps({
     shippingMethod: {
         type: Number,
         default: 1
+    },
+    shippingTypeId: {
+        type: Number,
+        default: 0
     }
 });
 
@@ -82,6 +88,7 @@ const loadFilter = async () => {
     flex-direction: column;
     padding: 10px;
 }
+
 .loading-data {
     width: 100%;
     height: 50px;
@@ -89,6 +96,7 @@ const loadFilter = async () => {
     justify-content: center;
     align-items: center;
 }
+
 .no-data {
     width: 100%;
     height: 50px;
@@ -110,12 +118,15 @@ li {
         content: "";
         background: #3985ff;
         width: 1px;
-        height: 100%; /* 使得线条的长度恰好达到下一个图标的顶部 */
+        height: 100%;
+        /* 使得线条的长度恰好达到下一个图标的顶部 */
         position: absolute;
         left: -20px;
-        top: 20px; /* 调整以确保线条从图标中心开始 */
+        top: 20px;
+        /* 调整以确保线条从图标中心开始 */
     }
 }
+
 .first-color {
     color: black;
 }
@@ -155,8 +166,10 @@ li {
 
 .date {
     display: block;
-    margin-top: 2px; /* 通过CSS管理间距 */
+    margin-top: 2px;
+    /* 通过CSS管理间距 */
 }
+
 .bold {
     font-weight: bold;
 }

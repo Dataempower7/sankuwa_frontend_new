@@ -131,33 +131,77 @@
                                         </span>
                                     </td>
                                     <td v-if="index == 0" :rowspan="item.aftersalesItems.length">
-                                        <DialogForm
-                                            v-if="item.status === 5 || item.status === 6 || item.status === 7"
-                                            :params="{ act: 'detail', id: item.aftersaleId }"
-                                            isDrawer
-                                            path="order/aftersales/Info"
-                                            :title="'售后详情 ' + item.aftersalesSn"
-                                            width="800px"
-                                            @okCallback="loadFilter"
-                                            :showClose="false"
-                                            :showOnOk="false"
-                                        >
-                                            <el-button size="small" text type="primary"> 售后详情 </el-button>
-                                        </DialogForm>
+                                        <ListBtn :item="item" @callback="loadFilter"></ListBtn>
+                                        <!-- <template v-if="item.vendorId && item.vendorId > 0">
+                                            <DialogForm
+                                                v-if="(item.status === 4 || item.status === 21 || item.status === 22) && adminType !== 'vendor'"
+                                                :params="{ act: 'detail', id: item.aftersaleId }"
+                                                isDrawer
+                                                path="order/aftersales/Info"
+                                                :title="'售后详情 ' + item.aftersalesSn"
+                                                width="800px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <el-button size="small" text type="primary"> 售后详情 </el-button>
+                                            </DialogForm>
+                                            <DialogForm
+                                                v-else-if="item.status === 5 || item.status === 6 || item.status === 7"
+                                                :params="{ act: 'detail', id: item.aftersaleId }"
+                                                isDrawer
+                                                path="order/aftersales/Info"
+                                                :title="'售后详情 ' + item.aftersalesSn"
+                                                width="800px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <el-button size="small" text type="primary"> 售后详情 </el-button>
+                                            </DialogForm>
+                                            <DialogForm
+                                                v-else-if="item.status !== 4"
+                                                :params="{ act: 'detail', id: item.aftersaleId }"
+                                                isDrawer
+                                                path="order/aftersales/Info"
+                                                :title="'处理售后申请 ' + item.aftersalesSn"
+                                                width="800px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <el-button size="small" text type="danger"> 处理退款 </el-button>
+                                            </DialogForm>
+                                        </template>
 
-                                        <DialogForm
-                                            v-else
-                                            :params="{ act: 'detail', id: item.aftersaleId }"
-                                            isDrawer
-                                            path="order/aftersales/Info"
-                                            :title="'处理售后申请 ' + item.aftersalesSn"
-                                            width="800px"
-                                            @okCallback="loadFilter"
-                                            :showClose="false"
-                                            :showOnOk="false"
-                                        >
-                                            <el-button size="small" text type="danger"> 处理退款 </el-button>
-                                        </DialogForm>
+                                        <template v-else>
+                                            <DialogForm
+                                                v-if="item.status === 3 || item.status === 5 || item.status === 6 || item.status === 7"
+                                                :params="{ act: 'detail', id: item.aftersaleId }"
+                                                isDrawer
+                                                path="order/aftersales/Info"
+                                                :title="'售后详情 ' + item.aftersalesSn"
+                                                width="800px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <el-button size="small" text type="primary"> 售后详情 </el-button>
+                                            </DialogForm>
+                                            <DialogForm
+                                                v-else
+                                                :params="{ act: 'detail', id: item.aftersaleId }"
+                                                isDrawer
+                                                path="order/aftersales/Info"
+                                                :title="'处理售后申请 ' + item.aftersalesSn"
+                                                width="800px"
+                                                @okCallback="loadFilter"
+                                                :showClose="false"
+                                                :showOnOk="false"
+                                            >
+                                                <el-button size="small" text type="danger"> 处理退款 </el-button>
+                                            </DialogForm>
+                                        </template> -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -190,15 +234,17 @@ import { batchSubmit, getAftersalesList, updateAftersalesField, getAftersalesApp
 import { priceFormat } from "@/utils/format";
 import { useRoute, useRouter } from "vue-router";
 import { useListRequest } from "@/hooks/useListRequest";
+import ListBtn from "./src/ListBtn.vue"
 const config: any = useConfigStore();
+const adminType = ref(localStorage.getItem("adminType"));
+const query = useRouter().currentRoute.value.query;
 const {
     listData: filterState,
     loading,
     total,
     filterParams,
     loadData: loadFilter,
-    onSearchSubmit,
-    resetParams
+    onSearchSubmit
 } = useListRequest<AftersalesFilterState, AftersalesFilterParams>({
     apiFunction: getAftersalesList,
     idKey: "aftersaleId",
@@ -207,15 +253,27 @@ const {
         sortOrder: "",
         keyword: "",
         aftersaleType: "",
-        status: "",
+        status: (query.status as any) || "",
         page: 1,
         size: config.get("pageSize")
     }
 });
 loadFilter();
+
+const resetParams = () => {
+    filterParams.page = 1;
+    filterParams.sortField = "";
+    filterParams.sortOrder = "";
+    filterParams.keyword = "";
+    filterParams.aftersaleType = "";
+    filterParams.status = "";
+    loadFilter();
+};
+
+useRouter().replace({ query: {} });
 const statusList = ref<any>({});
 const typeList = ref<any>({});
-const query = useRouter().currentRoute.value.query;
+
 // 获取列表的查询结果
 const loadData = async () => {
     loading.value = true;

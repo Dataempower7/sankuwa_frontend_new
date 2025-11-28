@@ -24,14 +24,22 @@ import { licensedUpdate, getLicensed } from "@/api/setting/licensed";
 const formRef = shallowRef();
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 const loading = ref<boolean>(false);
+
 const formData = ref({
     license: ""
 });
+
+const formatDomain = (domain: string): string => {
+    let cleanDomain = domain.replace(/^https?:\/\//, "");
+    cleanDomain = cleanDomain.split("/")[0].split("?")[0].split("#")[0];
+    cleanDomain = cleanDomain.replace(/^www\./, "");
+    return cleanDomain;
+};
 // 表单通过验证后提交
 const onSubmit = async () => {
     await formRef.value.validate();
     try {
-        const result = await licensedUpdate({ ...formData.value });
+        const result = await licensedUpdate({ ...formData.value, domain: formatDomain(window.location.origin) });
         message.success("操作成功");
         emit("submitCallback", result);
     } catch (error: any) {
@@ -46,7 +54,7 @@ const onFormSubmit = () => {
 defineExpose({ onFormSubmit });
 </script>
 <style lang="less" scoped>
-.input-wrapper{
+.input-wrapper {
     width: 95%;
 }
 </style>

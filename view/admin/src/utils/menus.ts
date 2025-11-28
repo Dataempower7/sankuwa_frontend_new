@@ -1,13 +1,13 @@
 import { getAllAuthority, getAllAuthorityData } from "@/api/authority/authority";
 import type { MainMenu } from "@/types/common/common.d";
-import { adminRouters, merchantRouters } from "@/router/asyncRoutes";
+import { adminRouters, merchantRouters, vendorRouters } from "@/router/asyncRoutes";
 import { useMenusStore } from "@/store/menu";
 
 export const updateMenu = async () => {
     try {
         const result = await getAllAuthority();
         return result as MainMenu[];
-    } catch (error) {}
+    } catch (error) { }
 };
 
 export const getMenu = async () => {
@@ -17,19 +17,37 @@ export const getMenu = async () => {
             return [];
         }
         const menus = useMenusStore();
-        let arr = result;
-        menus.setLicensed(arr.find((item) => item.authoritySn === "licensed" && item.isShow === 1) ? true : false);
+        let arr:any = result;
+        let routers:any = [];
+        menus.setLicensed(arr.find((item:any) => item.authoritySn === "licensed" && item.isShow === 1) ? true : false);
 
         const adminType = localStorage.getItem("adminType");
-
-        if (adminType !== "shop") {
-            arr = [...arr, { authoritySn: "accountEditingManage", authorityName: "个人中心" }];
-        } else {
+        if (adminType === "shop" || adminType === "store") {
+            routers = merchantRouters;
             arr = [...arr, { authoritySn: "accountManage", authorityName: "账户列表" }];
         }
-
-        return filterRoutesByAuthority(adminType !== "shop" ? adminRouters : merchantRouters, arr) || [];
-    } catch (error) {}
+        if (adminType === "vendor") {
+            routers = vendorRouters;
+            arr = [...arr, { authoritySn: "accountManage", authorityName: "账户列表" }];
+        }
+        if (adminType === "admin") {
+            routers = adminRouters;
+            arr = [...arr, { authoritySn: "accountEditingManage", authorityName: "个人中心" }, {
+                authorityId: 10000364,
+                authoritySn: "grouponManage",
+                authorityName: "拼团活动",
+                parentId: 10000413,
+                sortOrder: 69,
+                isShow: 1,
+                childAuth: "[{\"auth_name\":\"\\u7f16\\u8f91\",\"auth_sn\":\"grouponModifyManage\"}]",
+                routeLink: "",
+                authorityIco: "",
+                isSystem: 0,
+                adminType: "admin"
+            }];
+        }
+        return filterRoutesByAuthority(routers, arr) || [];
+    } catch (error) { }
 };
 
 /**

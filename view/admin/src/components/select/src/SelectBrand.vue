@@ -41,7 +41,7 @@
     </el-select>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, defineModel, PropType } from "vue";
+import { onMounted, ref, PropType } from "vue";
 import { message } from "ant-design-vue";
 import { getBrandSearch } from "@/api/product/brand";
 import { BrandFilterState } from "@/types/product/brand";

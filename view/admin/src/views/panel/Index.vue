@@ -65,7 +65,23 @@
                         <div class="store-data-con">
                             <div class="header">
                                 <div class="title">
-                                    <div>实时数据</div>
+                                    <el-tooltip class="box-item" effect="light" placement="right" show-after="300" trigger="click">
+                                        <template #content>
+                                            <div style="width: 350px; padding: 10px; line-height: 24px; font-size: 14px">
+                                                <p>1、支付金额：今日凌晨至更新时间，在商城中支付的订单金额数，按支付成功时间（不含充值订单）</p>
+                                                <p>2、访客数：今日凌晨至更新时间，在商城中访问客户数量</p>
+                                                <p>3、支付买家数：今日凌晨至更新时间，在商城中支付的订单的人数（不含充值订单）</p>
+                                                <p>
+                                                    4、浏览量：今日凌晨至更新时间，商城页面被浏览的次数。每打开一个页面或每刷新一次页面都记录1次 （按访问时间）
+                                                </p>
+                                                <p>5、支付订单数：今日凌晨至更新时间，在店铺中支付的订单单数，按支付成功时间（不含充值订单）</p>
+                                            </div>
+                                        </template>
+                                        <div class="flex flex-align-center">
+                                            <div>实时数据</div>
+                                            <el-icon style="margin-left: 5px" size="16" color="#969799"><QuestionFilled /></el-icon>
+                                        </div>
+                                    </el-tooltip>
                                     <div class="time" @click="refresh">
                                         <div>更新时间：{{ newTime }}</div>
                                         <i class="iconfont-admin icon-shuaxin1" :class="{ 'rotate-animation': isRotating }"></i>
@@ -915,11 +931,11 @@ onUnmounted(() => {
             transform: translateY(-50%);
             width: 1px;
         }
-        .live-wrapper{
+        .live-wrapper {
             padding: 0 !important;
-             .index-detail{
+            .index-detail {
                 align-items: center;
-             }
+            }
         }
     }
 

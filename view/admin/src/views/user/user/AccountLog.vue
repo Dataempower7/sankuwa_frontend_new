@@ -34,7 +34,7 @@
                             </TigInput>
                         </el-space>
                     </div>
-                    <div class="list-table-tool-col">
+                    <div class="list-table-tool-col mb10">
                         <DialogForm
                             :params="{ act: 'detail', id: id }"
                             isDrawer

@@ -3,14 +3,14 @@
         <el-space>
             <el-radio-group v-model="rangeType" @change="onChange" :disabled="props.disabled">
                 <el-radio :value="0">全部商品</el-radio>
-                <!-- <el-radio :value="1">以下分类</el-radio>
-                <el-radio :value="2">以下品牌</el-radio> -->
+                <!-- <el-radio :value="1">以下分类</el-radio> -->
+                <el-radio :value="2">以下品牌</el-radio>
                 <el-radio :value="3">以下商品</el-radio>
                 <el-radio :value="4">不含以下商品</el-radio>
             </el-radio-group>
         </el-space>
     </div>
-    <div class="tags" v-if="type == 'productBatch'">
+    <div class="tags" v-if="type == 'productBatch' && rangeType == 2 && tagList.length > 0">
         <el-tag v-for="(tag, index) in tagList" :key="tag" closable @close="onClose(index)">
             {{ tag.brandName }}
         </el-tag>
@@ -31,7 +31,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { defineModel, ref, nextTick } from "vue";
+import { ref, nextTick } from "vue";
 import { SelectCategory, SelectBrand, SelectProduct } from "@/components/select";
 import { message } from "ant-design-vue";
 // 传值

@@ -7,7 +7,7 @@
                 <template v-if="orderInfo.orderStatus === 0">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/one@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877qG31rxqGNrfwTdCbzB.jpeg" />
                             <view class="status-text-custom">待支付</view>
                         </view>
                         <view class="countdown-text-custom" v-if="countdownTime">
@@ -20,7 +20,7 @@
                 <template v-if="orderInfo.orderStatus === 1">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/one@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877qG31rxqGNrfwTdCbzB.jpeg" />
                             <view class="status-text-custom">待发货</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -33,7 +33,7 @@
                  <template v-if="orderInfo.orderStatus === 2">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/one@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877qG31rxqGNrfwTdCbzB.jpeg" />
                             <view class="status-text-custom">待收货</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -46,7 +46,7 @@
                  <template v-if="orderInfo.orderStatus === 4">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/three@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/176179287761z0ELO4OYHiLpVYGz.jpeg" />
                             <view class="status-text-custom">订单无效</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -59,7 +59,7 @@
                   <template v-if="orderInfo.orderStatus === 5 && orderInfo.availableActions?.toComment">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/two@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877wcww1joTmWPNalWfAi.jpeg" />
                             <view class="status-text-custom">待评论</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -72,7 +72,7 @@
                   <template v-if="orderInfo.orderStatus === 5 && !orderInfo.availableActions?.toComment">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/two@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877wcww1joTmWPNalWfAi.jpeg" />
                             <view class="status-text-custom">已完成</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -85,7 +85,7 @@
                  <template v-if="orderInfo.orderStatus === 3">
                     <view class="payment-status-custom">
                         <view class="status-title-custom">
-                            <image class="status-icon-img-custom" src="/static/images/after_sale/one@3x.png" />
+                            <image class="status-icon-img-custom" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877qG31rxqGNrfwTdCbzB.jpeg" />
                             <view class="status-text-custom">订单已取消</view>
                         </view>
                         <view class="countdown-text-custom">
@@ -239,7 +239,7 @@
                 >
                     <view class="service-card-custom" @click="handleService">
                         <view class="service-content">
-                            <image class="service-icon" src="/static/images/after_sale/service.png" />
+                            <image class="service-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202510/1761792877Ju8AE1YJChrh1LOa5w.jpeg" />
                             <view class="service-text">
                                 <view class="service-title">联系客服</view>
                             </view>
@@ -782,6 +782,34 @@
                 </template>
             </view>
         </view>
+        
+        <!-- 支付方式选择弹窗 -->
+        <view v-if="showPaymentModal" class="payment-modal-overlay" @tap="closePaymentModal">
+            <view class="payment-modal" @tap.stop="">
+                <view class="modal-header">
+                    <text class="modal-title">选择支付方式</text>
+                    <text class="modal-close" @tap="closePaymentModal">✕</text>
+                </view>
+                <view class="modal-content">
+                    <!-- 微信支付 -->
+                    <view class="payment-option" @tap="selectPaymentAndPay('wechat')">
+                        <view class="option-left">
+                            <image src="/static/images/common/wechatpay.png" class="option-icon" />
+                            <text class="option-name">微信支付</text>
+                        </view>
+                        <image v-if="selectedPaymentMethod === 'wechat'" src="/static/images/common/check.png" class="option-check" />
+                    </view>
+                    <!-- 支付宝支付 -->
+                    <view class="payment-option" @tap="selectPaymentAndPay('alipay')">
+                        <view class="option-left">
+                            <image src="/static/images/common/alipay.png" class="option-icon" />
+                            <text class="option-name">支付宝支付</text>
+                        </view>
+                        <image v-if="selectedPaymentMethod === 'alipay'" src="/static/images/common/check.png" class="option-check" />
+                    </view>
+                </view>
+            </view>
+        </view>
     </tig-layout>
 </template>
 
@@ -793,7 +821,9 @@ import type { OrderInfoResponseItem, ShippingInfoTrace } from "@/types/user/orde
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/store/user";
+import { useConfigStore } from "@/store/config";
 import { copy } from "@/utils";
+import { creatPay } from "@/api/order/pay";
 
 const serviceRef = ref<InstanceType<typeof service> | null>(null);
 const handleService = () => {
@@ -803,8 +833,19 @@ const handleService = () => {
 };
 
 const userStore = useUserStore();
+const configStore = useConfigStore();
 
 const { t } = useI18n();
+
+// 判断是否为微信生态
+const isWechatEcosystem = computed(() => {
+    return configStore.XClientType === 'wechat' || configStore.XClientType === 'miniProgram';
+});
+
+// 支付相关状态
+const showPaymentModal = ref(false);
+const selectedPaymentMethod = ref<'wechat' | 'alipay'>('wechat');
+const currentPayOrderId = ref<number | null>(null);
 
 interface IoStatusInfo {
     [key: number]: string;
@@ -938,10 +979,212 @@ const handleCancelOrder = (id: number) => {
     });
 };
 
+// 立即支付 - 智能处理
 const handlePay = (id: number) => {
-    uni.navigateTo({
-        url: `/pages/order/pay?orderId=${id}`
+    currentPayOrderId.value = id;
+    
+    // 如果是微信生态，直接调起微信支付
+    if (isWechatEcosystem.value) {
+        directPay('wechat');
+    } else {
+        // H5/APP 显示支付方式选择弹窗
+        showPaymentModal.value = true;
+    }
+};
+
+// 关闭支付方式选择弹窗
+const closePaymentModal = () => {
+    showPaymentModal.value = false;
+    selectedPaymentMethod.value = 'wechat';
+};
+
+// 选择支付方式并支付
+const selectPaymentAndPay = (method: 'wechat' | 'alipay') => {
+    selectedPaymentMethod.value = method;
+    showPaymentModal.value = false;
+    directPay(method);
+};
+
+// 直接调起支付
+const directPay = async (paymentType: 'wechat' | 'alipay') => {
+    if (!currentPayOrderId.value) return;
+    
+    try {
+        uni.showLoading({
+            title: t("支付中..."),
+            mask: true
+        });
+        
+        let payResult;
+        
+        // 微信小程序需要先获取 code
+        // #ifdef MP-WEIXIN
+        if (paymentType === 'wechat') {
+            payResult = await new Promise((resolve, reject) => {
+                // @ts-ignore
+                wx.login({
+                    success: async (res: any) => {
+                        try {
+                            const result = await creatPay({
+                                id: currentPayOrderId.value!,
+                                type: 'wechat',
+                                code: res.code
+                            });
+                            resolve(result);
+                        } catch (err) {
+                            reject(err);
+                        }
+                    },
+                    fail: (err: any) => {
+                        reject(err);
+                    }
+                });
+            });
+        } else {
+            payResult = await creatPay({
+                id: currentPayOrderId.value,
+                type: paymentType
+            });
+        }
+        // #endif
+        
+        // #ifndef MP-WEIXIN
+        // 其他平台直接创建支付订单
+        payResult = await creatPay({
+            id: currentPayOrderId.value,
+            type: paymentType
+        });
+        // #endif
+        
+        uni.hideLoading();
+        
+        if (payResult && payResult.payInfo) {
+            // 根据平台调起对应的支付
+            if (configStore.XClientType === 'miniProgram') {
+                // 微信小程序支付
+                miniProgramPay(payResult.payInfo, currentPayOrderId.value);
+            } else if (configStore.XClientType === 'wechat') {
+                // 微信公众号支付
+                if (paymentType === 'wechat') {
+                    window.open(payResult.payInfo.url, '_blank');
+                }
+            } else if (configStore.XClientType === 'h5') {
+                // H5支付
+                if (paymentType === 'wechat') {
+                    window.open(payResult.payInfo.url, '_blank');
+                } else if (paymentType === 'alipay' && payResult.payInfo.html) {
+                    // 支付宝 H5 支付
+                    const div = document.createElement('div');
+                    div.innerHTML = payResult.payInfo.html;
+                    document.body.appendChild(div);
+                    const form = div.querySelector('form');
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            } else if (configStore.XClientType === 'app') {
+                // APP 支付
+                appPay(payResult.payInfo, paymentType);
+            }
+            
+            // 支付后刷新订单详情
+            setTimeout(() => {
+                __getOrder();
+            }, 2000);
+        }
+    } catch (error: any) {
+        uni.hideLoading();
+        uni.showToast({
+            title: error.message || t("支付失败"),
+            icon: 'none',
+            duration: 2000
+        });
+    }
+};
+
+// 微信小程序支付
+const miniProgramPay = (payInfo: any, orderId: number) => {
+    // @ts-ignore
+    wx.requestPayment({
+        timeStamp: String(payInfo.timeStamp),
+        nonceStr: payInfo.nonceStr,
+        package: payInfo.package,
+        signType: payInfo.signType,
+        paySign: payInfo.paySign,
+        success: () => {
+            uni.showToast({
+                title: t("支付成功"),
+                duration: 1500
+            });
+            setTimeout(() => {
+                __getOrder();
+            }, 1500);
+        },
+        fail: () => {
+            uni.showToast({
+                title: t("支付失败"),
+                duration: 1500,
+                icon: 'none'
+            });
+        }
     });
+};
+
+// APP 支付
+const appPay = (payInfo: any, paymentType: 'wechat' | 'alipay') => {
+    if (paymentType === 'wechat') {
+        // 微信APP支付
+        uni.requestPayment({
+            provider: 'wxpay',
+            orderInfo: {
+                appid: payInfo.appId,
+                noncestr: payInfo.nonceStr,
+                package: payInfo.package,
+                partnerid: String(payInfo.partnerId),
+                prepayid: payInfo.prepayId,
+                timestamp: payInfo.timeStamp,
+                sign: payInfo.sign
+            },
+            success() {
+                uni.showToast({
+                    title: t("支付成功"),
+                    duration: 1500
+                });
+                setTimeout(() => {
+                    __getOrder();
+                }, 1500);
+            },
+            fail() {
+                uni.showToast({
+                    title: t("支付失败"),
+                    duration: 1500,
+                    icon: 'none'
+                });
+            }
+        });
+    } else {
+        // 支付宝APP支付
+        uni.requestPayment({
+            provider: payInfo.provider || 'alipay',
+            orderInfo: payInfo.orderInfo,
+            success() {
+                uni.showToast({
+                    title: t("支付成功"),
+                    duration: 1500
+                });
+                setTimeout(() => {
+                    __getOrder();
+                }, 1500);
+            },
+            fail() {
+                uni.showToast({
+                    title: t("支付失败"),
+                    duration: 1500,
+                    icon: 'none'
+                });
+            }
+        });
+    }
 };
 
 const handleToShop = (id: number) => {
@@ -2296,5 +2539,97 @@ onUnload(() => {
     font-size: 28rpx;
     font-weight: 500;
     color: #333;
+}
+
+/* 支付方式选择弹窗样式 */
+.payment-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-end;
+}
+
+.payment-modal {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 40rpx 40rpx 0 0;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40rpx 40rpx 20rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+    font-size: 36rpx;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    font-size: 48rpx;
+    color: #999;
+    padding: 0 10rpx;
+}
+
+.modal-content {
+    padding: 20rpx 40rpx 60rpx;
+}
+
+.payment-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30rpx 0;
+    border-bottom: 1rpx solid #f8f8f8;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+    
+    &:active {
+        background-color: #f8f8f8;
+    }
+}
+
+.option-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.option-icon {
+    width: 70rpx;
+    height: 70rpx;
+    margin-right: 25rpx;
+}
+
+.option-name {
+    font-size: 32rpx;
+    color: #333;
+    font-weight: 500;
+}
+
+.option-check {
+    width: 40rpx;
+    height: 40rpx;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 </style>

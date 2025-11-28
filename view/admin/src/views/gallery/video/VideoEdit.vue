@@ -27,10 +27,7 @@
                                     </div>
                                 </Upload>
                             </div>
-                            <div class="extra mt10">
-                                视频大小不超过{{ uploadMaxSize }}MB，时长5秒-5分钟以内，建议时长15-190秒，
-                                支持的视频文件类型 .mp4。
-                            </div>
+                            <div class="extra mt10">视频大小不超过{{ uploadMaxSize }}MB，时长5秒-5分钟以内，建议时长15-190秒， 支持的视频文件类型 .mp4。</div>
                         </div>
                     </el-form-item>
                     <el-form-item prop="videoName" label="视频名称" :rules="[{ required: true, validator: validateName }]">
@@ -38,15 +35,13 @@
                     </el-form-item>
                     <el-form-item prop="galleryId" label="所在视频相册" :rules="[{ required: true, message: '视频相册不能为空!' }]">
                         <div class="flex flex-justify-between">
-                            <el-select v-model="formState.galleryId" placeholder="请选择" style="flex: 1">
-                                <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id" />
-                            </el-select>
+                            <el-cascader v-model="formState.galleryId" :options="options" :props="props1" clearable />
                             <div class="con-btn ml10 flex flex-align-center flex-justify-center">
                                 <DialogForm
                                     :params="{ act: 'add', parentId: 0 }"
                                     path="gallery/video/GalleryVideoEdit"
                                     title="添加视频相册"
-                                    width="600px"
+                                    width="400px"
                                     @okCallback="loadGallery"
                                 >
                                     <el-button link type="primary">添加相册</el-button>
@@ -75,17 +70,25 @@ import request, { requestUrl } from "@/utils/request";
 import { ref, toRefs, onMounted, nextTick } from "vue";
 import { message, Upload } from "ant-design-vue";
 import { Plus } from "@element-plus/icons-vue";
-import { getGalleryVideoInfoDetail, updateVideoInfo, getGalleryVideoList } from "@/api/setting/gallery";
+import { getGalleryVideoInfoDetail, updateVideoInfo, getAllCategory } from "@/api/setting/gallery";
 import type { VideoDetail } from "@/types/setting/gallery.d";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 import { formatDuration } from "@/utils/time";
 import { useConfigStore } from "@/store/config";
+import { useGalleryStore } from "@/store/gallery";
 const uploadRef = ref<InstanceType<typeof Upload>>();
 const configStore = useConfigStore();
 configStore.updateConfig();
 const uploadMaxSize = configStore.config.uploadMaxSize;
 const fileList = ref<any[]>([]);
 const showUploadList = ref(true);
+const props1 = {
+    label: "name",
+    value: "id",
+    children: "children",
+    checkStrictly: true,
+    multiple: false
+};
 const progress: UploadProps["progress"] = {
     strokeWidth: 5,
     format: (percent) => {
@@ -105,6 +108,10 @@ const props = defineProps({
     act: {
         type: String,
         default: ""
+    },
+    galleryId: {
+        type: Number,
+        default: 0
     },
     isDialog: Boolean
 });
@@ -128,6 +135,7 @@ const emit = defineEmits(["submitCallback", "okType", "callback"]);
 // 表单参数初使化
 const formRef = ref(); //表单Ref
 let formState = ref<VideoDetail>({
+    galleryId: props.galleryId,
     videoUrl: "",
     videoName: "",
     videoCover: "",
@@ -142,17 +150,15 @@ onMounted(() => {
     }
     loadGallery(0);
 });
+const galleryStore = useGalleryStore();
 const options = ref<any[]>([]);
 const calleryLoding = ref(false);
 const loadGallery = async (data?: any) => {
     calleryLoding.value = true;
     try {
-        const result = await getGalleryVideoList();
-        options.value = result.records;
-        if (data > 0) {
-            formState.value.galleryId = data;
-            emit("callback", 0);
-        }
+        const result = await getAllCategory();
+        options.value = result;
+        galleryStore.isRefresh = true;
     } catch (error: any) {
         message.error(error.message);
     } finally {
@@ -247,6 +253,9 @@ const deleteVideo = () => {
 // 表单通过验证后提交
 const formSubmit = async () => {
     await formRef.value.validate();
+    if (!Array.isArray(formState.value.galleryId)) {
+        formState.value.galleryId = [formState.value.galleryId];
+    }
     try {
         const result = await updateVideoInfo(operation, {
             id: id.value,

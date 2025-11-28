@@ -2,7 +2,17 @@
     <div class="gallery-pic">
         <div :class="'gallery-pic-select ' + (photo ? 'have_image' : '')" v-if="!isMultiple && type == 1">
             <div class="item-img add-photo-btn">
-                <Image v-if="photo" class="gallery-img" :src="imageFormat(photo)" />
+                <BusinessImg
+                    v-if="pageType == 'overseas' && photo"
+                    v-model:modelValue="photo"
+                    :picThumb="photo"
+                    :dataType="dataType"
+                    @Edit="onEdit"
+                    @Delete="removeGallery"
+                >
+                    <Image v-if="photo" class="gallery-img" :src="imageFormat(photo)" />
+                </BusinessImg>
+                <Image v-if="pageType !== 'overseas' && photo" class="gallery-img" :src="imageFormat(photo)" />
                 <DialogForm type="gallery" class="item-bg" @okCallback="onEdit" :params="{ isMultiple: props.isMultiple }" v-if="!photo">
                     <div
                         class="flex"
@@ -11,7 +21,7 @@
                         <i class="iconfont icon-tianjiatupian"></i><span>添加图片</span>
                     </div>
                 </DialogForm>
-                <p class="remove-btn" v-if="photo && !disabled">
+                <p class="remove-btn" v-if="photo && !disabled" :class="{ left: isOverseas() }">
                     <i @click="removeGallery" class="iconfont icon-cha"></i>
                 </p>
             </div>
@@ -89,6 +99,7 @@ import { imageFormat } from "@/utils/format";
 import { Plus } from "@element-plus/icons-vue";
 import BusinessImg from "@/components/multilingual/BusinessImg.vue";
 import { isOverseas } from "@/utils/version";
+import { message } from "ant-design-vue";
 const dom: Ref<HTMLDivElement> = ref(null) as any;
 
 const props = defineProps({
@@ -115,14 +126,31 @@ const props = defineProps({
     pageType: {
         type: String,
         default: ""
+    },
+    dataType: {
+        type: Number,
+        default: 0
+    },
+    // 图片数量限制
+    maxCount: {
+        type: Number
     }
 });
 // 动态解析props
-const { photo, photos, isMultiple, disabled } = toRefs(props);
+const { photo, isMultiple, disabled } = toRefs(props);
+
+const photos = defineModel<any>("photos", {
+    type: Array,
+    default: []
+});
 
 const emit = defineEmits(["update:photo", "update:photos"]);
 const onEdit = (result: any) => {
-    if (isMultiple.value == true) {
+    if (props.maxCount && photos.value?.length + result.length > props.maxCount) {
+        message.error(`图片数量不能超过${props.maxCount}张`);
+        return;
+    }
+    if (isMultiple.value) {
         let _photos = photos.value || [];
         emit("update:photos", _photos.concat(result));
     } else {
@@ -131,9 +159,7 @@ const onEdit = (result: any) => {
 };
 
 const removePic = (index: number) => {
-    let _photos = photos.value;
-    _photos.splice(<any>index, 1);
-    emit("update:photos", _photos);
+    photos.value.splice(<any>index, 1);
 };
 const removeGallery = () => {
     emit("update:photo", "");
@@ -217,17 +243,20 @@ const previewPhoto = (v: any) => {
             font-size: 12px;
         }
     }
+    .left {
+        left: -10px !important;
+    }
 }
 
 .gallery-pic-select .item-img {
     display: block;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #f5f6f9;
 }
 
 .gallery-img {
@@ -308,7 +337,7 @@ const previewPhoto = (v: any) => {
 }
 
 .gallery-pic-select .add-photo-btn:hover {
-    background: #fff;
+    // background: #fff;
     border-color: var(--tig-primary);
     color: var(--tig-primary);
     .remove-btn {

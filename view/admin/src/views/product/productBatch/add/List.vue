@@ -108,7 +108,7 @@ const onSubmit = async () => {
     await formRef.value.validate();
     try {
         const result = await productBatchModifySubmit({ ...formState });
-        message.success("操作成功");
+        message.success(result.msg);
     } catch (error: any) {
         message.error(error.message);
     }

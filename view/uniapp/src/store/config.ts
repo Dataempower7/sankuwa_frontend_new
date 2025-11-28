@@ -236,9 +236,9 @@ export const useConfigStore = defineStore("config", {
             }
         },
         setH5Config() {
-            if (this.poweredByStatus != 1) {
-                this.baseInfo.shopTitle += "-powered by tigshop";
-            }
+            // if (this.poweredByStatus != 1) {
+            //     this.baseInfo.shopTitle += "-powered by tigshop";
+            // }
             const metaDescription = document.querySelector('meta[name="description"]');
             if (metaDescription) {
                 metaDescription.setAttribute("content", this.baseInfo.shopDesc);

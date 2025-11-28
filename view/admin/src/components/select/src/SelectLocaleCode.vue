@@ -16,7 +16,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, defineModel, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { message } from "ant-design-vue";
 import { getLocalesRelationConfig } from "@/api/multilingual/verbalAssociation";
 

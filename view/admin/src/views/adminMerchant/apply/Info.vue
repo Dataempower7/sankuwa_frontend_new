@@ -7,11 +7,11 @@
                     <el-tab-pane v-if="formState.type==2" :key="2" :label="'企业信息'" name="company"></el-tab-pane>
                     <el-tab-pane :key="3" :label="formState.type==1?'个人信息':'法人代表信息'" name="base"></el-tab-pane>
                     <el-tab-pane :key="4" label="商户信息" name="merchant"></el-tab-pane>
-                    <el-tab-pane :key="5" label="店铺信息" name="shop"></el-tab-pane>
+                    <el-tab-pane :key="5" :label="`${shopTypeName}信息`" name="shop"></el-tab-pane>
                 </el-tabs>
                 <el-form v-if="!loading" ref="formRef" :model="formState" label-width="auto">
                     <template v-if="activeKey=='sm'">
-                        <el-form-item label="预期店铺名称">
+                        <el-form-item :label="`预期${shopTypeName}名称`">
                             <div class="width100"> {{ formState.shopData.shopTitle }}</div>
                         </el-form-item>
                         <el-form-item label="入驻资质" prop="status">
@@ -180,7 +180,7 @@
                         </el-form-item>
                     </template>
                     <template v-if="activeKey=='shop'">
-                        <el-form-item label="店铺名称">
+                        <el-form-item :label="`${shopTypeName}名称`">
                             <div class="width100"> {{ formState.shopData.shopTitle }}</div>
                         </el-form-item>
                         <el-form-item label="联系电话">
@@ -188,14 +188,14 @@
                                 <MobileCard  :mobile="formState.shopData.contactMobile"></MobileCard>
                             </div>
                         </el-form-item>
-                        <el-form-item label="店铺logo">
+                        <el-form-item :label="`${shopTypeName}logo`">
                             <div class="width100">
                                 <template v-if="formState.shopData.shopLogo?.length>0">
                                     <el-image :src="imageFormat(formState.shopData.shopLogo[0].picUrl)" class="image-size" fit="cover" @click="showImage(imageFormat(formState.shopData.shopLogo[0].picUrl))"></el-image>
                                 </template>
                             </div>
                         </el-form-item>
-                        <el-form-item v-if="formState.shopData.description" label="店铺简介">
+                        <el-form-item v-if="formState.shopData.description" :label="`${shopTypeName}简介`">
                             <div class="width100"> {{ formState.shopData.description }}</div>
                         </el-form-item>
                     </template>
@@ -227,6 +227,8 @@ import { auditApply, getApply } from "@/api/adminMerchant/apply";
 import { imageFormat } from "@/utils/format";
 import StatusDot from "@/components/form/src/StatusDot.vue";
 import MobileCard from "@/components/list/src/MobileCard.vue";
+import { isStore } from "@/utils/version";
+const shopTypeName = isStore() ? "门店" : "店铺";
 // 父组件回调
 const emit = defineEmits(["submitCallback", "update:confirmLoading", "close"]);
 const activeKey = ref<string>("sm");
@@ -327,7 +329,7 @@ const open = (result:any) => {
     }
   )
     .then(() => {
-        router.push({ path: '/shop/merchant-list' });
+        router.push({ path: '/organize/merchant-list' });
         emit("submitCallback", result);
     })
     .catch(() => {

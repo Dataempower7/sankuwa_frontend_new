@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import '@/style/css/list.less'
-import { ref, reactive, onMounted, defineModel } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { message } from 'ant-design-vue'
 import type {groupFilterState, groupFilterParams} from "@/types/salesman/subgroup.d";
 import {getgroupList} from "@/api/salesman/subgroup";

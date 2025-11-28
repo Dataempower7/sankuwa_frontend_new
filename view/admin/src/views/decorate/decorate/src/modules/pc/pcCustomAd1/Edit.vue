@@ -22,7 +22,7 @@
                 <div class="title">中间每日推荐</div>
             </div>
             <div class="dec-edit-group-desc">
-                <div class="pic-change-desc">建议尺寸：第一张图500*720像素，其余四张180*180像素</div>
+                <div class="pic-change-desc">建议尺寸：第一张图500*720像素，其余三张180*180像素</div>
             </div>
             <div class="dec-edit-group-con">
                 <PicList :isMultiple="true" v-model:photos="module.picList2" :showDesc="true"></PicList>
@@ -44,7 +44,7 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from '@/components/decorate'
-import { ref, defineModel } from 'vue';
+import { ref } from 'vue';
 import { ModuleType, PcCustomAd1Type } from '@/types/decorate/decorate.d';
 const module = defineModel<ModuleType & PcCustomAd1Type>('module', {default: () => ({})});
 </script>

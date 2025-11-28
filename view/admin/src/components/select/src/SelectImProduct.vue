@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import "@/style/css/list.less";
-import { onMounted, reactive, defineModel, ref, inject } from "vue";
+import { onMounted, reactive, ref, inject } from "vue";
 import { message } from "ant-design-vue";
 import { imageFormat, priceFormat } from "@/utils/format";
 import { Pagination } from "@/components/list";

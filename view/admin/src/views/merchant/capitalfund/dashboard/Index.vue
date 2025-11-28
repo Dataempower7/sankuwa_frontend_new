@@ -8,16 +8,22 @@
                             <div class="overview">
                                 <div class="tit-box" @click="displayAmount = !displayAmount">
                                     账户概览
-                                    <el-icon v-if="displayAmount"><View /></el-icon>
-                                    <el-icon v-else><Hide /></el-icon>
+                                    <el-icon v-if="displayAmount">
+                                        <View />
+                                    </el-icon>
+                                    <el-icon v-else>
+                                        <Hide />
+                                    </el-icon>
                                 </div>
                                 <div class="money-tit">
-                                    可用店铺余额(元)
+                                    可用{{ getShopType() === 2 ? "门店" : "店铺" }}余额(元)
                                     <el-tooltip placement="right" effect="light">
                                         <template #content>
                                             <div class="tooltip-width">订单结算完成的入账金额，可用于商家日常经营收支、核心经营场景</div>
                                         </template>
-                                        <el-icon><QuestionFilled /></el-icon>
+                                        <el-icon>
+                                            <QuestionFilled />
+                                        </el-icon>
                                     </el-tooltip>
                                 </div>
                                 <div class="money-box-a">
@@ -38,11 +44,14 @@
                                             <template #content>
                                                 <div class="tooltip-width">交易未完成的订单总额，消费者确认收货后将自动转入店铺余额</div>
                                             </template>
-                                            <el-icon><QuestionFilled /></el-icon>
+                                            <el-icon>
+                                                <QuestionFilled />
+                                            </el-icon>
                                         </el-tooltip>
                                     </div>
                                     <div class="money-box-b">
-                                        <span v-if="displayAmount">{{ priceFormat(accountData.unSettlementMoney) || 0.0 }}</span>
+                                        <span v-if="displayAmount">{{ priceFormat(accountData.unSettlementMoney) || 0.0
+                                            }}</span>
                                         <span v-else>******</span>
                                         <!-- <el-icon><ArrowRightBold /></el-icon> -->
                                     </div>
@@ -54,11 +63,14 @@
                                             <template #content>
                                                 <div class="tooltip-width">提现中或者退款中的冻结金额</div>
                                             </template>
-                                            <el-icon><QuestionFilled /></el-icon>
+                                            <el-icon>
+                                                <QuestionFilled />
+                                            </el-icon>
                                         </el-tooltip>
                                     </div>
                                     <div class="money-box-b">
-                                        <span v-if="displayAmount">{{ priceFormat(accountData.frozenMoney) || 0.0 }}</span>
+                                        <span v-if="displayAmount">{{ priceFormat(accountData.frozenMoney) || 0.0
+                                            }}</span>
                                         <span v-else>******</span>
                                         <!-- <el-icon><ArrowRightBold /></el-icon> -->
                                     </div>
@@ -68,7 +80,8 @@
                         <div class="card-box">
                             <div class="overview">
                                 <div class="tit-box">账户信息</div>
-                                <div class="money-tit">用户名：{{ accountData.merchant?.companyName || accountData.merchant?.corporateName }}</div>
+                                <div class="money-tit">用户名：{{ accountData.merchant?.companyName ||
+                                    accountData.merchant?.corporateName }}</div>
                                 <div class="money-tit">
                                     银行卡：{{ accountData.cardCount }}张
                                     <router-link :to="{ path: '/account/list' }">
@@ -77,7 +90,7 @@
                                 </div>
                             </div>
                             <el-divider />
-                            <div class="overview h150">
+                            <!-- <div class="overview h150">
                                 <div class="labels">
                                     <DialogForm
                                         :params="{ act: 'detail' }"
@@ -97,7 +110,7 @@
                                         </div>
                                     </DialogForm>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </a-spin>
@@ -122,20 +135,29 @@
                             <el-table-column label="变动时间" prop="addTime" width="160"></el-table-column>
                             <el-table-column label="变动余额资金">
                                 <template #default="{ row }">
-                                    <span v-if="row.type == 1" style="color: #0000ff">+{{ row.changeAmount }}</span>
-                                        <span v-else-if="row.type == 2" style="color: #ff0000">-{{ row.changeAmount }}</span>
-                                        <span v-else>{{ row.changeAmount }}</span>
-                                        <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newShopMoney }}）</span>
+                                    <!-- <span v-if="row.type == 1" style="color: #0000ff">+{{ row.changeAmount }}</span>
+                                    <span v-else-if="row.type == 2" style="color: #ff0000">-{{ row.changeAmount }}</span>
+                                    <span v-else>{{ row.changeAmount }}</span>
+                                    <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newShopMoney }}）</span> -->
+
+                                    <span v-if="row.newShopMoney - row.changeAmount > 0" style="color: #0000ff">+{{
+                                        (row.newShopMoney - row.changeAmount).toFixed(2) }}</span>
+                                    <span v-else-if="row.newShopMoney - row.changeAmount == 0">0</span>
+                                    <span v-else style="color: #ff0000">-{{ (row.changeAmount -
+                                        row.newShopMoney).toFixed(2) }}</span>
+                                    <span v-if="row.newShopMoney" style="color: #999; font-size: 12px">（变更后金额:{{
+                                        row.newShopMoney }}）</span>
                                 </template>
                             </el-table-column>
-                           <el-table-column label="变动冻结资金">
+                            <el-table-column label="变动冻结资金">
                                 <template #default="{ row }">
-                                    <span v-if="row.newFrozenMoney - row.frozenMoney > 0" style="color: #0000ff"
-                                        >+{{ row.newFrozenMoney - row.frozenMoney }}</span
-                                    >
-                                    <span v-else-if="row.newFrozenMoney - row.frozenMoney == 0">{{ row.frozenMoney }}</span>
-                                    <span v-else style="color: #ff0000">-{{ row.frozenMoney - row.newFrozenMoney }}</span>
-                                    <span v-if="row.newFrozenMoney" style="color: #999; font-size: 12px">（变更后金额:{{ row.newFrozenMoney }}）</span>
+                                    <span v-if="row.newFrozenMoney - row.frozenMoney > 0" style="color: #0000ff">+{{
+                                        (row.newFrozenMoney - row.frozenMoney).toFixed(2) }}</span>
+                                    <span v-else-if="row.newFrozenMoney - row.frozenMoney == 0">0</span>
+                                    <span v-else style="color: #ff0000">-{{ (row.frozenMoney -
+                                        row.newFrozenMoney).toFixed(2) }}</span>
+                                    <span v-if="row.newFrozenMoney" style="color: #999; font-size: 12px">（变更后金额:{{
+                                        row.newFrozenMoney }}）</span>
                                 </template>
                             </el-table-column>
                             <!-- <el-table-column label="变动余额资金">
@@ -165,7 +187,8 @@
                         </el-table>
                     </a-spin>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -185,6 +208,8 @@ import { priceFormat } from "@/utils/format";
 import { DialogForm } from "@/components/dialog";
 import { useRouter } from "vue-router";
 import { View, Hide, QuestionFilled, ArrowRightBold, Tickets, ArrowRight } from "@element-plus/icons-vue";
+import { getShopType } from "@/utils/storage";
+
 // 路由
 const router = useRouter();
 const config: any = useConfigStore();
@@ -232,25 +257,32 @@ onMounted(() => {
 .tooltip-width {
     width: 250px;
 }
+
 .card-warp {
     justify-content: space-between;
     margin-bottom: 10px;
+
     .card-box {
         background-color: #fff;
+
         &:first-child {
             width: 70%;
             margin-right: 10px;
         }
+
         &:last-child {
             width: 30%;
         }
+
         :deep(.el-divider--horizontal) {
             margin: 20px 0 !important;
         }
+
         .overview {
             padding: 0 20px;
             height: 180px;
             position: relative;
+
             .tit-box {
                 margin-top: 20px;
                 font-size: 16px;
@@ -259,11 +291,13 @@ onMounted(() => {
                 margin-bottom: 20px;
                 display: flex;
                 align-items: center;
+
                 :deep(.el-icon) {
                     margin-left: 8px;
                     color: #c8c9cc;
                 }
             }
+
             .money-tit {
                 font-size: 14px;
                 color: #646566;
@@ -271,16 +305,19 @@ onMounted(() => {
                 margin-bottom: 10px;
                 display: flex;
                 align-items: center;
+
                 :deep(.el-icon) {
                     margin-left: 8px;
                     margin-top: 1px;
                     color: #c8c9cc;
                 }
+
                 :deep(.el-button) {
                     margin-left: 8px;
                     margin-top: 1px;
                 }
             }
+
             .money-box-a {
                 font-size: 26px;
                 line-height: 36px;
@@ -288,6 +325,7 @@ onMounted(() => {
                 font-weight: 700;
                 display: flex;
                 align-items: center;
+
                 :deep(.el-icon) {
                     font-size: 14px;
                     margin-left: 8px;
@@ -295,10 +333,12 @@ onMounted(() => {
                     color: #c8c9cc;
                 }
             }
+
             .btn {
                 position: absolute;
                 bottom: 0px;
             }
+
             .money-box-b {
                 font-size: 20px;
                 line-height: 28px;
@@ -306,6 +346,7 @@ onMounted(() => {
                 font-weight: 700;
                 display: flex;
                 align-items: center;
+
                 :deep(.el-icon) {
                     font-size: 14px;
                     margin-left: 8px;
@@ -313,12 +354,14 @@ onMounted(() => {
                     color: #c8c9cc;
                 }
             }
+
             .labels {
                 .label {
                     width: 60px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
+
                     .ico-box {
                         display: inline-block;
                         background-color: #6a92ff;
@@ -330,17 +373,21 @@ onMounted(() => {
                 }
             }
         }
+
         .h150 {
             height: 150px;
             margin-right: 80px;
         }
     }
 }
+
 .table-container {
     background-color: #fff;
     padding: 20px;
+
     .table-head {
         padding-bottom: 20px;
+
         span {
             display: inline-block;
             margin-right: 10px;

@@ -3,7 +3,7 @@
         <el-form-item label="属性模板" prop="type" class="inner-item">
             <el-space>
                 <el-select v-model="attrTplId" placeholder="请选择" clearable :disabled="disabled" style="width: 200px">
-                    <el-option v-for="item in <any>props.attrTplList" :label="item.tplName" :key="item.tplId" :value="item.tplId" />
+                    <el-option v-for="item in attrTplList" :label="item.tplName" :key="item.tplId" :value="item.tplId" />
                 </el-select>
             </el-space>
             <el-button :disabled="!attrTplId" @click="importAttrTpl" style="margin-left: 10px">确认导入</el-button>
@@ -14,7 +14,7 @@
                     <div class="title-box flex align-center">
                         <div class="label">属性名：</div>
                         <div class="tit-value">
-                            <BusinessData v-model:modelValue="item.attrName" width="300px" :disabled="disabled" :dataType="8"></BusinessData>
+                            <BusinessData v-model:modelValue="item.attrName" width="280px" :disabled="disabled" :dataType="8"></BusinessData>
                             <div v-if="!disabled" class="btn-remove3" @click="removeAttrList('normal', index)">
                                 <i class="iconfont icon-cha1"></i>
                             </div>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="attr-normal-value">
                         <el-space class="attr-row" v-for="(attr, idx) in item.attrList">
-                            <BusinessData v-model:modelValue="attr.attrValue" width="260px" :disabled="disabled" :dataType="8"></BusinessData>
+                            <BusinessData v-model:modelValue="attr.attrValue" width="310px" :disabled="disabled" :dataType="8"></BusinessData>
                         </el-space>
                     </div>
                 </div>
@@ -87,13 +87,22 @@
                                                 <div class="pic-select" v-if="!disabled">
                                                     <DialogForm type="gallery" @okCallback="addPic" :data="{ type: 'spe', index: index1, idx: index }">
                                                         <div class="pic-select-img">
-                                                            <img v-if="element.attrPicThumb" :src="imageFormat(element.attrPicThumb)" />
+                                                            <BusinessImg
+                                                                v-if="element.attrPicThumb"
+                                                                v-model:modelValue="element.attrPic"
+                                                                :picThumb="element.attrPicThumb"
+                                                                :dataId="element.attrPicId"
+                                                                :dataType="8"
+                                                            >
+                                                                <img :src="imageFormat(element.attrPicThumb)" />
+                                                            </BusinessImg>
                                                         </div>
                                                     </DialogForm>
                                                     <i
                                                         @click="removePic('spe', index1, index)"
                                                         v-if="element.attrPicThumb"
                                                         class="pic-select-del iconfont icon-cha"
+                                                        :class="{ left: isOverseas() }"
                                                     ></i>
                                                 </div>
                                             </div>
@@ -184,13 +193,14 @@
                                 {{ getAttrValue(row.attrs, attr.attrName) }}
                             </template>
                         </el-table-column>
-                        <el-table-column prop="skuPrice" label="一口价" width="150" fixed="right">
+                        <el-table-column prop="skuPrice" label="一口价" width="180">
                             <template #header>
                                 <el-tooltip effect="light" placement="top">
                                     <template #content>
                                         <div style="width: 100px; padding: 5px 10px">一口价会覆盖除属性价格外的所有价格，慎重设置</div>
                                     </template>
                                     <PopForm
+                                        v-if="!disabled || (getShopType() === 2 && (storeSettingInfo.storeAssignProductPrice === 1 || shopId))"
                                         :isDirect="true"
                                         :isHover="false"
                                         :max="100"
@@ -205,17 +215,51 @@
                                             <el-icon style="margin-left: 5px" size="14" color="#999"><QuestionFilled /></el-icon>
                                         </div>
                                     </PopForm>
+                                    <div v-else class="flex flex-align-center flex-justify-center">
+                                        <em class="red">*</em>
+                                        <div>一口价</div>
+                                        <el-icon style="margin-left: 5px" size="14" color="#999"><QuestionFilled /></el-icon>
+                                    </div>
                                 </el-tooltip>
                             </template>
                             <template #default="{ row, $index }">
                                 <el-form-item label="" :prop="`productList.${$index}.skuPrice`" :rules="[{ required: true, validator: validatePrice }]">
-                                    <PriceInput v-model:modelValue="row.skuPrice" :disabled="disabled"></PriceInput>
+                                    <PriceInput
+                                        v-model:modelValue="row.skuPrice"
+                                        :disabled="(getShopType() !== 2 && disabled) || (getShopType() === 2 && storeSettingInfo.storeAssignProductPrice === 0 && !shopId)"
+                                    ></PriceInput>
                                 </el-form-item>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="skuStock" label="库存" width="150" fixed="right">
+                        <el-table-column prop="purchasePrice" label="进货价" width="180">
                             <template #header>
                                 <PopForm
+                                    v-if="!disabled"
+                                    :isDirect="true"
+                                    :isHover="false"
+                                    :max="100"
+                                    type="decimal"
+                                    v-model:org-value="batchInput.purchasePrice"
+                                    @callback="onBatchClick"
+                                    label="进货价"
+                                >
+                                    <div class="flex flex-align-center flex-justify-center">进货价</div>
+                                </PopForm>
+                                <div v-else class="flex flex-align-center flex-justify-center">进货价</div>
+                            </template>
+                            <template #default="{ row, $index }">
+                                <el-form-item label="" :prop="`productList.${$index}.purchasePrice`" :rules="[{ validator: validatePurchasePrice }]">
+                                    <PriceInput
+                                        v-model:modelValue="row.purchasePrice"
+                                        :disabled="disabled"
+                                    ></PriceInput>
+                                </el-form-item>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="skuStock" label="库存" width="150">
+                            <template #header>
+                                <PopForm
+                                    v-if="!disabled || (getShopType() === 2 && storeSettingInfo.storeUseSoloProductStock === 1 || shopId)"
                                     :isDirect="true"
                                     :isHover="false"
                                     :max="100"
@@ -225,16 +269,25 @@
                                 >
                                     <div class="flex flex-align-center flex-justify-center"><em class="red">*</em> 库存</div>
                                 </PopForm>
+                                <div v-else class="flex flex-align-center flex-justify-center"><em class="red">*</em> 库存</div>
                             </template>
                             <template #default="{ row, $index }">
                                 <el-form-item label="" :prop="`productList.${$index}.skuStock`" :rules="[{ required: true, validator: validateStock }]">
-                                    <TigInput type="integer" v-model="row.skuStock" :disabled="disabled" :min="0" />
+                                    <TigInput
+                                        type="integer"
+                                        v-model="row.skuStock"
+                                        :disabled="
+                                            (getShopType() !== 2 && disabled) || (getShopType() === 2 && storeSettingInfo.storeUseSoloProductStock === 0 && !shopId)
+                                        "
+                                        :min="0"
+                                    />
                                 </el-form-item>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="skuSn" label="商品编码" width="150" fixed="right">
+                        <el-table-column prop="skuSn" label="商品编码" width="180">
                             <template #header>
                                 <PopForm
+                                    v-if="!disabled"
                                     :isDirect="true"
                                     :isHover="false"
                                     :max="100"
@@ -244,14 +297,16 @@
                                 >
                                     <div class="flex flex-align-center flex-justify-center">商品编码</div>
                                 </PopForm>
+                                <div v-else class="flex flex-align-center flex-justify-center">商品编码</div>
                             </template>
                             <template #default="{ row, $index }">
                                 <TigInput v-model="row.skuSn" :disabled="disabled" />
                             </template>
                         </el-table-column>
-                        <el-table-column prop="skuTsn" label="商品条形码" width="150" fixed="right">
+                        <el-table-column prop="skuTsn" label="商品条形码" width="180">
                             <template #header>
                                 <PopForm
+                                    v-if="!disabled"
                                     :isDirect="true"
                                     :isHover="false"
                                     :max="100"
@@ -261,6 +316,7 @@
                                 >
                                     <div class="flex flex-align-center flex-justify-center">商品条形码</div>
                                 </PopForm>
+                                <div v-else class="flex flex-align-center flex-justify-center">商品条形码</div>
                             </template>
                             <template #default="{ row, $index }">
                                 <TigInput v-model="row.skuTsn" :disabled="disabled" />
@@ -293,6 +349,7 @@
 </template>
 
 <script setup lang="ts">
+import BusinessImg from "@/components/multilingual/BusinessImg.vue";
 import BusinessData from "@/components/multilingual/BusinessData.vue";
 import { PopForm } from "@/components/pop-form";
 import { Rank, QuestionFilled } from "@element-plus/icons-vue";
@@ -303,21 +360,28 @@ import { DialogForm } from "@/components/dialog";
 import request from "@/utils/request";
 import { imageFormat } from "@/utils/format";
 import PriceInput from "@/views/product/product/src/PriceInput.vue";
+import { getAdminType, getShopType } from "@/utils/storage";
+import { isOverseas } from "@/utils/version";
 const visible = ref(false);
 const props = defineProps({
     attrList: { type: Object, default: { normal: [], spe: [], extra: [] } },
     productList: { type: [Object, Array], default: [] },
     attrChanged: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    shopId: { type: String, default: "" },
     action: { type: String, default: "add" },
     attrTplList: {
         type: Array
+    },
+    storeSettingInfo: {
+        type: Object,
+        default: {}
     }
 });
 const productFormRef = ref();
-const skuErrorText = ref("");
 const dialogTitle = ref("");
-const emit = defineEmits(["update:productList", "update:attrList", "update:attrChanged", "update:skuErrorText"]);
+const skuErrorText = defineModel<string>("skuErrorText", { default: "" });
+const emit = defineEmits(["update:productList", "update:attrList", "update:attrChanged"]);
 
 const typeId = {
     normal: 0,
@@ -382,6 +446,19 @@ const validatePrice = (rule: any, value: any, callback: any) => {
         callback();
     }
 };
+const validatePurchasePrice = (rule: any, value: any, callback: any) => {
+    const index = rule.field.split(".")[1];
+    let purchasePrice = productList.value[index].purchasePrice;
+    // 进货价是可选的，如果填写了则验证格式
+    if (purchasePrice !== null && purchasePrice !== undefined && purchasePrice !== '') {
+        let price = Number(purchasePrice);
+        if (isNaN(price) || price < 0) {
+            callback(new Error("进货价格式不正确"));
+            return;
+        }
+    }
+    callback();
+};
 const validateProductSku = async () => {
     await productFormRef.value.validate();
 };
@@ -430,6 +507,7 @@ const addAttrSpeList = (type: string) => {
 };
 // 添加图片
 const addPic = (result: any, data: any) => {
+    attrList.value[data.type][data.index].attrList[data.idx].attrPicId = result[0].picId;
     attrList.value[data.type][data.index].attrList[data.idx].attrPic = result[0].picUrl;
     attrList.value[data.type][data.index].attrList[data.idx].attrPicThumb = result[0].picThumb;
 };
@@ -437,6 +515,7 @@ const addPic = (result: any, data: any) => {
 const removePic = (type: string, index: number, idx: number) => {
     attrList.value[type][index].attrList[idx].attrPic = "";
     attrList.value[type][index].attrList[idx].attrPicThumb = "";
+    attrList.value[type][index].attrList[idx].attrPicId = "";
 };
 //导入模板
 const importAttrTpl = () => {
@@ -475,6 +554,7 @@ const onBatchClick = () => {
         if (batchInput.value.skuSn) productList.value[index].skuSn = batchInput.value.skuSn + "-" + i;
         if (batchInput.value.skuTsn) productList.value[index].skuTsn = batchInput.value.skuTsn + "-" + i;
         if (batchInput.value.skuPrice) productList.value[index].skuPrice = batchInput.value.skuPrice;
+        if (batchInput.value.purchasePrice) productList.value[index].purchasePrice = batchInput.value.purchasePrice;
         i++;
     }
 };
@@ -520,9 +600,6 @@ const getProductForm = () => {
         };
         let arr = [];
         for (let i in list[idx]) {
-            // if (list[idx][i].attrName == "") {
-            //     continue;
-            // }
             res[idx].attrs[i] = {
                 attrName: list[idx][i].attrName,
                 attrValue: list[idx][i].attrValue
@@ -533,8 +610,6 @@ const getProductForm = () => {
             res[idx].skuStock = res[idx].skuStock;
         }
         res[idx].skuValue = arr.join("|");
-        // console.log("处理后：", res[idx]);
-        // console.log("接口返回的数据第一条：", productList.value[0]);
         // 匹配已存在的值
         const match = productList.value.find((item: any) => {
             return res[idx].skuValue == item.skuValue;
@@ -544,6 +619,7 @@ const getProductForm = () => {
             res[idx].skuSn = match.skuSn;
             res[idx].skuTsn = match.skuTsn;
             res[idx].skuPrice = match.skuPrice;
+            res[idx].purchasePrice = match.purchasePrice;
         }
     }
     // 用于匹配修改后的值
@@ -863,7 +939,6 @@ defineExpose({ skuErrorText, validateProductSku });
     border-radius: 2px;
     cursor: pointer;
     position: relative;
-    overflow: hidden;
 }
 
 .pic-select-con :deep(.pic-select-img:after) {
@@ -895,6 +970,9 @@ defineExpose({ skuErrorText, validateProductSku });
     line-height: 16px;
     font-size: 12px;
     display: none;
+}
+.pic-select-con :deep(.pic-select .left) {
+    left: -8px !important;
 }
 
 .pic-select-con:hover :deep(.pic-select .pic-select-del) {

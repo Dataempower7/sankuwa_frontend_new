@@ -43,5 +43,3 @@ export interface ProductGroupFormState {
     productIds?: number[];
 }
 
-
-

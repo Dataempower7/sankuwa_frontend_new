@@ -1,5 +1,12 @@
 import request from "@/utils/request";
-import type { ProductGroupFilterParams, ProductGroupFilterResult, ProductGroupFormState, ProductGroupSearchFilterResult } from "@/types/product/productGroup";
+import {
+    ProductGroupFilterParams,
+    ProductGroupFilterResult,
+    ProductGroupFilterState,
+    ProductGroupFormState,
+    ProductGroupSearchFilterResult
+} from "@/types/product/productGroup";
+import type { BrandSearchFilterResult } from "@/types/product/brand";
 
 // 获取商品分类列表
 export const getProductGroupList = (params: ProductGroupFilterParams) => {
@@ -58,5 +65,13 @@ export const updateProductGroupField = (data: object) => {
         url: "product/productGroup/updateField",
         method: "post",
         data
+    });
+};
+
+// 获取商品分组列表
+export const getProductGroupClientList = () => {
+    return request<ProductGroupFilterState[]>({
+        url: "product/productGroup/clientList",
+        method: "get"
     });
 };

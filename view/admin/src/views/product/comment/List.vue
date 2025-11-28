@@ -90,7 +90,7 @@
                                                 <Image :src="imageFormat(row.picThumb)" class="image-style shopPics" fit="contain" />
                                             </div>
                                             <div class="text_comment multiline_hiding">
-                                                <a :href="urlFormat({ path: 'product', id: row.productId })" target="_blank"> {{ row.productName }} </a>
+                                                <a :href="urlFormat({ path: 'product', sn: row.productSn })" target="_blank"> {{ row.productName }} </a>
                                             </div>
                                         </div>
                                     </template>

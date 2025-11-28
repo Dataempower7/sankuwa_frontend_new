@@ -3,18 +3,20 @@
         <div class="content_wrapper">
             <div class="tit-box">
                 <div class="tit">
-                    <span>店铺余额</span>
+                    <span>{{ getShopType() === 2 ? "门店" : "店铺" }}余额</span>
                 </div>
             </div>
             <div class="balance-box flex-wrap">
                 <div class="label">
                     <div class="title">
-                        可用店铺余额(元)
+                        可用{{ getShopType() === 2 ? "门店" : "店铺" }}余额(元)
                         <el-tooltip placement="bottom" effect="light">
                             <template #content>
-                                <div class="tooltip-width">可用店铺余额</div>
+                                <div class="tooltip-width">可用{{ getShopType() === 2 ? "门店" : "店铺" }}余额</div>
                             </template>
-                            <el-icon><QuestionFilled /></el-icon>
+                            <el-icon>
+                                <QuestionFilled />
+                            </el-icon>
                         </el-tooltip>
                         <!-- <router-link :to="{ path: '/capitalfund/account/list' }">
                             <el-button type="primary" link>充值记录</el-button>
@@ -35,7 +37,9 @@
                             <template #content>
                                 <div class="tooltip-width">交易未完成的订单总额，消费者确认收货后将自动转入店铺余额</div>
                             </template>
-                            <el-icon><QuestionFilled /></el-icon>
+                            <el-icon>
+                                <QuestionFilled />
+                            </el-icon>
                         </el-tooltip>
                         <el-button type="primary" link @click="onTabChange(99)">明细</el-button>
                     </div>
@@ -50,7 +54,9 @@
                             <template #content>
                                 <div class="tooltip-width">提现中或者退款中的冻结店铺余额</div>
                             </template>
-                            <el-icon><QuestionFilled /></el-icon>
+                            <el-icon>
+                                <QuestionFilled />
+                            </el-icon>
                         </el-tooltip>
                     </div>
                     <div class="num">
@@ -73,9 +79,10 @@
                     <el-tab-pane v-for="item in orderStatusList" :label="item.label" :name="item.value"></el-tab-pane>
                 </el-tabs>
                 <div class="table-container">
-                    <el-table :data="filterState" :loading="loading" :total="total" row-key="logId" v-loading="tableLoading">
+                    <el-table :data="filterState" :loading="loading" :total="total" row-key="logId"
+                        v-loading="tableLoading">
                         <el-table-column label="时间" prop="addTime" width="160"></el-table-column>
-<!--                        <el-table-column label="名称" prop="productName" width="160"></el-table-column>-->
+                        <!--                        <el-table-column label="名称" prop="productName" width="160"></el-table-column>-->
                         <el-table-column label="订单编号" prop="orderSn" width="160"></el-table-column>
                         <el-table-column label="金额(元)|明细">
                             <template #default="{ row }">
@@ -93,16 +100,9 @@
                         <el-table-column label="状态" prop="orderStatusName" width="120"></el-table-column>
                         <el-table-column label="操作" width="80">
                             <template #default="{ row }">
-                                <DialogForm
-                                    :params="{ act: 'detail', id: row.orderId }"
-                                    :showClose="false"
-                                    :showOnOk="false"
-                                    :title="'订单详情 ' + row.orderSn"
-                                    isDrawer
-                                    path="order/order/Info"
-                                    width="880px"
-                                    @callback="loadFilter"
-                                >
+                                <DialogForm :params="{ act: 'detail', id: row.orderId }" :showClose="false"
+                                    :showOnOk="false" :title="'订单详情 ' + row.orderSn" isDrawer path="order/order/Info"
+                                    width="880px" @callback="loadFilter">
                                     <el-button size="small" link type="primary"> 查看详情 </el-button>
                                 </DialogForm>
                             </template>
@@ -114,7 +114,8 @@
                         </template>
                     </el-table>
                     <div v-if="total > 0" class="pagination-con">
-                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total" @callback="loadFilter" />
+                        <Pagination v-model:page="filterParams.page" v-model:size="filterParams.size" :total="total"
+                            @callback="loadFilter" />
                     </div>
                 </div>
             </div>
@@ -136,6 +137,8 @@ import { AccountFormState } from "@/types/merchant/capitalfund/dashboard.d";
 import { priceFormat } from "@/utils/format";
 import { getOrderList } from "@/api/order/order";
 import { OrderFilterParams } from "@/types/order/order.d";
+import { getShopType } from "@/utils/storage";
+
 
 // 基本参数定义
 const orderStatusList = reactive([
@@ -205,6 +208,7 @@ const onTabChange = (e: number) => {
 .content_wrapper {
     background-color: #fff;
     padding: 20px;
+
     .tit-box {
         display: flex;
         align-items: center;
@@ -212,12 +216,14 @@ const onTabChange = (e: number) => {
         background-color: #f5f6fa;
         padding: 10px;
         margin-bottom: 20px;
+
         .tit {
             border-left: 3px solid #155bd4;
             padding-left: 10px;
             font-size: 14px;
         }
     }
+
     .balance-box {
         display: flex;
         align-items: center;
@@ -226,31 +232,38 @@ const onTabChange = (e: number) => {
         padding: 10px;
         margin-bottom: 20px;
         font-size: 14px;
+
         .label {
             padding: 28px;
+
             .title {
                 margin-bottom: 26px;
                 display: flex;
                 align-items: center;
+
                 :deep(.el-icon) {
                     margin-left: 5px;
                     color: #333;
                 }
             }
+
             .num {
                 font-size: 24px;
                 font-weight: 500;
             }
         }
     }
+
     :deep(.el-tabs--card) {
         .el-tabs__header .el-tabs__item {
             background-color: #f5f6fa;
         }
+
         .el-tabs__header .el-tabs__item.is-active {
             background-color: #fff;
             color: #333;
         }
+
         .el-tabs__header .el-tabs__nav {
             overflow: hidden;
         }

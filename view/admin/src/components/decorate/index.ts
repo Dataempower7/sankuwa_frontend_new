@@ -7,3 +7,4 @@ export { default as ProductSelect } from "./src/ProductSelect.vue";
 export { default as ProductInfoSelect } from "./src/ProductInfoSelect.vue";
 export { default as ProductTagSelect } from "./src/ProductTagSelect.vue";
 export { default as ProductGroupSelect } from "./src/ProductGroupSelect.vue";
+export { default as buyShowProductGroupSelect } from "./src/buyShowProductGroupSelect.vue";

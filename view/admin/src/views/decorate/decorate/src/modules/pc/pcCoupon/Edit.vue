@@ -10,7 +10,6 @@
 </template>
 <script lang="ts" setup>
 import { PicList } from "@/components/decorate";
-import { ref, defineModel } from "vue";
 import { ModuleType } from "@/types/decorate/decorate.d";
 const module = defineModel<ModuleType>("module", { default: () => ({}) });
 </script>

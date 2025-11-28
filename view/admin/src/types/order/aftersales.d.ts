@@ -24,6 +24,7 @@ export interface AftersalesFilterResult {
 // 获取详情返回参数类型
 export interface AftersalesFilterState {
     aftersaleId?: number;
+    vendorId?: number;
     aftersalesSn?: number;
     orderSn?: number;
     orderItemId?: number;
@@ -70,6 +71,8 @@ export interface FormState {
     logisticsName?:string;
     number:number;
     modifyNumber?:number;
+    shopId?:number;
+    vendorId?:number;
     orderId?:number;
     orderItemId?:number;
     orderSn?:string;
@@ -102,6 +105,8 @@ export interface aftersalesLog {
 	refundDesc?: string;
 	userName?: string;
 	returnPic: returnPic[];
+    shopId:number;
+    vendorId:number;
 }
 
 export interface returnPic {
