@@ -25,6 +25,7 @@
         "distribute" : {
             /* android打包配置 */
             "android" : {
+                "packagename" : "com.sankuwa.app",
                 "permissions" : [
                     "<uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>",
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
@@ -87,6 +88,12 @@
                 "payment" : {
                     "alipay" : {
                         "__platform__" : [ "ios", "android" ]
+                    }
+                },
+                "maps" : {
+                    "amap" : {
+                        "appkey_android" : "8e740eb1b4364590f521e596b8ffb260",
+                        "appkey_ios" : "请替换为您的iOS Key"
                     }
                 }
             },
@@ -192,7 +199,16 @@
                 "enable" : true
             }
         },
-        "title" : "sankuwa"
+        "title" : "sankuwa",
+        "sdkConfigs" : {
+            "maps" : {
+                "amap" : {
+                    "key" : "bd417a40083bd4d3dfd2e81de034c248",
+                    "securityJsCode" : "49ecf7a5408077f663b895c5b5b1f73a",
+                    "serviceHost" : ""
+                }
+            }
+        }
     },
     "vueVersion" : "3",
     "locale" : "auto",

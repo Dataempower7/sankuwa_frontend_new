@@ -169,8 +169,14 @@
                 </view>
 
                  <!-- AI浮动按钮 -->
-                <view class="ai-float-button" @click="goToAI" style="position: fixed; right: 10rpx; top: 62%; transform: translateY(-50%); z-index: 999;">
-                    <image class="ai-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202511/17633605914a9ybDSUc9ZjgiCO1i.jpeg" style="width: 80rpx; height: 80rpx; border-radius: 50%; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);" mode="aspectFill" />
+                <view 
+                    class="ai-float-button" 
+                    :class="{ 'ai-expanded': isAiExpanded }"
+                    @click="handleAiClick" 
+                    style="position: fixed; right: -40rpx; top: 62%; transform: translateY(-50%); z-index: 999; transition: right 0.3s ease;"
+                    :style="{ right: isAiExpanded ? '10rpx' : '-30rpx' }"
+                >
+                    <image class="ai-icon" src="https://sankuwa-image.oss-cn-hangzhou.aliyuncs.com/img/gallery/202511/1764310710VCaO0ohUR4xnQbY6cB.jpeg" style="width: 60rpx; height: 60rpx; border-radius: 50%; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);" mode="aspectFill" />
                 </view>
                 
 
@@ -1218,6 +1224,24 @@ const goToSettings = () => {
         url: '/pages/user/profile/index'
     });
     closeSidebar();
+};
+
+// AI按钮展开状态
+const isAiExpanded = ref(false);
+
+// 处理AI按钮点击
+const handleAiClick = () => {
+    if (!isAiExpanded.value) {
+        // 第一次点击：展开按钮
+        isAiExpanded.value = true;
+        // 3秒后自动收起
+        setTimeout(() => {
+            isAiExpanded.value = false;
+        }, 3000);
+    } else {
+        // 已展开状态：跳转到AI页面
+        goToAI();
+    }
 };
 
 // 跳转到AI页面

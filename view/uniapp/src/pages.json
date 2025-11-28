@@ -632,5 +632,5 @@
             "loading-box": "@/components/loading-box/loading-box.vue",
             "empty-box": "@/components/empty-box/empty-box.vue"
         }
-    }
+	}
 }
