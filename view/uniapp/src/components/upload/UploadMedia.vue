@@ -36,11 +36,9 @@ import { defineProps, ref } from "vue";
 import { baseUrl, getSecret } from "@/utils/request";
 import { imageFormat } from "@/utils/format";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
-// #ifdef APP-PLUS
 import { requestPhotosPermission } from "@/utils/appPermission";
 import TigImage from "@/components/tig/tig-image/tig-image.vue";
-// #endif
+const { t } = useI18n();
 
 interface MediaItem {
     type: "image" | "video";

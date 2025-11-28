@@ -96,10 +96,10 @@
             },
             "icons" : {
                 "android" : {
-                    "hdpi" : "",
-                    "xhdpi" : "",
-                    "xxhdpi" : "",
-                    "xxxhdpi" : ""
+                    "hdpi" : "/Users/zhangxinzheng/Desktop/72x72.png",
+                    "xhdpi" : "/Users/zhangxinzheng/Desktop/96x96.png",
+                    "xxhdpi" : "/Users/zhangxinzheng/Desktop/144x144.png",
+                    "xxxhdpi" : "/Users/zhangxinzheng/Desktop/192x192.png"
                 },
                 "ios" : {
                     "appstore" : "",

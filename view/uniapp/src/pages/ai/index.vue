@@ -133,6 +133,7 @@ import { ref, computed } from 'vue';
 import TigLayout from '@/components/tig/tig-layout/tig-layout.vue';
 import { useUserStore } from '@/store/user';
 import { imageFormat } from '@/utils/format';
+import { sendMessage as sendMessageApi, getHistory } from '@/api/ai/ai';
 
 const userStore = useUserStore();
 
@@ -177,7 +178,6 @@ const sendMessage = async () => {
     isLoading.value = true;
     
     try {
-        const { sendMessage: sendMessageApi } = await import('@/api/ai/ai');
         const response: any = await sendMessageApi(text);
         
         // 兼容多种响应格式
@@ -233,7 +233,6 @@ const createNew = () => {
 // 查看历史记录 - 打开弹窗
 const refresh = async () => {
     try {
-        const { getHistory } = await import('@/api/ai/ai');
         const response: any = await getHistory();
         
         // 兼容不同的响应格式
